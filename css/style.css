@@ -323,7 +323,13 @@ nav a:hover::after { transform: scaleX(1); }
   margin-bottom: var(--s5);
   letter-spacing: -.025em;
 }
-.hero-brand { letter-spacing: -.01em; }
+.hero-brand {
+  font-family: 'Cinzel Decorative', serif;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-shadow: 0 2px 24px rgba(0,0,0,.4);
+}
 .brand-red   { color: #ef4444; }
 .brand-white { color: #ffffff; }
 .brand-green { color: #4ade80; }
