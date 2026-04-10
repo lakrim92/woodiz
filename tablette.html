@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PANUOZZO" />
+  <meta name="theme-color" content="#1a6b4e" />
+  <link rel="manifest" href="/tablette-manifest.json" />
   <title>Tablette — PANUOZZO</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -331,6 +337,11 @@
 <audio id="notif-sound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA..." preload="auto"></audio>
 
 <script>
+  // ── Service Worker (PWA) ─────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/tablette-sw.js').catch(() => {});
+  }
+
   // ── Audio Context (débloqué après geste utilisateur) ─────
   let audioCtx = null;
   function unlockAudio() {
