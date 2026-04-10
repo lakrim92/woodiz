@@ -325,11 +325,10 @@ nav a:hover::after { transform: scaleX(1); }
   letter-spacing: -.025em;
 }
 .hero-content h1.hero-brand {
-  font-family: 'Almendra', serif !important;
-  font-weight: 700;
-  font-style: italic;
-  letter-spacing: .06em;
-  line-height: 1;
+  font-family: 'Great Vibes', cursive !important;
+  font-weight: 400;
+  letter-spacing: .04em;
+  line-height: 1.1;
   text-shadow: 0 2px 20px rgba(0,0,0,.4);
 }
 .brand-red   { color: #ef4444; }
