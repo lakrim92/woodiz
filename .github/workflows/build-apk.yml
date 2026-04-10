@@ -1,0 +1,75 @@
+name: Build APK Tablette
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:  # Lancement manuel possible
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Generate launcher icon from SVG
+        run: |
+          sudo apt-get install -y librsvg2-bin
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          rsvg-convert -w 72  -h 72  icon-512.svg -o android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+          rsvg-convert -w 96  -h 96  icon-512.svg -o android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+          rsvg-convert -w 144 -h 144 icon-512.svg -o android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+
+      - name: Make gradlew executable
+        working-directory: android
+        run: |
+          # Télécharger le gradle wrapper si absent
+          gradle wrapper --gradle-version 8.2 2>/dev/null || true
+          chmod +x gradlew 2>/dev/null || true
+
+      - name: Build Release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: panuozzo-tablette
+          path: android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-v${{ github.run_number }}
+          name: "PANUOZZO Tablette v${{ github.run_number }}"
+          body: |
+            ## 📲 Application tablette PANUOZZO
+
+            **Installation :**
+            1. Télécharger `panuozzo-tablette.apk`
+            2. Sur la tablette Android → Paramètres → Sécurité → Autoriser sources inconnues
+            3. Ouvrir le fichier APK et installer
+
+            **Fonctionnalités :**
+            - Commandes en temps réel
+            - Sonnerie automatique à chaque nouvelle commande
+            - Plein écran, orientation paysage
+            - Écran toujours allumé
+          files: android/app/build/outputs/apk/release/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,3 @@
+#!/bin/sh
+# Gradle wrapper stub — remplacé automatiquement par GitHub Actions
+exec gradle "$@"
