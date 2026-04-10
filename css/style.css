@@ -325,11 +325,12 @@ nav a:hover::after { transform: scaleX(1); }
   letter-spacing: -.025em;
 }
 .hero-content h1.hero-brand {
-  font-family: 'UnifrakturMaguntia', cursive !important;
-  font-weight: 400;
-  letter-spacing: .05em;
+  font-family: 'Almendra', serif !important;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: .06em;
   line-height: 1;
-  text-shadow: 0 2px 28px rgba(0,0,0,.5);
+  text-shadow: 0 2px 20px rgba(0,0,0,.4);
 }
 .brand-red   { color: #ef4444; }
 .brand-white { color: #ffffff; }
