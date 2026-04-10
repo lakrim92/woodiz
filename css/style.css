@@ -324,9 +324,10 @@ nav a:hover::after { transform: scaleX(1); }
   letter-spacing: -.025em;
 }
 .hero-brand {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
-  letter-spacing: .04em;
+  font-style: italic;
+  letter-spacing: .06em;
   line-height: 1;
   text-shadow: 0 2px 24px rgba(0,0,0,.4);
 }
