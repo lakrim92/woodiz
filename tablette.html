@@ -410,8 +410,12 @@
   };
 
   // ── SSE ───────────────────────────────────────────────────
+  let activeES = null;
   function initSSE() {
+    // Fermer l'ancienne connexion si elle existe (lifecycle Android)
+    if (activeES) { activeES.close(); activeES = null; }
     const es = new EventSource('/api/orders/stream');
+    activeES = es;
 
     es.addEventListener('init', e => {
       orders = JSON.parse(e.data);
@@ -421,6 +425,8 @@
 
     es.addEventListener('new-order', e => {
       const order = JSON.parse(e.data);
+      // Anti-doublon : ignorer si déjà dans la liste (connexions multiples WebView)
+      if (orders.find(o => o.id === order.id)) return;
       orders.unshift(order);
       render();
       playNotif();
