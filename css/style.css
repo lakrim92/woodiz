@@ -323,11 +323,17 @@ nav a:hover::after { transform: scaleX(1); }
   margin-bottom: var(--s5);
   letter-spacing: -.025em;
 }
-.hero-highlight {
-  background: linear-gradient(135deg, #fbbf24, #f97316);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.hero-brand { letter-spacing: -.01em; }
+.brand-red   { color: #ef4444; }
+.brand-white { color: #ffffff; }
+.brand-green { color: #4ade80; }
+
+.hero-tagline {
+  color: rgba(255,255,255,.88);
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: var(--s4);
+  letter-spacing: .01em;
 }
 .hero-desc {
   color: rgba(255,255,255,.7);

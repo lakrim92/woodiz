@@ -40,8 +40,9 @@ function updateStatut() {
 
   let isOpen = false;
 
-  if (day >= 1 && day <= 6) {
-    // Lun–Sam
+  // Lundi (day=1) : fermé toute la journée
+  if (day >= 2 && day <= 6) {
+    // Mar–Sam
     isOpen = (hm >= midi_open && hm < midi_close) || (hm >= soir_open && hm < soir_close);
   } else if (day === 0) {
     // Dimanche
@@ -51,11 +52,13 @@ function updateStatut() {
   if (isOpen) {
     el.innerHTML = '<span style="color:#4ade80;font-weight:700;">● Ouvert maintenant</span>';
   } else {
-    // Calcule prochaine ouverture
     let next = '';
-    if (day === 0 && hm < soir_open) next = 'Ouvre ce soir à 18h00';
-    else if (hm < midi_open && day >= 1 && day <= 6) next = 'Ouvre à 11h00';
-    else if (hm >= midi_close && hm < soir_open && day >= 1 && day <= 6) next = 'Ouvre à 18h00';
+    if (day === 1) next = 'Ouvre demain à 11h00';                                         // lundi → mardi
+    else if (day === 0 && hm < soir_open) next = 'Ouvre ce soir à 18h00';
+    else if (day === 0 && hm >= soir_close) next = 'Ouvre mardi à 11h00';                 // dim soir → skip lundi
+    else if (day === 6 && hm >= soir_close) next = 'Ouvre dimanche à 18h00';              // sam soir → dim
+    else if (hm < midi_open && day >= 2 && day <= 6) next = 'Ouvre à 11h00';
+    else if (hm >= midi_close && hm < soir_open && day >= 2 && day <= 6) next = 'Ouvre à 18h00';
     else next = 'Ouvre demain à 11h00';
     el.innerHTML = `<span style="color:#fbbf24;font-weight:700;">● Fermé — ${next}</span>`;
   }
@@ -363,6 +366,14 @@ function buildSelectHtml(id, label, options) {
 }
 
 function openFormuleModal(type) {
+  // Menu Midi : uniquement Mar–Sam 11h00–14h30
+  if (type === 'midi') {
+    const _n = new Date(), _day = _n.getDay(), _hm = _n.getHours() * 60 + _n.getMinutes();
+    if (_day === 0 || _day === 1 || _hm < 11 * 60 || _hm >= 14 * 60 + 30) {
+      alert('Le Menu Midi est disponible uniquement du mardi au samedi entre 11h00 et 14h30 🕚');
+      return;
+    }
+  }
   const pizzas   = getPizzaOptions();
   const panizzas = getPanizzaOptions();
   const bouteilles = [
@@ -442,20 +453,16 @@ function openFormuleModal(type) {
 
 function updateFormuleTotal() {
   if (!currentFormule) return;
-  let total = 0;
   const { type } = currentFormule;
+  let total = 0;
 
   if (type === 'gourmand') {
-    ['fg-p1','fg-p2','fg-p3','fg-boit'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (sel) total += parseFloat(sel.selectedOptions[0]?.dataset.price || 0);
-    });
+    total = 37.90;
   } else if (type === 'midi') {
     const isPizza = document.querySelector('[name="midi-plat-type"]:checked')?.value === 'pizza';
-    const selId = isPizza ? 'fm-pizza' : 'fm-panizza';
-    const sel = document.getElementById(selId);
-    if (sel) total += parseFloat(sel.selectedOptions[0]?.dataset.price || 0);
+    total = isPizza ? 12.90 : 9.90;
   } else if (type === 'exclusive') {
+    // 2 pizzas payées + 1 offerte — seules les 2 premières sont facturées
     const p1 = document.getElementById('fe-p1');
     const p2 = document.getElementById('fe-p2');
     if (p1) total += parseFloat(p1.selectedOptions[0]?.dataset.price || 0);
@@ -483,20 +490,23 @@ formuleConfirm.addEventListener('click', () => {
     ['fg-p1','fg-p2','fg-p3'].forEach((id, i) => {
       const sel = document.getElementById(id);
       const n   = sel?.value;
-      const p   = parseFloat(sel?.selectedOptions[0]?.dataset.price || 0);
       if (!n) { alert(`Veuillez choisir la pizza n°${i+1}`); throw new Error(); }
-      items.push({ name: n, price: p });
+      items.push({ name: n, price: 0 }); // prix réparti sur le forfait
     });
     const bSel = document.getElementById('fg-boit');
     if (!bSel?.value) { alert('Veuillez choisir votre bouteille'); return; }
-    items.push({ name: bSel.value, price: 4 });
+    items.push({ name: bSel.value, price: 0 });
+    // Prix fixe forfait Gourmand
+    items[0].price = 37.90;
   } else if (type === 'midi') {
     const isPizza = document.querySelector('[name="midi-plat-type"]:checked')?.value === 'pizza';
     const sel = document.getElementById(isPizza ? 'fm-pizza' : 'fm-panizza');
     if (!sel?.value) { alert('Veuillez choisir votre plat'); return; }
     const canSel = document.getElementById('fm-canette');
     if (!canSel?.value) { alert('Veuillez choisir votre canette'); return; }
-    items.push({ name: sel.value, price: parseFloat(sel.selectedOptions[0]?.dataset.price || 0) });
+    // Prix fixe : 12,90€ pizza / 9,90€ panizza — canette offerte incluse
+    const fixedPrice = isPizza ? 12.90 : 9.90;
+    items.push({ name: sel.value, price: fixedPrice });
     items.push({ name: `${canSel.value} (offerte)`, price: 0 });
   } else if (type === 'exclusive') {
     const p1 = document.getElementById('fe-p1');
@@ -504,7 +514,7 @@ formuleConfirm.addEventListener('click', () => {
     if (!p1?.value || !p2?.value) { alert('Veuillez choisir vos 2 pizzas'); return; }
     items.push({ name: p1.value, price: parseFloat(p1.selectedOptions[0]?.dataset.price || 0) });
     items.push({ name: p2.value, price: parseFloat(p2.selectedOptions[0]?.dataset.price || 0) });
-    items.push({ name: `${p1.value} (offerte)`, price: 0 });
+    items.push({ name: `${p1.value} (offerte 🎁)`, price: 0 });
   }
 
   const total = items.reduce((s, i) => s + i.price, 0);
