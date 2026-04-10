@@ -318,13 +318,14 @@ nav a:hover::after { transform: scaleX(1); }
 .hero-content h1 {
   font-family: var(--font-head);
   font-size: clamp(2.5rem, 6.5vw, 4.5rem);
+  /* police remplacée pour .hero-brand ci-dessous */
   color: var(--white);
   line-height: 1.08;
   margin-bottom: var(--s5);
   letter-spacing: -.025em;
 }
-.hero-brand {
-  font-family: 'UnifrakturMaguntia', cursive;
+.hero-content h1.hero-brand {
+  font-family: 'UnifrakturMaguntia', cursive !important;
   font-weight: 400;
   letter-spacing: .05em;
   line-height: 1;
