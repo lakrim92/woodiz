@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PANUOZZO – Pizzeria artisanale à Bougival. Commande en ligne, livraison à Bougival, Rueil-Malmaison, Chatou, Le Pecq, Croissy-sur-Seine, Louveciennes, Marly-le-Roi, La Celle-Saint-Cloud, Port-Marly." />
+  <meta name="keywords" content="pizzeria Bougival, pizza livraison Bougival, pizza Rueil-Malmaison, pizza Chatou, pizza Le Pecq, pizza Croissy-sur-Seine, pizza Louveciennes, pizza Marly-le-Roi, pizza La Celle-Saint-Cloud, pizza Port-Marly, commander pizza, panuozzo" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PANUOZZO – Pizzeria Bougival" />
+  <meta property="og:description" content="Pizzas artisanales à emporter ou en livraison. Commandez en ligne maintenant !" />
+  <meta property="og:type" content="restaurant" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:url" content="https://panuozzo-bougival.fr" />
+  <meta property="og:image" content="https://panuozzo-bougival.fr/images/og-image.jpg" />
+  <link rel="canonical" href="https://panuozzo-bougival.fr" />
+
+  <!-- Schema.org LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    "name": "PANUOZZO",
+    "servesCuisine": "Italienne, Pizza",
+    "priceRange": "€€",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "30 Av. Jean Moulin",
+      "addressLocality": "Bougival",
+      "addressRegion": "Île-de-France",
+      "postalCode": "78380",
+      "addressCountry": "FR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 48.8683,
+      "longitude": 2.1375
+    },
+    "url": "https://panuozzo-bougival.fr",
+    "telephone": "+33175269120",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "11:00",
+        "closes": "14:30"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "18:00",
+        "closes": "23:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Sunday"],
+        "opens": "18:00",
+        "closes": "23:00"
+      }
+    ],
+    "areaServed": [
+      "Bougival", "Rueil-Malmaison", "Chatou", "Le Pecq",
+      "Croissy-sur-Seine", "Louveciennes", "Marly-le-Roi",
+      "La Celle-Saint-Cloud", "Port-Marly"
+    ]
+  }
+  </script>
+
+  <title>PANUOZZO – Pizzeria Bougival | Livraison & À emporter</title>
+  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+  <!-- ===== HEADER STICKY ===== -->
+  <header id="header">
+    <div class="header-inner">
+      <a href="#accueil" class="logo">
+        <span class="logo-text">PANUOZZO</span>
+        <span class="logo-sub">Bougival</span>
+      </a>
+      <nav id="nav">
+        <a href="#menu">Menu</a>
+        <a href="#livraison">Livraison</a>
+        <a href="#avis">Avis</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="#commander" class="btn-order-header">Commander</a>
+      <button class="burger" id="burger" aria-label="Menu">&#9776;</button>
+    </div>
+    <!-- Mobile nav -->
+    <div class="mobile-nav" id="mobile-nav">
+      <a href="#menu" onclick="closeNav()">Menu</a>
+      <a href="#livraison" onclick="closeNav()">Livraison</a>
+      <a href="#avis" onclick="closeNav()">Avis</a>
+      <a href="#contact" onclick="closeNav()">Contact</a>
+      <a href="#commander" class="btn-order-mobile" onclick="closeNav()">Commander maintenant</a>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section id="accueil" class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-floating" aria-hidden="true">
+      <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
+    </div>
+    <div class="hero-content">
+      <p class="hero-tag">🍕 Pizzeria artisanale – Bougival</p>
+      <h1>Des pizzas qui font<br><span class="hero-highlight">vraiment</span> la différence</h1>
+      <p class="hero-desc">Pâte fraîche maison, ingrédients frais, cuisson au feu de bois.<br>À emporter ou livré chez vous en 30 min.</p>
+      <div class="hero-actions">
+        <a href="#commander" class="btn-primary">🛒 Commander maintenant</a>
+        <a href="#menu" class="btn-secondary">Voir le menu</a>
+      </div>
+      <div class="hero-badges">
+        <span>⏱ Livraison ~30 min</span>
+        <span>🏠 À emporter</span>
+        <span>⭐ 4.8 / 5</span>
+        <span class="badge-halal">☪ Viande Halal</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BANDEAU HORAIRES ===== -->
+  <div class="bandeau-horaires">
+    <div class="bandeau-inner">
+      <span>📍 30 Av. Jean Moulin, Bougival</span>
+      <span class="sep">|</span>
+      <span>📞 <a href="tel:+33175269120" style="color:inherit;text-decoration:none;">01 75 26 91 20</a></span>
+      <span class="sep">|</span>
+      <span id="statut-ouvert"></span>
+      <span class="sep">|</span>
+      <span>Lun–Sam : 11h00–14h30 &amp; 18h00–23h00</span>
+      <span class="sep">|</span>
+      <span>Dim : 18h00–23h00</span>
+    </div>
+  </div>
+
+  <!-- ===== MENU ===== -->
+  <section id="menu" class="section-menu">
+    <div class="container">
+      <h2 class="section-title">Notre Menu</h2>
+      <p class="section-sub">Tout préparé à la commande · Pâte fraîche maison · Cuisson au feu de bois · <span class="halal-inline">☪ Viande Halal</span></p>
+
+      <!-- Ingrédients supplémentaires -->
+      <div class="extras-banner">
+        <button class="extras-toggle" id="extras-toggle">
+          <span>➕ Ingrédient supplémentaire <strong>+2€</strong></span>
+          <span class="extras-tag">Voir la liste complète ▼</span>
+        </button>
+        <div class="extras-grid" id="extras-list" hidden>
+          <span>Anchois</span><span>Artichaut</span><span>Avocat</span><span>Champignons</span>
+          <span>Chèvre</span><span>Chorizo</span><span>Cornichons</span><span>Feta</span>
+          <span>Gorgonzola</span><span>Jambon</span><span>Jambon de Parme</span><span>Lardons</span>
+          <span>Merguez</span><span>Mozzarella ×2</span><span>Œuf</span><span>Olives</span>
+          <span>Oignons</span><span>Parmesan</span><span>Pepperoni</span><span>Poivrons</span>
+          <span>Poulet</span><span>Roquette</span><span>Saumon fumé</span><span>Thon</span>
+          <span>Tomates fraîches</span>
+        </div>
+      </div>
+
+      <!-- Offre exclusive lun–jeu -->
+      <div class="offre-exclusive">
+        <div class="offre-days-row">
+          <span class="day-pill">Lun</span><span class="day-pill">Mar</span>
+          <span class="day-pill">Mer</span><span class="day-pill">Jeu</span>
+          <span class="offre-condition">· À emporter uniquement</span>
+        </div>
+        <p class="offre-headline">🍕&nbsp; 2 pizzas achetées <strong>=</strong> 1 pizza offerte</p>
+        <div class="offre-badge-wrap"><span class="offre-badge">−33%</span></div>
+      </div>
+
+      <!-- Menu Midi -->
+      <div class="menu-midi-banner">
+        <span class="midi-sun">☀️</span>
+        <div class="midi-text">
+          <strong>Menu Midi — À emporter uniquement</strong>
+          <span>Pizza au choix + canette offerte &nbsp;·&nbsp; Panizza au choix + canette offerte</span>
+        </div>
+      </div>
+
+      <!-- Recherche pizza -->
+      <div class="search-wrap">
+        <input type="search" id="pizza-search" class="pizza-search"
+               placeholder="Rechercher une pizza ou un ingrédient…" autocomplete="off" />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Catégories -->
+      <div class="menu-tabs">
+        <button class="tab active" data-tab="tomate">🍅 Base Tomate <em>20</em></button>
+        <button class="tab" data-tab="creme">🥛 Base Crème <em>14</em></button>
+        <button class="tab" data-tab="sandwichs">🥪 Sandwichs <em>7</em></button>
+        <button class="tab" data-tab="desserts">🍰 Desserts &amp; Glaces</button>
+        <button class="tab" data-tab="boissons">🥤 Boissons</button>
+        <button class="tab" data-tab="formules">🎁 Formules</button>
+      </div>
+
+      <!-- Résultats de recherche -->
+      <div class="tab-content hidden" id="tab-search">
+        <p class="search-label" id="search-label"></p>
+        <div class="menu-grid" id="search-results-grid"></div>
+        <p class="no-results hidden" id="no-results">Aucune pizza trouvée.</p>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : BASE TOMATE (20 pizzas)
+      ══════════════════════════════════════ -->
+      <div class="tab-content" id="tab-tomate">
+        <div class="menu-grid">
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-red"></div>
+            <div class="pizza-info">
+              <h3>Margherita</h3>
+              <p>Tomate, mozzarella,olives, basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>11,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-orange"></div>
+            <div class="pizza-info">
+              <h3>Reine</h3>
+              <p>Tomate, mozzarella, jambon, champignons frais basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-navy"></div>
+            <div class="pizza-info">
+              <h3>Tonara</h3>
+              <p>Tomate, mozzarella, thon, tomates cerises, olives, basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-pepperoni"></div>
+            <div class="pizza-info">
+              <h3>Calzone</h3>
+              <p>Tomate, mozzarella, viande hachée au choix, oeuf</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-brown"></div>
+            <div class="pizza-info">
+              <h3>Napolitaine</h3>
+              <p>Tomate, mozzarella, anchoix, capres, olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-fire"></div>
+            <div class="pizza-info">
+              <h3>Fromagie</h3>
+              <p>Tomate, mozzarella, gorgonzola, provolone, pecorino, basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-green"></div>
+            <div class="pizza-info">
+              <h3>Quattro Stagioni</h3>
+              <p>Tomate, mozzarella, jambon, champignons frais, artichauts, basilic frais, olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-bbq"></div>
+            <div class="pizza-info">
+              <h3>Di Buffala</h3>
+              <p>Tomate, mozzarella, tomates cerises, mozzarella Di Buffala, olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-orient"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
+              <h3>Campione</h3>
+              <p>Tomate, mozzarella, viande hachée, champignons frais, oeufs, persillade</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-italo"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
+              <h3>Chorizo</h3>
+              <p>Tomate, mozzarella, chorizo, champignons frais, olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-forest"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Légumes</h3>
+              <p>Tomate, mozzarella, champignons, poivrons, artichauts, tomates cerises, olives, basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-sicilian"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Aubergines</h3>
+              <p>Tomate, mozzarella, aubergines grillées, olives, parmesan, basilic frais, filet d'huile d'olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-bosca"></div>
+            <div class="pizza-info">
+              <h3>Boursin</h3>
+              <p>Tomate, mozzarella, boursin, oignon rouges, viande hachée, champignons</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-bbqchick"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
+              <h3>Orientale</h3>
+              <p>Tomate, mozzarella, merguez, poivrons, olives, oeuf</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-purple"></div>
+            <div class="pizza-info">
+              <h3>Luciano</h3>
+              <p>Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilice frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-med"></div>
+            <div class="pizza-info">
+              <h3>Pescatore</h3>
+              <p>Tomate, mozzarella, noix de fruits de mer, persillade, olives, basilic frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-savoy"></div>
+            <div class="pizza-info">
+              <h3>Gaetano</h3>
+              <p>Tomate, mozzarella, poulet, tomates cerises, oeuf</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-gold"></div>
+            <div class="pizza-info">
+              <h3>Burrata</h3>
+              <p>Tomate, mozzarella, mozarella burrata, roquette, huile d'olives</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-poulet"></div>
+            <div class="pizza-info">
+              <h3>La Polo</h3>
+              <p>Tomate, mozzarella, poulet, oignons rouges, pommes de terre</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-capri"></div>
+            <div class="pizza-info">
+              <h3>Del Capo</h3>
+              <p>Tomate, mozzarella, viande hachée, merguez, oeuf</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : BASE CRÈME FRAÎCHE (14 pizzas)
+      ══════════════════════════════════════ -->
+      <div class="tab-content hidden" id="tab-creme">
+        <div class="menu-grid">
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-cream"></div>
+            <div class="pizza-info">
+              <h3>Bianca</h3>
+              <p>Crème fraîche, mozzarella, ail confit, herbes fraîches</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>11€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-salmon"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
+              <h3>Saumon</h3>
+              <p>Crème fraîche, mozzarella, saumon fumé, citron, aneth</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>15€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-mont"></div>
+            <div class="pizza-info">
+              <h3>Montagnarde</h3>
+              <p>Crème fraîche, mozzarella, lardons, reblochon, oignons</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-miel"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Chèvre Miel</h3>
+              <p>Crème fraîche, mozzarella, chèvre frais, miel, noix, roquette</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-alsace"></div>
+            <div class="pizza-info">
+              <h3>Alsacienne</h3>
+              <p>Crème fraîche, lardons fumés, oignons, emmental gratiné</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-bleu"></div>
+            <div class="pizza-info">
+              <h3>4 Fromages</h3>
+              <p>Crème fraîche, mozzarella, gorgonzola, chèvre, parmesan</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-truffe"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-sig">✦ Signature</span></div>
+              <h3>Truffe Noire</h3>
+              <p>Crème truffe noire, mozzarella, champignons sauvages, roquette</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>17€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-burrata"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
+              <h3>Burrata</h3>
+              <p>Crème fraîche, burrata entière, tomates cerises, jambon de Parme, basilic</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>16€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-sauav"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
+              <h3>Saumon Avocat</h3>
+              <p>Crème fraîche, mozzarella, saumon fumé, avocat, citron vert</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>16€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-norm"></div>
+            <div class="pizza-info">
+              <h3>Normande</h3>
+              <p>Crème fraîche, mozzarella, camembert, lardons, oignons caramélisés</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>14€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-epinard"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Épinards Ricotta</h3>
+              <p>Crème fraîche, mozzarella, épinards frais, ricotta, ail</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-pesto"></div>
+            <div class="pizza-info">
+              <h3>Poulet Pesto</h3>
+              <p>Crème pesto basilic, mozzarella, poulet grillé, tomates cerises</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-champ"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Champignons</h3>
+              <p>Crème fraîche, mozzarella, champignons variés, ail, persil frais</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img pg-tartif"></div>
+            <div class="pizza-info">
+              <h3>Tartiflette</h3>
+              <p>Crème fraîche, pommes de terre, lardons, reblochon, oignons</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>15€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : SANDWICHS (3 panuozzo + 4 panizza)
+      ══════════════════════════════════════ -->
+      <div class="tab-content hidden" id="tab-sandwichs">
+
+        <div class="menu-subsection">
+          <div class="subsection-header">
+            <h3 class="subsection-title">Panuozzo</h3>
+            <p class="subsection-desc">Sandwich napolitain — pâte à pizza grillée, garni à la commande</p>
+          </div>
+          <div class="menu-grid">
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-sand-classic"></div>
+              <div class="pizza-info">
+                <h3>Classico</h3>
+                <p>Jambon cuit, mozzarella filante, tomates fraîches, basilic</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">9€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-sand-spicy"></div>
+              <div class="pizza-info">
+                <div class="card-badges"><span class="badge badge-hot">🌶 Épicé</span></div>
+                <h3>Spicy</h3>
+                <p>Salami piquant, mozzarella, poivrons grillés, jalapeño</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">10€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-sand-veg"></div>
+              <div class="pizza-info">
+                <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+                <h3>Végé</h3>
+                <p>Mozzarella, légumes grillés (courgette, aubergine, poivron), roquette</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">9€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="menu-subsection">
+          <div class="subsection-header">
+            <h3 class="subsection-title">Panizza</h3>
+            <p class="subsection-desc">Calzone sandwich — pâte dorée croustillante, fermée et cuite au four</p>
+          </div>
+          <div class="menu-grid">
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-pan-regi"></div>
+              <div class="pizza-info">
+                <h3>Reginella</h3>
+                <p>Jambon cuit, mozzarella, champignons, sauce tomate</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">10€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-pan-rust"></div>
+              <div class="pizza-info">
+                <h3>Rustica</h3>
+                <p>Saucisse italienne, mozzarella, poivrons rôtis</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">10€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-pan-diav"></div>
+              <div class="pizza-info">
+                <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
+                <h3>Diavola</h3>
+                <p>Chorizo piquant, mozzarella, olives, piment</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">11€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-pan-bian"></div>
+              <div class="pizza-info">
+                <h3>Bianca</h3>
+                <p>Crème fraîche, mozzarella, poulet rôti, herbes fraîches</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">10€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : DESSERTS & GLACES
+      ══════════════════════════════════════ -->
+      <div class="tab-content hidden" id="tab-desserts">
+
+        <div class="menu-subsection">
+          <div class="subsection-header">
+            <h3 class="subsection-title">Desserts Maison</h3>
+          </div>
+          <div class="menu-grid">
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-tiram"></div>
+              <div class="pizza-info">
+                <h3>Tiramisu Maison</h3>
+                <p>Mascarpone crémeux, café, cacao, biscuits savoiardi</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">6€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-choco"></div>
+              <div class="pizza-info">
+                <h3>Mousse au Chocolat</h3>
+                <p>Chocolat noir intense, chantilly maison</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">5€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-tart"></div>
+              <div class="pizza-info">
+                <h3>Tarte Tatin</h3>
+                <p>Pommes caramélisées, pâte feuilletée, crème fraîche</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">6€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pizza-card">
+              <div class="pizza-img pg-panna"></div>
+              <div class="pizza-info">
+                <h3>Panna Cotta</h3>
+                <p>Vanille douce, coulis de fruits rouges</p>
+                <div class="pizza-footer">
+                  <strong class="item-price">5€</strong>
+                  <button class="btn-add">Choisir</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Häagen-Dazs -->
+        <div class="menu-subsection hd-section">
+          <div class="subsection-header">
+            <h3 class="hd-brand">Häagen-Dazs</h3>
+            <p class="subsection-desc">3 parfums au choix : <strong>Vanille</strong> · <strong>Fraise</strong> · <strong>Chocolat</strong></p>
+          </div>
+          <div class="hd-grid">
+            <div class="hd-card">
+              <div class="hd-pot-wrap">
+                <div class="hd-pot-icon">🍨</div>
+                <div class="hd-pot-size">100 ml</div>
+              </div>
+              <div class="hd-pot-info">
+                <strong>Pot individuel</strong>
+                <p>Vanille · Fraise · Chocolat</p>
+                <span class="hd-price">4€</span>
+              </div>
+              <button class="btn-add">Choisir</button>
+            </div>
+            <div class="hd-card hd-card-lg">
+              <div class="hd-pot-wrap">
+                <div class="hd-pot-icon">🍦</div>
+                <div class="hd-pot-size">500 ml</div>
+              </div>
+              <div class="hd-pot-info">
+                <strong>Pot famille</strong>
+                <p>Vanille · Fraise · Chocolat</p>
+                <span class="hd-price">12€</span>
+              </div>
+              <button class="btn-add">Choisir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : BOISSONS
+      ══════════════════════════════════════ -->
+      <div class="tab-content hidden" id="tab-boissons">
+
+        <div class="menu-subsection">
+          <div class="subsection-header">
+            <h3 class="subsection-title">Canettes 33cl</h3>
+            <span class="price-tag-header">2,50€ / canette</span>
+          </div>
+          <div class="drinks-grid">
+            <div class="drink-card" data-name="Coca-Cola 33cl" data-price="2.50">🥤<span>Coca-Cola</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Coca-Cola Zéro 33cl" data-price="2.50">⚫<span>Coca-Cola Zéro</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Fanta Orange 33cl" data-price="2.50">🍊<span>Fanta Orange</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Sprite 33cl" data-price="2.50">💚<span>Sprite</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Perrier 33cl" data-price="2.50">💧<span>Perrier</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Ice Tea Pêche 33cl" data-price="2.50">🍑<span>Ice Tea Pêche</span><button class="btn-add">Ajouter</button></div>
+          </div>
+        </div>
+
+        <div class="menu-subsection">
+          <div class="subsection-header">
+            <h3 class="subsection-title">Bouteilles 1,25L</h3>
+            <span class="price-tag-header">4€ / bouteille</span>
+          </div>
+          <div class="drinks-grid">
+            <div class="drink-card drink-card-lg" data-name="Coca-Cola 1,25L" data-price="4">🥤<span>Coca-Cola</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card drink-card-lg" data-name="Fanta Orange 1,25L" data-price="4">🍊<span>Fanta Orange</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card drink-card-lg" data-name="Sprite 1,25L" data-price="4">💚<span>Sprite</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card drink-card-lg" data-name="Ice Tea Pêche 1,25L" data-price="4">🍑<span>Ice Tea Pêche</span><button class="btn-add">Ajouter</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB : FORMULES
+      ══════════════════════════════════════ -->
+      <div class="tab-content hidden" id="tab-formules">
+        <div class="formules-grid">
+
+          <div class="formule-card formule-gourmand">
+            <div class="formule-header">
+              <span class="formule-icon-big">🍕🍕🍕</span>
+              <div class="formule-badge formule-badge-gold">Menu Gourmand</div>
+            </div>
+            <h3>Menu Gourmand</h3>
+            <p class="formule-desc">Pour un repas généreux !</p>
+            <ul class="formule-items">
+              <li>✓ <strong>3 pizzas</strong> au choix (tomate ou crème fraîche)</li>
+              <li>✓ <strong>1 bouteille</strong> 1,25L au choix</li>
+            </ul>
+            <div class="formule-note">Mix de bases libre · Tailles au choix</div>
+            <button class="btn-primary btn-formule" data-formule="gourmand">Composer ma formule</button>
+          </div>
+
+          <div class="formule-card formule-midi">
+            <div class="formule-header">
+              <span class="formule-icon-big">☀️</span>
+              <div class="formule-badge formule-badge-green">Menu Midi</div>
+            </div>
+            <h3>Menu Midi</h3>
+            <p class="formule-desc">À emporter uniquement · Service du midi</p>
+            <ul class="formule-items">
+              <li>🍕 <strong>Pizza</strong> au choix + <strong>canette offerte</strong></li>
+              <li><em>— ou —</em></li>
+              <li>🥪 <strong>Panizza</strong> au choix + <strong>canette offerte</strong></li>
+            </ul>
+            <div class="formule-note">La boisson est offerte avec votre plat</div>
+            <button class="btn-primary btn-formule" data-formule="midi">Composer ma formule</button>
+          </div>
+
+          <div class="formule-card formule-exclusive">
+            <div class="formule-header">
+              <span class="formule-icon-big">🎁</span>
+              <div class="formule-badge formule-badge-red">Offre Exclusive</div>
+            </div>
+            <h3>2+1 Offert</h3>
+            <p class="formule-desc">Lundi au jeudi · À emporter uniquement</p>
+            <ul class="formule-items">
+              <li>🍕 Achetez <strong>2 pizzas</strong></li>
+              <li>🎁 La <strong>3ème est offerte !</strong></li>
+            </ul>
+            <div class="formule-days-footer">
+              <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span>
+            </div>
+            <div class="formule-note">Non cumulable avec d'autres offres</div>
+            <button class="btn-primary btn-formule" data-formule="exclusive">Composer ma formule</button>
+          </div>
+
+        </div>
+      </div>
+
+      <p class="menu-note">🌾 Pâte sans gluten disponible sur demande (+2€) &nbsp;·&nbsp; Suppléments ingrédients +2€ pièce</p>
+    </div>
+  </section>
+
+  <!-- ===== COMMANDER ===== -->
+  <section id="commander" class="section-commander">
+    <div class="container">
+      <h2 class="section-title white">Votre panier</h2>
+      <p class="section-sub white">Ajoutez vos pizzas depuis le menu, puis choisissez livraison ou retrait</p>
+
+      <div class="cart-infobadges">
+        <span>🛵 Livraison ~30 min · à partir de 15€</span>
+        <span>🏠 Retrait ~15 min · sans minimum</span>
+        <span>🔒 Paiement sécurisé</span>
+      </div>
+
+      <div id="stripe-cart">
+        <p class="cart-empty">Ton panier est vide — ajoute des pizzas depuis le menu ci-dessus</p>
+      </div>
+      <div class="cart-summary hidden" id="cart-summary">
+        <div class="cart-total">Total : <strong id="cart-total">0€</strong></div>
+        <div class="cart-delivery-choice">
+          <p class="cart-delivery-label">Comment souhaitez-vous récupérer votre commande ?</p>
+          <div class="cart-delivery-btns">
+            <button class="btn-delivery-opt" id="btn-livraison">🛵 Livraison</button>
+            <button class="btn-delivery-opt" id="btn-emporter">🏠 À emporter</button>
+          </div>
+        </div>
+        <p class="cmd-note">Paiement 100% sécurisé via Stripe</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ZONE DE LIVRAISON ===== -->
+  <section id="livraison" class="section-livraison">
+    <div class="container">
+      <h2 class="section-title">Zone de livraison</h2>
+      <p class="section-sub">Nous livrons dans les communes suivantes</p>
+      <div class="livraison-grid">
+        <div class="livraison-card active">
+          <span class="livraison-icon">📍</span>
+          <strong>Bougival</strong>
+          <span>Livraison 2€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Le Pecq</strong>
+          <span>Livraison 2€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Croissy-sur-Seine</strong>
+          <span>Livraison 2€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Port-Marly</strong>
+          <span>Livraison 3€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Chatou</strong>
+          <span>Livraison 3€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Louveciennes</strong>
+          <span>Livraison 3€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Marly-le-Roi</strong>
+          <span>Livraison 4€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>La Celle-Saint-Cloud</strong>
+          <span>Livraison 4€</span>
+        </div>
+        <div class="livraison-card">
+          <span class="livraison-icon">📍</span>
+          <strong>Rueil-Malmaison</strong>
+          <span>Livraison 4€</span>
+        </div>
+      </div>
+      <div class="livraison-conditions">
+        <span>🛒 Minimum de commande : <strong>15€</strong></span>
+        <span>⏱ Délai moyen : <strong>30 min</strong></span>
+        <span>💳 CB, espèces, ticket resto</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROMO FIRST ORDER ===== -->
+  <section class="section-promo">
+    <div class="container promo-inner">
+      <div>
+        <h2>-10% sur votre première commande</h2>
+        <p>Commandez en ligne et utilisez le code ci-dessous</p>
+      </div>
+      <div class="promo-code-box">
+        <span id="promo-code">BIENVENUE10</span>
+        <button onclick="copyPromo()" id="btn-copy">Copier</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AVIS CLIENTS ===== -->
+  <section id="avis" class="section-avis">
+    <div class="container">
+      <h2 class="section-title">Ce que disent nos clients</h2>
+      <div class="avis-score">
+        <span class="score-num">4.8</span>
+        <div>
+          <div class="stars">★★★★★</div>
+          <p>Basé sur 124 avis Google</p>
+        </div>
+      </div>
+      <div class="avis-grid">
+        <div class="avis-card">
+          <div class="avis-stars">★★★★★</div>
+          <p>"Pâte excellente, vraiment croustillante. La burrata est incroyable. Je reviens chaque semaine !"</p>
+          <div class="avis-author">
+            <div class="avis-avatar">M</div>
+            <div>
+              <strong>Marie L.</strong>
+              <span>Bougival · Google</span>
+            </div>
+          </div>
+        </div>
+        <div class="avis-card">
+          <div class="avis-stars">★★★★★</div>
+          <p>"Livraison rapide, pizza encore chaude. La diavola est parfaite pour les amateurs de piquant !"</p>
+          <div class="avis-author">
+            <div class="avis-avatar">T</div>
+            <div>
+              <strong>Thomas B.</strong>
+              <span>Chatou · Google</span>
+            </div>
+          </div>
+        </div>
+        <div class="avis-card">
+          <div class="avis-stars">★★★★☆</div>
+          <p>"Très bonne qualité, portions généreuses. Le meilleur rapport qualité/prix du coin."</p>
+          <div class="avis-author">
+            <div class="avis-avatar">S</div>
+            <div>
+              <strong>Sophie M.</strong>
+              <span>Rueil-Malmaison · Google</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a href="https://www.google.com/maps/search/?q=PANUOZZO+30+Av.+Jean+Moulin+78380+Bougival" target="_blank" rel="noopener" class="btn-avis">Laisser un avis Google</a>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact" class="section-contact">
+    <div class="container contact-grid">
+      <div class="contact-info">
+        <h2 class="section-title">Nous trouver</h2>
+        <div class="contact-items">
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            <div>
+              <strong>Adresse</strong>
+              <p>30 Av. Jean Moulin<br>78380 Bougival</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <div>
+              <strong>Téléphone</strong>
+              <p><a href="tel:+33175269120">01 75 26 91 20</a></p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">🕐</span>
+            <div>
+              <strong>Horaires</strong>
+              <p>Lun–Sam : 11h00–14h30 &amp; 18h00–23h00<br>Dim : 18h00–23h00</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">💳</span>
+            <div>
+              <strong>Paiement</strong>
+              <p>CB, espèces, ticket restaurant</p>
+            </div>
+          </div>
+        </div>
+        <a href="https://maps.google.com/?q=30+Avenue+Jean+Moulin+78380+Bougival" target="_blank" rel="noopener" class="btn-maps">📍 Ouvrir dans Google Maps</a>
+      </div>
+      <div class="contact-map">
+        <iframe
+          src="https://maps.google.com/maps?q=30+Av.+Jean+Moulin,+78380+Bougival,+France&hl=fr&z=16&output=embed"
+          width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade" title="PANUOZZO Bougival sur Google Maps">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">PANUOZZO</span>
+        <p>Pizzeria artisanale à Bougival<br>Livraison &amp; à emporter</p>
+      </div>
+      <div class="footer-links">
+        <a href="#menu">Menu</a>
+        <a href="#livraison">Zone de livraison</a>
+        <a href="#avis">Avis</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 PANUOZZO – Tous droits réservés</p>
+        <p>30 Av. Jean Moulin, 78380 Bougival · <a href="tel:+33175269120" style="color:inherit;">01 75 26 91 20</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== CTA FLOTTANT MOBILE ===== -->
+  <div class="floating-cta" id="floating-cta">
+    <a href="#commander" class="btn-floating">🛒 Commander maintenant</a>
+  </div>
+
+  <!-- ===== MODAL LIVRAISON ===== -->
+  <div class="modal-overlay" id="delivery-modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="delivery-modal-title">
+      <button class="modal-close" id="delivery-modal-close" aria-label="Fermer">✕</button>
+      <div class="modal-header">
+        <h3 id="delivery-modal-title">🛵 Informations de livraison</h3>
+        <p class="modal-desc">Renseignez vos informations, vous serez ensuite redirigé vers le paiement.</p>
+      </div>
+      <form id="delivery-form" novalidate>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="d-firstname">Prénom <span class="form-required">*</span></label>
+            <input type="text" id="d-firstname" placeholder="Jean" autocomplete="given-name" required>
+            <span class="form-error" id="d-firstname-err"></span>
+          </div>
+          <div class="form-group">
+            <label for="d-lastname">Nom <span class="form-required">*</span></label>
+            <input type="text" id="d-lastname" placeholder="Dupont" autocomplete="family-name" required>
+            <span class="form-error" id="d-lastname-err"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="d-phone">Téléphone <span class="form-required">*</span></label>
+          <input type="tel" id="d-phone" placeholder="06 12 34 56 78" autocomplete="tel" required>
+          <span class="form-error" id="d-phone-err"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="d-address">Adresse <span class="form-required">*</span></label>
+          <input type="text" id="d-address" placeholder="15 rue de la Paix" autocomplete="street-address" required>
+          <span class="form-error" id="d-address-err"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="d-floor">Étage</label>
+            <input type="text" id="d-floor" placeholder="ex : 3ème">
+          </div>
+          <div class="form-group">
+            <label for="d-appt">N° appartement</label>
+            <input type="text" id="d-appt" placeholder="ex : 12">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="d-building">Bâtiment / Résidence</label>
+            <input type="text" id="d-building" placeholder="ex : Bât. B, Résidence Les Pins">
+          </div>
+          <div class="form-group">
+            <label for="d-code">Code d'accès / Interphone</label>
+            <input type="text" id="d-code" placeholder="ex : A1234">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="d-notes">Instructions pour le livreur</label>
+          <textarea id="d-notes" placeholder="Ex : Sonner deux fois, laisser devant la porte..." rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary btn-delivery-submit">💳 Confirmer et payer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL FORMULE ===== -->
+  <div class="modal-overlay" id="formule-modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="formule-modal-title">
+      <button class="modal-close" id="formule-modal-close" aria-label="Fermer">✕</button>
+      <div class="modal-header">
+        <h3 id="formule-modal-title"></h3>
+        <p class="modal-desc" id="formule-modal-desc"></p>
+      </div>
+      <div id="formule-modal-body"></div>
+      <div class="modal-footer">
+        <div class="modal-total-line">Total : <strong id="formule-total"></strong></div>
+        <button class="btn-primary modal-confirm" id="formule-confirm">🛒 Ajouter au panier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PERSONNALISATION PIZZA ===== -->
+  <div class="modal-overlay" id="pizza-modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-pizza-name">
+      <button class="modal-close" id="modal-close" aria-label="Fermer">✕</button>
+
+      <div class="modal-header">
+        <h3 id="modal-pizza-name"></h3>
+        <p class="modal-desc" id="modal-pizza-desc"></p>
+        <p class="modal-base-price">Prix de base : <strong id="modal-base-price-val"></strong></p>
+      </div>
+
+      <div class="modal-section">
+        <h4>Retirer des ingrédients <span class="modal-note">(gratuit)</span></h4>
+        <div class="modal-checks" id="modal-remove"></div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Ajouter des ingrédients <span class="modal-note">+2€ / ingrédient</span></h4>
+        <div class="modal-checks modal-checks-extras" id="modal-add"></div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="modal-total-line">Total : <strong id="modal-total"></strong></div>
+        <button class="btn-primary modal-confirm" id="modal-confirm">🛒 Ajouter au panier</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js?v=4"></script>
+</body>
+</html>
