@@ -160,14 +160,30 @@
 
     .order-items { margin-bottom: 12px; }
     .order-item {
-      display: flex;
-      justify-content: space-between;
       font-size: .84rem;
-      padding: 4px 0;
+      padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,.04);
     }
     .order-item:last-child { border-bottom: none; }
-    .order-item-qty { color: rgba(255,255,255,.45); margin-right: 6px; }
+    .order-item-main { display: flex; align-items: baseline; gap: 4px; font-weight: 600; }
+    .order-item-qty { color: rgba(255,255,255,.45); margin-right: 4px; }
+    .order-item-price { margin-left: auto; color: rgba(255,255,255,.55); font-weight: 400; }
+    .item-detail { font-size: .76rem; padding-left: 18px; margin-top: 2px; line-height: 1.4; }
+    .item-removed { color: #f87171; }
+    .item-added   { color: #4ade80; }
+    .item-meat    { color: #fbbf24; }
+    .item-desc    { color: rgba(255,255,255,.5); }
+
+    .order-promo {
+      background: rgba(22, 163, 74, .12);
+      border: 1px solid rgba(22, 163, 74, .3);
+      border-radius: 6px;
+      color: #4ade80;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      margin-bottom: 6px;
+    }
 
     .order-total {
       display: flex;
@@ -214,6 +230,20 @@
     .btn-preparation { background: rgba(37,99,235,.2);  color: #60a5fa; }
     .btn-pret        { background: rgba(26,107,78,.2);  color: #4ade80; }
     .btn-livre       { background: rgba(255,255,255,.07); color: rgba(255,255,255,.5); }
+
+    .btn-print {
+      flex: 0 0 auto;
+      width: 38px;
+      padding: 9px 0;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.55);
+      font-size: .88rem;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .btn-print:hover { background: rgba(255,255,255,.12); color: var(--white); }
 
     /* ── Vide ── */
     .empty-state {
@@ -289,6 +319,86 @@
     }
     .login-error { color: var(--red); font-size: .8rem; margin-top: 8px; min-height: 18px; }
 
+    /* ── Modale livraison ── */
+    #delivery-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+    #delivery-modal.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .delivery-modal-box {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      transform: translateY(16px);
+      transition: transform .2s;
+    }
+    #delivery-modal.open .delivery-modal-box { transform: translateY(0); }
+    .delivery-modal-header {
+      background: #1e3a5f;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .delivery-modal-header h3 { font-size: 1rem; color: #60a5fa; margin: 0; }
+    .delivery-modal-close {
+      background: rgba(255,255,255,.1);
+      border: none;
+      color: #fff;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .delivery-modal-body { padding: 20px; }
+    .delivery-row {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      font-size: .88rem;
+      line-height: 1.4;
+    }
+    .delivery-row:last-child { border-bottom: none; }
+    .delivery-row-label {
+      color: rgba(255,255,255,.4);
+      min-width: 100px;
+      flex-shrink: 0;
+      font-size: .8rem;
+      padding-top: 1px;
+    }
+    .delivery-row-value { color: var(--white); font-weight: 500; }
+    .delivery-row-value.address { color: #60a5fa; font-weight: 700; }
+
+    .btn-delivery-info {
+      background: rgba(37,99,235,.2);
+      border: 1px solid rgba(37,99,235,.3);
+      color: #60a5fa;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .btn-delivery-info:hover { background: rgba(37,99,235,.35); }
+
     @media (max-width: 600px) {
       .orders-grid { padding: 0 12px 24px; }
       .filters { padding: 12px; }
@@ -305,7 +415,7 @@
     <h2>PANUOZZO</h2>
     <p>Accès réservé au personnel</p>
     <input type="password" id="login-input" placeholder="Mot de passe" autocomplete="current-password" />
-    <button onclick="checkLogin()">Entrer</button>
+    <button id="login-btn">Entrer</button>
     <p class="login-error" id="login-error"></p>
   </div>
 </div>
@@ -321,14 +431,25 @@
   </header>
 
   <div class="filters">
-    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Toutes <span class="badge-count" id="badge-all"></span></button>
-    <button class="filter-btn" data-filter="nouveau" onclick="setFilter('nouveau', this)">Nouvelles <span class="badge-count" id="badge-nouveau"></span></button>
-    <button class="filter-btn" data-filter="en_preparation" onclick="setFilter('en_preparation', this)">En préparation <span class="badge-count" id="badge-en_preparation"></span></button>
-    <button class="filter-btn" data-filter="pret" onclick="setFilter('pret', this)">Prêtes <span class="badge-count" id="badge-pret"></span></button>
-    <button class="filter-btn" data-filter="livre" onclick="setFilter('livre', this)">Livrées</button>
+    <button class="filter-btn active" data-filter="all">Toutes <span class="badge-count" id="badge-all"></span></button>
+    <button class="filter-btn" data-filter="nouveau">Nouvelles <span class="badge-count" id="badge-nouveau"></span></button>
+    <button class="filter-btn" data-filter="en_preparation">En préparation <span class="badge-count" id="badge-en_preparation"></span></button>
+    <button class="filter-btn" data-filter="pret">Prêtes <span class="badge-count" id="badge-pret"></span></button>
+    <button class="filter-btn" data-filter="livre">Livrées</button>
   </div>
 
   <div class="orders-grid" id="orders-grid"></div>
+</div>
+
+<!-- Modale infos livraison -->
+<div id="delivery-modal">
+  <div class="delivery-modal-box">
+    <div class="delivery-modal-header">
+      <h3>🛵 Infos de livraison</h3>
+      <button class="delivery-modal-close" id="delivery-modal-close-btn">✕</button>
+    </div>
+    <div class="delivery-modal-body" id="delivery-modal-body"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -336,252 +457,6 @@
 <!-- Son notification -->
 <audio id="notif-sound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA..." preload="auto"></audio>
 
-<script>
-  // ── Service Worker (PWA) ─────────────────────────────────
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/tablette-sw.js').catch(() => {});
-  }
-
-  // ── Audio Context (débloqué après geste utilisateur) ─────
-  let audioCtx = null;
-  function unlockAudio() {
-    if (audioCtx) return;
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch {}
-  }
-  document.addEventListener('click', unlockAudio, { once: true });
-
-  // ── Auth ─────────────────────────────────────────────────
-  const SESSION_KEY = 'panuozzo_tablette_auth';
-
-  function checkLogin() {
-    unlockAudio(); // débloquer l'audio dès le premier clic
-    const pwd = document.getElementById('login-input').value;
-    const err = document.getElementById('login-error');
-    if (!pwd) { err.textContent = 'Entrez le mot de passe'; return; }
-    // Vérifie via l'API (le serveur compare avec TABLETTE_PASSWORD)
-    fetch('/api/auth/tablette', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pwd }),
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data.ok) {
-        sessionStorage.setItem(SESSION_KEY, pwd);
-        showApp();
-      } else {
-        err.textContent = 'Mot de passe incorrect';
-        document.getElementById('login-input').value = '';
-      }
-    })
-    .catch(() => { err.textContent = 'Erreur réseau'; });
-  }
-
-  document.getElementById('login-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkLogin();
-  });
-
-  function showApp() {
-    document.getElementById('login-overlay').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    initSSE();
-  }
-
-  // Auto-login si session active
-  const savedPwd = sessionStorage.getItem(SESSION_KEY);
-  if (savedPwd) {
-    fetch('/api/auth/tablette', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: savedPwd }),
-    }).then(r => r.json()).then(data => { if (data.ok) showApp(); });
-  }
-
-  // ── State ─────────────────────────────────────────────────
-  let orders = [];
-  let currentFilter = 'all';
-
-  const STATUS_LABELS = {
-    nouveau:        '🟡 Nouvelle',
-    en_preparation: '🔵 En préparation',
-    pret:           '🟢 Prête',
-    livre:          '⚫ Livrée',
-  };
-
-  // ── SSE ───────────────────────────────────────────────────
-  let activeES = null;
-  function initSSE() {
-    // Fermer l'ancienne connexion si elle existe (lifecycle Android)
-    if (activeES) { activeES.close(); activeES = null; }
-    const es = new EventSource('/api/orders/stream');
-    activeES = es;
-
-    es.addEventListener('init', e => {
-      orders = JSON.parse(e.data);
-      render();
-      setConn(true);
-    });
-
-    es.addEventListener('new-order', e => {
-      const order = JSON.parse(e.data);
-      // Anti-doublon : ignorer si déjà dans la liste (connexions multiples WebView)
-      if (orders.find(o => o.id === order.id)) return;
-      orders.unshift(order);
-      render();
-      playNotif();
-      showToast(`🔔 Nouvelle commande — ${order.delivery?.prenom || ''} ${order.delivery?.nom || ''} — ${order.total?.toFixed(2)}€`);
-    });
-
-    es.addEventListener('status-update', e => {
-      const { id, status } = JSON.parse(e.data);
-      const o = orders.find(o => o.id === id);
-      if (o) { o.status = status; render(); }
-    });
-
-    es.onerror = () => setConn(false);
-    es.onopen  = () => setConn(true);
-  }
-
-  function setConn(ok) {
-    document.getElementById('conn-dot').style.background = ok ? '#4ade80' : '#dc2626';
-    document.getElementById('conn-label').textContent = ok ? 'En direct' : 'Reconnexion…';
-  }
-
-  // ── Filtres ───────────────────────────────────────────────
-  function setFilter(f, btn) {
-    currentFilter = f;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-  }
-
-  // ── Rendu ─────────────────────────────────────────────────
-  function render() {
-    const grid = document.getElementById('orders-grid');
-
-    // Badges
-    ['nouveau','en_preparation','pret'].forEach(s => {
-      const el = document.getElementById(`badge-${s}`);
-      const n = orders.filter(o => o.status === s).length;
-      if (el) el.textContent = n || '';
-    });
-    const allActive = orders.filter(o => o.status !== 'livre').length;
-    const badgeAll = document.getElementById('badge-all');
-    if (badgeAll) badgeAll.textContent = allActive || '';
-
-    const filtered = currentFilter === 'all'
-      ? orders.filter(o => o.status !== 'livre')
-      : orders.filter(o => o.status === currentFilter);
-
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">🍕</div>
-          <p>Aucune commande ${currentFilter === 'all' ? 'active' : STATUS_LABELS[currentFilter]?.toLowerCase() || ''}</p>
-        </div>`;
-      return;
-    }
-
-    grid.innerHTML = filtered.map(order => orderCard(order)).join('');
-  }
-
-  function orderCard(order) {
-    const d = order.delivery || {};
-    const time = new Date(order.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const isLivraison = d.mode === 'livraison';
-
-    const addrParts = [d.adresse, d.etage && `Ét. ${d.etage}`, d.appt && `Apt ${d.appt}`, d.batiment && `Bât. ${d.batiment}`, d.codeAcces && `Code : ${d.codeAcces}`].filter(Boolean);
-
-    const itemsHtml = (order.items || []).map(i =>
-      `<div class="order-item"><span><span class="order-item-qty">${i.qty}×</span>${i.name}</span><span>${i.price?.toFixed(2)}€</span></div>`
-    ).join('');
-
-    const btnPrep = `<button class="btn-status btn-preparation" onclick="updateStatus('${order.id}','en_preparation')" ${order.status !== 'nouveau' ? 'disabled' : ''}>👨‍🍳 En prépa</button>`;
-    const btnPret = `<button class="btn-status btn-pret" onclick="updateStatus('${order.id}','pret')" ${order.status !== 'en_preparation' ? 'disabled' : ''}>✅ Prête</button>`;
-    const btnLivre = `<button class="btn-status btn-livre" onclick="updateStatus('${order.id}','livre')" ${order.status !== 'pret' ? 'disabled' : ''}>${isLivraison ? '🛵 Livrée' : '🏠 Récupérée'}</button>`;
-
-    return `
-      <div class="order-card" id="card-${order.id}">
-        <div class="order-card-header">
-          <div>
-            <div class="order-number">#${String(order.orderNumber).slice(-6)}</div>
-            <div class="order-time">${time}</div>
-          </div>
-          <span class="status-pill status-${order.status}">${STATUS_LABELS[order.status] || order.status}</span>
-        </div>
-        <div class="order-card-body">
-          <div class="order-client">
-            <div class="order-client-name">${d.prenom || ''} ${d.nom || ''}</div>
-            ${d.telephone ? `<div class="order-client-phone">📞 ${d.telephone}</div>` : ''}
-          </div>
-          <div class="order-mode ${isLivraison ? 'mode-livraison' : 'mode-emporter'}">
-            ${isLivraison ? '🛵 Livraison' : '🏠 Retrait sur place'}
-          </div>
-          ${isLivraison && addrParts.length ? `<div class="order-address">${addrParts.join(' · ')}</div>` : ''}
-          <div class="order-items">${itemsHtml}</div>
-          <div class="order-total"><span>Total</span><span>${order.total?.toFixed(2)}€</span></div>
-          ${d.instructions ? `<div class="order-instructions">💬 ${d.instructions}</div>` : ''}
-        </div>
-        <div class="order-card-footer">
-          ${btnPrep}${btnPret}${btnLivre}
-        </div>
-      </div>`;
-  }
-
-  // ── Mise à jour statut ────────────────────────────────────
-  async function updateStatus(id, status) {
-    try {
-      await fetch(`/api/orders/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      const o = orders.find(o => o.id === id);
-      if (o) { o.status = status; render(); }
-    } catch (err) {
-      showToast('❌ Erreur de mise à jour', true);
-    }
-  }
-
-  // ── Toast ─────────────────────────────────────────────────
-  let toastTimer;
-  function showToast(msg, isError = false) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.background = isError ? '#dc2626' : '#1a6b4e';
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
-  }
-
-  // ── Son notification ──────────────────────────────────────
-  function playNotif() {
-    if (!audioCtx) {
-      // Dernier recours : tenter de créer le contexte
-      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch { return; }
-    }
-    try {
-      // Reprendre si suspendu (politique autoplay navigateur)
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      // 3 bips ascendants façon Uber Eats
-      [880, 1100, 1320].forEach((freq, i) => {
-        const osc  = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = freq;
-        osc.type = 'triangle';
-        const t = audioCtx.currentTime + i * 0.18;
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.4, t + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-        osc.start(t);
-        osc.stop(t + 0.3);
-      });
-    } catch {}
-  }
-</script>
+<script src="/js/tablette.js"></script>
 </body>
 </html>
