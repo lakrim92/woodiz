@@ -42,19 +42,13 @@
     "openingHoursSpecification": [
       {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "11:00",
         "closes": "14:30"
       },
       {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-        "opens": "18:00",
-        "closes": "23:00"
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Sunday"],
+        "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "18:00",
         "closes": "23:00"
       }
@@ -68,7 +62,7 @@
   </script>
 
   <title>PANUOZZO – Pizzeria Bougival | Livraison & À emporter</title>
-  <link rel="stylesheet" href="css/style.css?v=11" />
+  <link rel="stylesheet" href="css/style.css?v=19" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
 
@@ -79,7 +73,7 @@
   <header id="header">
     <div class="header-inner">
       <a href="#accueil" class="logo">
-        <span class="logo-text">PANUOZZO</span>
+        <span class="logo-text"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></span>
         <span class="logo-sub">Bougival</span>
       </a>
       <nav id="nav">
@@ -93,11 +87,11 @@
     </div>
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobile-nav">
-      <a href="#menu" onclick="closeNav()">Menu</a>
-      <a href="#livraison" onclick="closeNav()">Livraison</a>
-      <a href="#avis" onclick="closeNav()">Avis</a>
-      <a href="#contact" onclick="closeNav()">Contact</a>
-      <a href="#menu" class="btn-order-mobile" onclick="closeNav()">Commander maintenant</a>
+      <a href="#menu">Menu</a>
+      <a href="#livraison">Livraison</a>
+      <a href="#avis">Avis</a>
+      <a href="#contact">Contact</a>
+      <a href="#menu" class="btn-order-mobile">Commander maintenant</a>
     </div>
   </header>
 
@@ -108,7 +102,6 @@
       <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
     </div>
     <div class="hero-content">
-      <p class="hero-tag">🍕 Pizzeria artisanale – Bougival</p>
       <h1 class="hero-brand"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></h1>
       <p class="hero-tagline">Une pâte artisanale, un goût inoubliable</p>
       <p class="hero-desc">Pâte fraîche maison, ingrédients frais, cuisson au feu de bois.<br>À emporter ou livré chez vous en 30 min.</p>
@@ -116,6 +109,7 @@
         <a href="#menu" class="btn-secondary">Voir le menu</a>
       </div>
       <div class="hero-badges">
+        <span id="hero-statut"></span>
         <span>⏱ Livraison ~30 min</span>
         <span>🏠 À emporter</span>
         <span>⭐ 4.8 / 5</span>
@@ -135,7 +129,7 @@
       <span class="sep">|</span>
       <span>Mar–Sam : 11h00–14h30 &amp; 18h00–23h00</span>
       <span class="sep">|</span>
-      <span>Dim : 18h00–23h00</span>
+      <span>Dim : 11h00–14h30 &amp; 18h00–23h00</span>
     </div>
   </div>
 
@@ -145,41 +139,27 @@
       <h2 class="section-title">Notre Menu</h2>
       <p class="section-sub">Tout préparé à la commande · Pâte fraîche maison · Cuisson au feu de bois · <span class="halal-inline">☪ Viande Halal</span></p>
 
-      <!-- Ingrédients supplémentaires -->
-      <div class="extras-banner">
-        <button class="extras-toggle" id="extras-toggle">
-          <span>➕ Ingrédient supplémentaire <strong>+2€</strong></span>
-          <span class="extras-tag">Voir la liste complète ▼</span>
-        </button>
-        <div class="extras-grid" id="extras-list" hidden>
-          <span>Anchois</span><span>Artichaut</span><span>Avocat</span><span>Champignons</span>
-          <span>Chèvre</span><span>Chorizo</span><span>Cornichons</span><span>Feta</span>
-          <span>Gorgonzola</span><span>Jambon</span><span>Jambon de Parme</span><span>Lardons</span>
-          <span>Merguez</span><span>Mozzarella ×2</span><span>Œuf</span><span>Olives</span>
-          <span>Oignons</span><span>Parmesan</span><span>Pepperoni</span><span>Poivrons</span>
-          <span>Poulet</span><span>Roquette</span><span>Saumon fumé</span><span>Thon</span>
-          <span>Tomates fraîches</span>
-        </div>
-      </div>
 
       <!-- Offre exclusive lun–jeu -->
-      <div class="offre-exclusive">
+      <div class="offre-exclusive" role="button" tabindex="0" id="btn-offre-exclusive" style="cursor:pointer;" title="Voir les formules">
         <div class="offre-days-row">
-          <span class="day-pill">Lun</span><span class="day-pill">Mar</span>
-          <span class="day-pill">Mer</span><span class="day-pill">Jeu</span>
+          <span class="day-pill">Mar</span><span class="day-pill">Mer</span>
+          <span class="day-pill">Jeu</span><span class="day-pill">Ven</span>
+          <span class="day-pill">Sam</span><span class="day-pill">Dim</span>
           <span class="offre-condition">· À emporter uniquement</span>
         </div>
         <p class="offre-headline">🍕&nbsp; 2 pizzas achetées <strong>=</strong> 1 pizza offerte</p>
-        <div class="offre-badge-wrap"><span class="offre-badge">−33%</span></div>
+        <div class="offre-badge-wrap"><span class="offre-badge">−33%</span> <span class="offre-link">Voir la formule →</span></div>
       </div>
 
       <!-- Menu Midi -->
-      <div class="menu-midi-banner">
+      <div class="menu-midi-banner" role="button" tabindex="0" id="btn-menu-midi" style="cursor:pointer;" title="Voir le menu midi">
         <span class="midi-sun">☀️</span>
         <div class="midi-text">
-          <strong>Menu Midi — À emporter uniquement</strong>
+          <strong>Menu Midi — Mar–Dim · À emporter uniquement</strong>
           <span>Pizza au choix + canette offerte &nbsp;·&nbsp; Panizza au choix + canette offerte</span>
         </div>
+        <span class="offre-link">Voir →</span>
       </div>
 
       <!-- Recherche pizza -->
@@ -194,9 +174,9 @@
         <button class="tab active" data-tab="tomate">🍅 Base Tomate <em>20</em></button>
         <button class="tab" data-tab="creme">🥛 Base Crème <em>14</em></button>
         <button class="tab" data-tab="sandwichs">🥪 Sandwichs <em>7</em></button>
-        <button class="tab" data-tab="desserts">🍰 Desserts &amp; Glaces</button>
-        <button class="tab" data-tab="boissons">🥤 Boissons</button>
-        <button class="tab" data-tab="formules">🎁 Formules</button>
+        <button class="tab" data-tab="desserts">🍰 Desserts &amp; Glaces <em>6</em></button>
+        <button class="tab" data-tab="boissons">🥤 Boissons <em>10</em></button>
+        <button class="tab" data-tab="formules">🎁 Formules <em>3</em></button>
       </div>
 
       <!-- Résultats de recherche -->
@@ -216,7 +196,7 @@
             <div class="pizza-img pg-red"></div>
             <div class="pizza-info">
               <h3>Margherita</h3>
-              <p>Tomate, mozzarella,olives, basilic frais</p>
+              <p>Tomate, mozzarella, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>11,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -228,7 +208,7 @@
             <div class="pizza-img pg-orange"></div>
             <div class="pizza-info">
               <h3>Reine</h3>
-              <p>Tomate, mozzarella, jambon, champignons frais basilic frais</p>
+              <p>Tomate, mozzarella, jambon, champignons frais, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -264,7 +244,7 @@
             <div class="pizza-img pg-brown"></div>
             <div class="pizza-info">
               <h3>Napolitaine</h3>
-              <p>Tomate, mozzarella, anchoix, capres, olives</p>
+              <p>Tomate, mozzarella, anchois, câpres, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -364,7 +344,7 @@
             <div class="pizza-img pg-bosca"></div>
             <div class="pizza-info">
               <h3>Boursin</h3>
-              <p>Tomate, mozzarella, boursin, oignon rouges, viande hachée, champignons</p>
+              <p>Tomate, mozzarella, boursin, oignons rouges, viande hachée, champignons</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -389,7 +369,7 @@
             <div class="pizza-img pg-purple"></div>
             <div class="pizza-info">
               <h3>Luciano</h3>
-              <p>Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilice frais</p>
+              <p>Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -425,7 +405,7 @@
             <div class="pizza-img pg-gold"></div>
             <div class="pizza-info">
               <h3>Burrata</h3>
-              <p>Tomate, mozzarella, mozarella burrata, roquette, huile d'olives</p>
+              <p>Tomate, mozzarella, mozzarella burrata, roquette, huile d'olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -909,35 +889,38 @@
             <button class="btn-primary btn-formule" data-formule="gourmand">Composer ma formule</button>
           </div>
 
-          <div class="formule-card formule-midi">
+          <div class="formule-card formule-midi" id="formule-card-midi">
             <div class="formule-header">
               <span class="formule-icon-big">☀️</span>
               <div class="formule-badge formule-badge-green">Menu Midi</div>
             </div>
             <h3>Menu Midi</h3>
-            <p class="formule-desc">À emporter uniquement · Service du midi</p>
+            <p class="formule-desc">Mar–Dim · À emporter uniquement · Service du midi</p>
             <ul class="formule-items">
               <li>🍕 <strong>Pizza</strong> au choix + <strong>canette offerte</strong></li>
               <li><em>— ou —</em></li>
               <li>🥪 <strong>Panizza</strong> au choix + <strong>canette offerte</strong></li>
             </ul>
+            <div class="formule-days-footer">
+              <span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+            </div>
             <div class="formule-note">La boisson est offerte avec votre plat</div>
             <button class="btn-primary btn-formule" data-formule="midi">Composer ma formule</button>
           </div>
 
-          <div class="formule-card formule-exclusive">
+          <div class="formule-card formule-exclusive" id="formule-card-exclusive">
             <div class="formule-header">
               <span class="formule-icon-big">🎁</span>
               <div class="formule-badge formule-badge-red">Offre Exclusive</div>
             </div>
             <h3>2+1 Offert</h3>
-            <p class="formule-desc">Lundi au jeudi · À emporter uniquement</p>
+            <p class="formule-desc">Mar–Dim · À emporter uniquement</p>
             <ul class="formule-items">
               <li>🍕 Achetez <strong>2 pizzas</strong></li>
               <li>🎁 La <strong>3ème est offerte !</strong></li>
             </ul>
             <div class="formule-days-footer">
-              <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span>
+              <span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
             </div>
             <div class="formule-note">Non cumulable avec d'autres offres</div>
             <button class="btn-primary btn-formule" data-formule="exclusive">Composer ma formule</button>
@@ -946,7 +929,7 @@
         </div>
       </div>
 
-      <p class="menu-note">🌾 Pâte sans gluten disponible sur demande (+2€) &nbsp;·&nbsp; Suppléments ingrédients +2€ pièce</p>
+      <p class="menu-note">Suppléments ingrédients +2€ pièce</p>
     </div>
   </section>
 
@@ -957,11 +940,12 @@
       <p class="section-sub white">Ajoutez vos pizzas depuis le menu, puis choisissez livraison ou retrait</p>
 
       <div class="cart-infobadges">
-        <span>🛵 Livraison ~30 min · à partir de 15€</span>
-        <span>🏠 Retrait ~15 min · sans minimum</span>
+        <span>🛵 Livraison gratuite · minimum 20€</span>
+        <span>🏠 Retrait ~15 min · minimum 20€</span>
         <span>🔒 Paiement sécurisé</span>
       </div>
 
+      <div class="cart-wrap">
       <div id="stripe-cart">
         <p class="cart-empty">Ton panier est vide — ajoute des pizzas depuis le menu ci-dessus</p>
       </div>
@@ -969,13 +953,28 @@
         <div class="cart-total">Total : <strong id="cart-total">0€</strong></div>
         <div class="cart-delivery-choice">
           <p class="cart-delivery-label">Comment souhaitez-vous récupérer votre commande ?</p>
-          <div class="cart-delivery-btns">
+          <div class="cart-delivery-btns" id="cart-delivery-btns">
             <button class="btn-delivery-opt" id="btn-livraison">🛵 Livraison</button>
             <button class="btn-delivery-opt" id="btn-emporter">🏠 À emporter</button>
+          </div>
+          <div id="cart-min-notice" class="cart-min-notice" style="display:none;">
+            <span>🛒</span>
+            <div>
+              <strong>Minimum de commande : 20€</strong>
+              <p>Ajoutez des articles pour atteindre le minimum requis.</p>
+            </div>
+          </div>
+          <div id="cart-closed-notice" class="cart-closed-notice" style="display:none;">
+            <span>🔴</span>
+            <div>
+              <strong>Restaurant fermé</strong>
+              <p>Les commandes en ligne ne sont pas disponibles en ce moment.<br>Revenez pendant nos horaires d'ouverture.</p>
+            </div>
           </div>
         </div>
         <p class="cmd-note">Paiement 100% sécurisé via Stripe</p>
       </div>
+      </div><!-- /.cart-wrap -->
     </div>
   </section>
 
@@ -983,58 +982,58 @@
   <section id="livraison" class="section-livraison">
     <div class="container">
       <h2 class="section-title">Zone de livraison</h2>
-      <p class="section-sub">Nous livrons dans les communes suivantes</p>
+      <p class="section-sub">Livraison gratuite · Commande minimum 20€</p>
       <div class="livraison-grid">
         <div class="livraison-card active">
           <span class="livraison-icon">📍</span>
           <strong>Bougival</strong>
-          <span>Livraison 2€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Le Pecq</strong>
-          <span>Livraison 2€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Croissy-sur-Seine</strong>
-          <span>Livraison 2€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Port-Marly</strong>
-          <span>Livraison 3€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Chatou</strong>
-          <span>Livraison 3€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Louveciennes</strong>
-          <span>Livraison 3€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Marly-le-Roi</strong>
-          <span>Livraison 4€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>La Celle-Saint-Cloud</strong>
-          <span>Livraison 4€</span>
+          <span>Livraison gratuite</span>
         </div>
         <div class="livraison-card">
           <span class="livraison-icon">📍</span>
           <strong>Rueil-Malmaison</strong>
-          <span>Livraison 4€</span>
+          <span>Livraison gratuite</span>
         </div>
       </div>
       <div class="livraison-conditions">
-        <span>🛒 Minimum de commande : <strong>15€</strong></span>
+        <span>🛒 Minimum de commande : <strong>20€</strong></span>
         <span>⏱ Délai moyen : <strong>30 min</strong></span>
-        <span>💳 CB, espèces, ticket resto</span>
+        <span>💳 CB en ligne · Espèces &amp; ticket resto sur place</span>
       </div>
     </div>
   </section>
@@ -1044,11 +1043,11 @@
     <div class="container promo-inner">
       <div>
         <h2>-10% sur votre première commande</h2>
-        <p>Commandez en ligne et utilisez le code ci-dessous</p>
+        <p>La remise est appliquée automatiquement — entrez simplement votre email lors du paiement.</p>
       </div>
-      <div class="promo-code-box">
-        <span id="promo-code">BIENVENUE10</span>
-        <button onclick="copyPromo()" id="btn-copy">Copier</button>
+      <div class="promo-code-box" style="font-size:.95rem;letter-spacing:0;gap:0;">
+        <span style="font-size:1.6rem;">🎉</span>
+        <span style="color:#fff;font-weight:600;">Aucun code à saisir</span>
       </div>
     </div>
   </section>
@@ -1067,39 +1066,48 @@
       <div class="avis-grid">
         <div class="avis-card">
           <div class="avis-stars">★★★★★</div>
-          <p>"Pâte excellente, vraiment croustillante. La burrata est incroyable. Je reviens chaque semaine !"</p>
+          <div class="avis-criteria">
+            <span>Cuisine <strong>5</strong></span><span>Service <strong>5</strong></span><span>Ambiance <strong>5</strong></span>
+          </div>
+          <p>"Excellente pizza, très goûteuse et pâte croustillante. Hâte de recommander. Ne changez pas la qualité svp"</p>
           <div class="avis-author">
-            <div class="avis-avatar">M</div>
+            <div class="avis-avatar">S</div>
             <div>
-              <strong>Marie L.</strong>
-              <span>Bougival · Google</span>
+              <strong>Sissy Wasfer</strong>
+              <span>Google</span>
             </div>
           </div>
         </div>
         <div class="avis-card">
           <div class="avis-stars">★★★★★</div>
-          <p>"Livraison rapide, pizza encore chaude. La diavola est parfaite pour les amateurs de piquant !"</p>
+          <div class="avis-criteria">
+            <span>Cuisine <strong>5</strong></span><span>Service <strong>5</strong></span><span>Ambiance <strong>5</strong></span>
+          </div>
+          <p>"Très bonnes pizzas au feu de bois, service au top ! Je recommande."</p>
           <div class="avis-author">
-            <div class="avis-avatar">T</div>
+            <div class="avis-avatar">H</div>
             <div>
-              <strong>Thomas B.</strong>
-              <span>Chatou · Google</span>
+              <strong>Hamdene Boughattas</strong>
+              <span>Google</span>
             </div>
           </div>
         </div>
         <div class="avis-card">
-          <div class="avis-stars">★★★★☆</div>
-          <p>"Très bonne qualité, portions généreuses. Le meilleur rapport qualité/prix du coin."</p>
+          <div class="avis-stars">★★★★★</div>
+          <div class="avis-criteria">
+            <span>Cuisine <strong>5</strong></span><span>Service <strong>5</strong></span><span>Ambiance <strong>5</strong></span>
+          </div>
+          <p>"Excellente pizzas au feu de bois, accueil très agréable et propreté irréprochable."</p>
           <div class="avis-author">
-            <div class="avis-avatar">S</div>
+            <div class="avis-avatar">L</div>
             <div>
-              <strong>Sophie M.</strong>
-              <span>Rueil-Malmaison · Google</span>
+              <strong>Lali Hamama</strong>
+              <span>Google</span>
             </div>
           </div>
         </div>
       </div>
-      <a href="https://www.google.com/maps/search/?q=PANUOZZO+30+Av.+Jean+Moulin+78380+Bougival" target="_blank" rel="noopener" class="btn-avis">Laisser un avis Google</a>
+      <a href="https://www.google.com/maps?cid=15158477616899090332&action=WRITE_REVIEW" target="_blank" rel="noopener" class="btn-avis">Laisser un avis Google</a>
     </div>
   </section>
 
@@ -1127,18 +1135,18 @@
             <span class="contact-icon">🕐</span>
             <div>
               <strong>Horaires</strong>
-              <p>Mar–Sam : 11h00–14h30 &amp; 18h00–23h00<br>Dim : 18h00–23h00<br><span style="color:#ef4444;font-size:.85em">Fermé le lundi</span></p>
+              <p>Mar–Sam : 11h00–14h30 &amp; 18h00–23h00<br>Dim : 11h00–14h30 &amp; 18h00–23h00<br><span style="color:#ef4444;font-size:.85em">Fermé le lundi</span></p>
             </div>
           </div>
           <div class="contact-item">
             <span class="contact-icon">💳</span>
             <div>
               <strong>Paiement</strong>
-              <p>CB, espèces, ticket restaurant</p>
+              <p>CB en ligne · Espèces &amp; ticket restaurant acceptés sur place uniquement</p>
             </div>
           </div>
         </div>
-        <a href="https://maps.google.com/?q=30+Avenue+Jean+Moulin+78380+Bougival" target="_blank" rel="noopener" class="btn-maps">📍 Ouvrir dans Google Maps</a>
+        <a href="https://www.google.com/maps/place/PANUOZZO+-+Pizza+au+feu+de+bois,+30+Av.+Jean+Moulin,+78380+Bougival/data=!4m2!3m1!1s0x47e67d37233744ad:0xd25dbb145afae79c" target="_blank" rel="noopener" class="btn-maps">📍 Ouvrir dans Google Maps</a>
       </div>
       <div class="contact-map">
         <iframe
@@ -1154,7 +1162,7 @@
   <footer class="footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <span class="logo-text">PANUOZZO</span>
+        <span class="logo-text"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></span>
         <p>Pizzeria artisanale à Bougival<br>Livraison &amp; à emporter</p>
       </div>
       <div class="footer-links">
@@ -1166,9 +1174,18 @@
       <div class="footer-legal">
         <p>© 2026 PANUOZZO – Tous droits réservés</p>
         <p>30 Av. Jean Moulin, 78380 Bougival · <a href="tel:+33175269120" style="color:inherit;">01 75 26 91 20</a></p>
+        <p style="margin-top:6px;">
+          <a href="/legal.html#mentions" style="color:rgba(255,255,255,.45);font-size:.72rem;margin-right:12px;">Mentions légales</a>
+          <a href="/legal.html#cgv" style="color:rgba(255,255,255,.45);font-size:.72rem;margin-right:12px;">CGV</a>
+          <a href="/legal.html#cookies" style="color:rgba(255,255,255,.45);font-size:.72rem;">Politique cookies</a>
+        </p>
       </div>
     </div>
   </footer>
+  <div style="background:#0d0d0d;text-align:center;padding:8px;font-size:.68rem;color:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;gap:6px;">
+    <img src="/images/ai-autoheal-logo.webp" alt="AI-Autoheal" style="height:16px;opacity:.35;vertical-align:middle;">
+    Site créé par AI-Autoheal
+  </div>
 
   <!-- ===== CTA FLOTTANT MOBILE ===== -->
   <div class="floating-cta" id="floating-cta">
@@ -1212,6 +1229,19 @@
 
         <div class="form-row">
           <div class="form-group">
+            <label for="d-zip">Code postal <span class="form-required">*</span></label>
+            <input type="text" id="d-zip" placeholder="78380" autocomplete="postal-code" required maxlength="5">
+            <span class="form-error" id="d-zip-err"></span>
+          </div>
+          <div class="form-group">
+            <label for="d-city">Ville <span class="form-required">*</span></label>
+            <input type="text" id="d-city" placeholder="Bougival" autocomplete="address-level2" required>
+            <span class="form-error" id="d-city-err"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
             <label for="d-floor">Étage</label>
             <input type="text" id="d-floor" placeholder="ex : 3ème">
           </div>
@@ -1237,7 +1267,44 @@
           <textarea id="d-notes" placeholder="Ex : Sonner deux fois, laisser devant la porte..." rows="2"></textarea>
         </div>
 
+        <div class="form-group">
+          <label for="d-email">Email <span style="font-weight:400;color:var(--gray);font-size:.78rem;">(optionnel — confirmation de commande)</span></label>
+          <input type="email" id="d-email" placeholder="jean@email.com" autocomplete="email">
+          <div id="d-promo-badge" class="promo-eligible-badge" style="display:none;">🎉 -10% première commande appliqué !</div>
+        </div>
+
         <button type="submit" class="btn-primary btn-delivery-submit">💳 Confirmer et payer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL EMPORTER ===== -->
+  <div class="modal-overlay" id="emporter-modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="emporter-modal-title">
+      <button class="modal-close" id="emporter-modal-close" aria-label="Fermer">✕</button>
+      <div class="modal-header">
+        <h3 id="emporter-modal-title">🏠 À emporter</h3>
+        <p class="modal-desc">Votre commande sera prête en ~15 min au comptoir.</p>
+      </div>
+      <form id="emporter-form" novalidate>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="e-firstname">Prénom <span class="form-required">*</span></label>
+            <input type="text" id="e-firstname" placeholder="Jean" autocomplete="given-name" required>
+            <span class="form-error" id="e-firstname-err"></span>
+          </div>
+          <div class="form-group">
+            <label for="e-phone">Téléphone <span class="form-required">*</span></label>
+            <input type="tel" id="e-phone" placeholder="06 12 34 56 78" autocomplete="tel" required>
+            <span class="form-error" id="e-phone-err"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="e-email">Email <span style="font-weight:400;color:var(--gray);font-size:.78rem;">(optionnel — confirmation + -10% 1ère commande)</span></label>
+          <input type="email" id="e-email" placeholder="jean@email.com" autocomplete="email">
+          <div id="e-promo-badge" class="promo-eligible-badge" style="display:none;">🎉 -10% première commande appliqué !</div>
+        </div>
+        <button type="submit" class="btn-primary btn-delivery-submit">🏠 Confirmer et payer</button>
       </form>
     </div>
   </div>
@@ -1286,6 +1353,29 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=5"></script>
+  <script src="js/main.js?v=18"></script>
+
+  <!-- ===== BANNIÈRE COOKIES ===== -->
+  <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:rgba(255,255,255,.85);padding:14px 20px;z-index:9999;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.8rem;box-shadow:0 -4px 20px rgba(0,0,0,.25);">
+    <p style="margin:0;flex:1;min-width:200px;">
+      Ce site utilise des cookies nécessaires à son fonctionnement (paiement sécurisé, cartes). Aucun cookie publicitaire.
+      <a href="/legal.html#cookies" style="color:#4ade80;text-decoration:underline;">En savoir plus</a>
+    </p>
+    <div style="display:flex;gap:10px;flex-shrink:0;">
+      <button id="cookie-refuse" style="background:transparent;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.2);padding:7px 16px;border-radius:6px;font-size:.8rem;cursor:pointer;">Refuser</button>
+      <button id="cookie-accept" style="background:#1a6b4e;color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer;">Accepter</button>
+    </div>
+  </div>
+  <script>
+    function setCookieConsent(val) {
+      localStorage.setItem('cookie_consent', val);
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
+    document.getElementById('cookie-refuse').addEventListener('click', () => setCookieConsent('refused'));
+    document.getElementById('cookie-accept').addEventListener('click', () => setCookieConsent('accepted'));
+    if (!localStorage.getItem('cookie_consent')) {
+      document.getElementById('cookie-banner').style.display = 'flex';
+    }
+  </script>
 </body>
 </html>

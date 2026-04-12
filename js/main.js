@@ -14,6 +14,11 @@ function closeNav() {
   mobileNav.classList.remove('open');
 }
 
+// Close nav when a link inside mobile-nav is clicked
+mobileNav.addEventListener('click', (e) => {
+  if (e.target.tagName === 'A') closeNav();
+});
+
 // Close nav when clicking outside
 document.addEventListener('click', (e) => {
   if (!burger.contains(e.target) && !mobileNav.contains(e.target)) {
@@ -22,9 +27,11 @@ document.addEventListener('click', (e) => {
 });
 
 // ── Statut ouvert/fermé ──────────────────────────────────
+let restaurantOpen = false; // état global utilisé par le checkout
+
 function updateStatut() {
-  const el = document.getElementById('statut-ouvert');
-  if (!el) return;
+  const el      = document.getElementById('statut-ouvert');
+  const heroEl  = document.getElementById('hero-statut');
 
   const now = new Date();
   const day = now.getDay();  // 0 = dim, 1 = lun, ..., 6 = sam
@@ -32,40 +39,68 @@ function updateStatut() {
   const m   = now.getMinutes();
   const hm  = h * 60 + m;  // minutes depuis minuit
 
-  // Horaires : lun-sam 11h00-14h30 & 18h00-23h00 / dim 18h00-23h00
+  // Horaires : Mar–Dim 11h00-14h30 & 18h00-23h00 / Lundi fermé
   const midi_open  = 11 * 60;
   const midi_close = 14 * 60 + 30;
   const soir_open  = 18 * 60;
   const soir_close = 23 * 60;
 
-  let isOpen = false;
+  let isOpen   = false;
+  let closesAt = '';
 
   // Lundi (day=1) : fermé toute la journée
-  if (day >= 2 && day <= 6) {
-    // Mar–Sam
-    isOpen = (hm >= midi_open && hm < midi_close) || (hm >= soir_open && hm < soir_close);
-  } else if (day === 0) {
-    // Dimanche
-    isOpen = hm >= soir_open && hm < soir_close;
+  // Mar–Sam (2–6) et Dim (0) : mêmes horaires midi + soir
+  if (day !== 1) {
+    if (hm >= midi_open && hm < midi_close) { isOpen = true; closesAt = '14h30'; }
+    else if (hm >= soir_open && hm < soir_close) { isOpen = true; closesAt = '23h00'; }
   }
 
-  if (isOpen) {
-    el.innerHTML = '<span style="color:#4ade80;font-weight:700;">● Ouvert maintenant</span>';
-  } else {
-    let next = '';
-    if (day === 1) next = 'Ouvre demain à 11h00';                                         // lundi → mardi
-    else if (day === 0 && hm < soir_open) next = 'Ouvre ce soir à 18h00';
-    else if (day === 0 && hm >= soir_close) next = 'Ouvre mardi à 11h00';                 // dim soir → skip lundi
-    else if (day === 6 && hm >= soir_close) next = 'Ouvre dimanche à 18h00';              // sam soir → dim
-    else if (hm < midi_open && day >= 2 && day <= 6) next = 'Ouvre à 11h00';
-    else if (hm >= midi_close && hm < soir_open && day >= 2 && day <= 6) next = 'Ouvre à 18h00';
+  let next = '';
+  if (!isOpen) {
+    if (day === 1) next = 'Ouvre demain à 11h00';
+    else if (day === 0 && hm >= soir_close) next = 'Ouvre mardi à 11h00';
+    else if (day === 6 && hm >= soir_close) next = 'Ouvre dimanche à 11h00';
+    else if (hm < midi_open) next = 'Ouvre à 11h00';
+    else if (hm >= midi_close && hm < soir_open) next = 'Ouvre à 18h00';
     else next = 'Ouvre demain à 11h00';
-    el.innerHTML = `<span style="color:#fbbf24;font-weight:700;">● Fermé — ${next}</span>`;
   }
+
+  restaurantOpen = isOpen;
+
+  // Bandeau horaires (texte sobre)
+  if (el) {
+    el.innerHTML = isOpen
+      ? `<span style="color:#4ade80;font-weight:700;">● Ouvert jusqu'à ${closesAt}</span>`
+      : `<span style="color:#fbbf24;font-weight:700;">● Fermé — ${next}</span>`;
+  }
+
+  // Badge hero (pill visuelle)
+  if (heroEl) {
+    heroEl.style.display = '';
+    if (isOpen) {
+      heroEl.style.background  = 'rgba(74, 222, 128, .15)';
+      heroEl.style.color       = '#4ade80';
+      heroEl.style.borderColor = 'rgba(74, 222, 128, .4)';
+      heroEl.style.fontWeight  = '700';
+      heroEl.textContent       = `🟢 Ouvert jusqu'à ${closesAt}`;
+    } else {
+      heroEl.style.background  = 'rgba(251, 191, 36, .12)';
+      heroEl.style.color       = '#fbbf24';
+      heroEl.style.borderColor = 'rgba(251, 191, 36, .35)';
+      heroEl.style.fontWeight  = '700';
+      heroEl.textContent       = `🔴 Fermé — ${next}`;
+    }
+  }
+
+  // Blocage du panier si fermé
+  const notice  = document.getElementById('cart-closed-notice');
+  const btns    = document.getElementById('cart-delivery-btns');
+  if (notice) notice.style.display = isOpen ? 'none' : 'flex';
+  if (btns)   btns.style.display   = isOpen ? 'flex'  : 'none';
 }
 
 updateStatut();
-setInterval(updateStatut, 60_000);
+setInterval(updateStatut, 30_000);
 
 // ── Onglets menu ─────────────────────────────────────────
 const tabs        = document.querySelectorAll('.tab');
@@ -82,6 +117,40 @@ function animateCards(container) {
     }, i * 45);
   });
 }
+
+function switchToTab(target) {
+  const tab = document.querySelector(`.tab[data-tab="${target}"]`);
+  if (!tab) return;
+  tabs.forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  const searchEl = document.getElementById('pizza-search');
+  if (searchEl) searchEl.value = '';
+  tabContents.forEach(content => {
+    if (content.id === `tab-${target}`) {
+      content.classList.remove('hidden');
+      animateCards(content);
+    } else {
+      content.classList.add('hidden');
+    }
+  });
+  document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function switchToTabAndScroll(target, cardId) {
+  switchToTab(target);
+  // Wait for tab to be visible before scrolling to the card
+  setTimeout(() => {
+    const card = document.getElementById(cardId);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 350);
+}
+
+// Wire hero banners (offre exclusive + menu midi)
+document.getElementById('btn-offre-exclusive')?.addEventListener('click', () => switchToTabAndScroll('formules', 'formule-card-exclusive'));
+document.getElementById('btn-offre-exclusive')?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchToTabAndScroll('formules', 'formule-card-exclusive'); } });
+document.getElementById('btn-menu-midi')?.addEventListener('click', () => switchToTabAndScroll('formules', 'formule-card-midi'));
+document.getElementById('btn-menu-midi')?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchToTabAndScroll('formules', 'formule-card-midi'); } });
 
 tabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -107,18 +176,6 @@ tabs.forEach(tab => {
   });
 });
 
-// ── Extras toggle ─────────────────────────────────────────
-document.getElementById('extras-toggle').addEventListener('click', () => {
-  const list = document.getElementById('extras-list');
-  const tag  = document.querySelector('.extras-tag');
-  if (list.hasAttribute('hidden')) {
-    list.removeAttribute('hidden');
-    if (tag) tag.textContent = 'Masquer ▲';
-  } else {
-    list.setAttribute('hidden', '');
-    if (tag) tag.textContent = 'Voir la liste complète ▼';
-  }
-});
 
 // ── Recherche pizza ───────────────────────────────────────
 document.getElementById('pizza-search').addEventListener('input', (e) => {
@@ -222,13 +279,7 @@ window.addEventListener('scroll', () => {
   lastScroll = scrollY;
 }, { passive: true });
 
-// ── Chargement Stripe.js ─────────────────────────────────
-(function() {
-  const s = document.createElement('script');
-  s.src = 'https://js.stripe.com/v3/';
-  s.defer = true;
-  document.head.appendChild(s);
-})();
+// Paiement via Stripe Checkout hébergé (redirect) — Stripe.js non requis côté client
 
 // ── Modal personnalisation pizza ──────────────────────────
 const EXTRAS = [
@@ -246,6 +297,13 @@ const modalRemoveEl = document.getElementById('modal-remove');
 const modalAddEl    = document.getElementById('modal-add');
 const modalTotalEl  = document.getElementById('modal-total');
 
+// Délégation unique sur le container des extras (résistant aux remplacements d'innerHTML)
+modalAddEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-extra]');
+  if (!btn) return;
+  changeExtra(btn.getAttribute('data-extra'), parseInt(btn.getAttribute('data-delta'), 10));
+});
+
 let currentModal  = null;
 let extrasCount   = {}; // { 'Jambon': 2, 'Mozzarella': 1, ... }
 
@@ -258,6 +316,12 @@ function changeExtra(name, delta) {
   }
   updateModalTotal();
 }
+
+// Event delegation for pizza base radio buttons (data-select-id / data-base)
+document.getElementById('menu').addEventListener('change', (e) => {
+  const radio = e.target.closest('input[type="radio"][data-select-id]');
+  if (radio) filterBasePizzas(radio.dataset.selectId, radio.dataset.base);
+});
 
 // ── Délégation sur le conteneur menu ─────────────────────
 document.getElementById('menu').addEventListener('click', (e) => {
@@ -341,8 +405,47 @@ function getPizzaOptions() {
     .map(c => {
       const n = c.querySelector('h3')?.textContent.trim();
       const p = parseFloat((c.querySelector('.pizza-price strong')?.textContent || '0€').replace('€','').replace(',','.'));
-      return { name: n, price: p };
+      const base = c.closest('#tab-tomate') ? 'tomate' : 'creme';
+      return { name: n, price: p, base };
     }).filter(o => o.name);
+}
+
+// Stockage global des options par selectId (évite le problème innerHTML+<script>)
+const _basePizzaOpts = {};
+
+function buildBasePizzaSelectHtml(id, label, allPizzas) {
+  const tomate = allPizzas.filter(p => p.base === 'tomate');
+  const creme  = allPizzas.filter(p => p.base === 'creme');
+  _basePizzaOpts[id] = { tomate, creme };
+  const radioName = `base-${id}`;
+  return `
+    <div class="formule-select-group formule-base-group">
+      <label>${label}</label>
+      <div class="base-radio-row">
+        <label class="base-radio-label">
+          <input type="radio" name="${radioName}" value="tomate" checked data-select-id="${id}" data-base="tomate">
+          <span>🍅 Base Tomate</span>
+        </label>
+        <label class="base-radio-label">
+          <input type="radio" name="${radioName}" value="creme" data-select-id="${id}" data-base="creme">
+          <span>🥛 Base Crème Fraîche</span>
+        </label>
+      </div>
+      <select id="${id}" class="formule-pizza-select">
+        <option value="">-- Choisir une pizza --</option>
+        ${tomate.map(o => `<option value="${o.name}" data-price="${o.price}" data-base="tomate">${o.name} (${o.price.toFixed(2).replace('.',',')}€)</option>`).join('')}
+      </select>
+    </div>`;
+}
+
+function filterBasePizzas(selectId, base) {
+  const opts = _basePizzaOpts[selectId];
+  if (!opts) return;
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Choisir une pizza --</option>' +
+    opts[base].map(o => `<option value="${o.name}" data-price="${o.price}" data-base="${base}">${o.name} (${o.price.toFixed(2).replace('.',',')}€)</option>`).join('');
+  updateFormuleTotal();
 }
 
 function getPanizzaOptions() {
@@ -366,11 +469,11 @@ function buildSelectHtml(id, label, options) {
 }
 
 function openFormuleModal(type) {
-  // Menu Midi : uniquement Mar–Sam 11h00–14h30
+  // Menu Midi : uniquement Mar–Dim 11h00–14h30
   if (type === 'midi') {
     const _n = new Date(), _day = _n.getDay(), _hm = _n.getHours() * 60 + _n.getMinutes();
-    if (_day === 0 || _day === 1 || _hm < 11 * 60 || _hm >= 14 * 60 + 30) {
-      alert('Le Menu Midi est disponible uniquement du mardi au samedi entre 11h00 et 14h30 🕚');
+    if (_day === 1 || _hm < 11 * 60 || _hm >= 14 * 60 + 30) {
+      alert('Le Menu Midi est disponible uniquement du mardi au dimanche entre 11h00 et 14h30 🕚');
       return;
     }
   }
@@ -390,9 +493,9 @@ function openFormuleModal(type) {
     desc  = '3 pizzas au choix + 1 bouteille 1,25L';
     bodyHtml = `
       <p class="formule-section-title">Choisissez vos 3 pizzas</p>
-      ${buildSelectHtml('fg-p1', 'Pizza n°1', pizzas)}
-      ${buildSelectHtml('fg-p2', 'Pizza n°2', pizzas)}
-      ${buildSelectHtml('fg-p3', 'Pizza n°3', pizzas)}
+      ${buildBasePizzaSelectHtml('fg-p1', 'Pizza n°1', pizzas)}
+      ${buildBasePizzaSelectHtml('fg-p2', 'Pizza n°2', pizzas)}
+      ${buildBasePizzaSelectHtml('fg-p3', 'Pizza n°3', pizzas)}
       <p class="formule-section-title">Choisissez votre bouteille</p>
       ${buildSelectHtml('fg-boit', 'Bouteille 1,25L', bouteilles)}`;
   } else if (type === 'midi') {
@@ -405,14 +508,14 @@ function openFormuleModal(type) {
       { name: 'Ice Tea Pêche 33cl',   price: 0 },
     ];
     title = 'Menu Midi';
-    desc  = 'À emporter · pizza ou panizza + canette offerte';
+    desc  = 'Mar–Dim · À emporter · pizza ou panizza + canette offerte';
     bodyHtml = `
       <p class="formule-section-title">Votre plat</p>
       <div class="formule-radio-group" id="midi-type">
         <label class="formule-radio-label"><input type="radio" name="midi-plat-type" value="pizza" checked><span>🍕 Pizza</span></label>
         <label class="formule-radio-label"><input type="radio" name="midi-plat-type" value="panizza"><span>🥙 Panizza</span></label>
       </div>
-      <div id="midi-pizza-wrap">${buildSelectHtml('fm-pizza', 'Pizza au choix', pizzas)}</div>
+      <div id="midi-pizza-wrap">${buildBasePizzaSelectHtml('fm-pizza', 'Pizza au choix', pizzas)}</div>
       <div id="midi-panizza-wrap" style="display:none">${buildSelectHtml('fm-panizza', 'Panizza au choix', panizzas)}</div>
       <p class="formule-section-title">Votre canette <span style="font-size:.78rem;color:var(--green);font-weight:700;">offerte 🎁</span></p>
       ${buildSelectHtml('fm-canette', 'Canette au choix', canettes)}`;
@@ -421,8 +524,8 @@ function openFormuleModal(type) {
     desc  = 'Lun–Jeu · À emporter · 2 pizzas achetées = 1 offerte';
     bodyHtml = `
       <p class="formule-section-title">Choisissez vos 2 pizzas (la 3ème sera identique à la 1ère)</p>
-      ${buildSelectHtml('fe-p1', 'Pizza n°1 (+ 1 offerte)', pizzas)}
-      ${buildSelectHtml('fe-p2', 'Pizza n°2', pizzas)}`;
+      ${buildBasePizzaSelectHtml('fe-p1', 'Pizza n°1 (+ 1 offerte identique)', pizzas)}
+      ${buildBasePizzaSelectHtml('fe-p2', 'Pizza n°2', pizzas)}`;
   }
 
   document.getElementById('formule-modal-title').textContent = title;
@@ -519,7 +622,7 @@ formuleConfirm.addEventListener('click', () => {
 
   const total = items.reduce((s, i) => s + i.price, 0);
   const label = items.map(i => i.name).join(' + ');
-  addToCart({ name: document.getElementById('formule-modal-title').textContent, desc: label, price: total });
+  addToCart({ name: document.getElementById('formule-modal-title').textContent, desc: label, price: total, formuleType: type });
   closeFormuleModal();
 
   const cmdSection = document.getElementById('commander');
@@ -604,11 +707,12 @@ function openPizzaModalFull(name, desc, priceText, basePrice, isDessert, meatCho
     <div class="extra-row" data-extra-name="${ing}">
       <span class="extra-name">${ing} <em>+2€</em></span>
       <div class="extra-counter">
-        <button type="button" class="extra-btn extra-dec" onclick="changeExtra('${ing}', -1)">−</button>
+        <button type="button" class="extra-btn extra-dec" data-extra="${ing}" data-delta="-1">−</button>
         <span class="extra-count">0</span>
-        <button type="button" class="extra-btn extra-inc" onclick="changeExtra('${ing}', +1)">+</button>
+        <button type="button" class="extra-btn extra-inc" data-extra="${ing}" data-delta="1">+</button>
       </div>
     </div>`).join('');
+
 
   modalConfirm.textContent = '🛒 Ajouter au panier';
   currentModal = { name, desc, basePrice, ingredients, meatChoice };
@@ -705,6 +809,15 @@ modalConfirm.addEventListener('click', () => {
 // ── Panier ────────────────────────────────────────────────
 const cart = [];
 
+// Escape HTML — empêche XSS lors de l'injection de noms/descriptions dans innerHTML
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function addToCart(item) {
   cart.push({ ...item, qty: 1 });
   renderCart();
@@ -734,34 +847,49 @@ function renderCart() {
     let customHtml = '';
     // Choix de viande (Calzone) — toujours affiché en premier
     if (item.meatChoice) {
-      customHtml += `<div class="cart-item-custom cart-item-meat">🥩 ${item.meatChoice}</div>`;
+      customHtml += `<div class="cart-item-custom cart-item-meat">🥩 ${esc(item.meatChoice)}</div>`;
     }
     if (item.removed?.length || item.added?.length) {
       if (item.removed?.length)
-        customHtml += `<div class="cart-item-custom"><span class="removed">−&nbsp;${item.removed.join(', ')}</span></div>`;
+        customHtml += `<div class="cart-item-custom"><span class="removed">−&nbsp;${item.removed.map(esc).join(', ')}</span></div>`;
       if (item.added?.length)
-        customHtml += `<div class="cart-item-custom"><span class="added">+&nbsp;${item.added.map(a => `${a.qty > 1 ? a.qty + '× ' : ''}${a.name} <em>(+${a.qty * 2}€)</em>`).join(' · ')}</span></div>`;
+        customHtml += `<div class="cart-item-custom"><span class="added">+&nbsp;${item.added.map(a => `${a.qty > 1 ? a.qty + '× ' : ''}${esc(a.name)} <em>(+${a.qty * 2}€)</em>`).join(' · ')}</span></div>`;
     } else if (!item.meatChoice && item.desc) {
       // Détail pour formules, glaces, etc.
-      customHtml += `<div class="cart-item-custom cart-item-desc">${item.desc}</div>`;
+      customHtml += `<div class="cart-item-custom cart-item-desc">${esc(item.desc)}</div>`;
     }
     return `
     <div class="cart-item">
       <div class="cart-item-name">
-        <span>${item.name}</span>
+        <span>${esc(item.name)}</span>
         ${customHtml}
       </div>
       <div class="cart-item-qty">
-        <button onclick="changeQty(${idx}, -1)">−</button>
+        <button data-idx="${idx}" data-delta="-1">−</button>
         <span>${item.qty}</span>
-        <button onclick="changeQty(${idx}, +1)">+</button>
+        <button data-idx="${idx}" data-delta="1">+</button>
         <span>${(item.price * item.qty).toFixed(2).replace('.',',')}€</span>
       </div>
     </div>`;
   }).join('');
 
+  // Attacher les listeners directement sur les boutons quantité du panier
+  container.querySelectorAll('[data-idx]').forEach(btn => {
+    btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx, 10), parseInt(btn.dataset.delta, 10)));
+  });
+
   if (totalEl) totalEl.textContent = `${total.toFixed(2).replace('.',',')}€`;
   summary?.classList.remove('hidden');
+
+  // Notice minimum de commande
+  const minNotice = document.getElementById('cart-min-notice');
+  const deliveryBtns = document.getElementById('cart-delivery-btns');
+  if (minNotice) {
+    const belowMin = total < 20;
+    minNotice.style.display = belowMin ? 'flex' : 'none';
+    if (deliveryBtns) deliveryBtns.style.pointerEvents = belowMin ? 'none' : '';
+    if (deliveryBtns) deliveryBtns.style.opacity = belowMin ? '0.35' : '';
+  }
 }
 
 function changeQty(idx, delta) {
@@ -770,6 +898,7 @@ function changeQty(idx, delta) {
   renderCart();
 }
 
+
 // ── Choix livraison / à emporter ─────────────────────────
 let deliveryInfo = null;  // { mode: 'livraison'|'emporter', address?, code?, phone? }
 
@@ -777,7 +906,17 @@ const deliveryModal      = document.getElementById('delivery-modal');
 const deliveryModalClose = document.getElementById('delivery-modal-close');
 const deliveryForm       = document.getElementById('delivery-form');
 
+// Formules disponibles uniquement à emporter
+const EMPORTER_ONLY = ['midi', 'exclusive'];
+
 document.getElementById('btn-livraison').addEventListener('click', () => {
+  // Vérifier si le panier contient des formules non livrables
+  const blocked = cart.filter(i => EMPORTER_ONLY.includes(i.formuleType));
+  if (blocked.length) {
+    const names = blocked.map(i => `• ${i.name}`).join('\n');
+    alert(`Les articles suivants sont disponibles uniquement à emporter :\n${names}\n\nRetirez-les du panier pour commander en livraison, ou choisissez "À emporter".`);
+    return;
+  }
   document.getElementById('btn-livraison').classList.add('active');
   document.getElementById('btn-emporter').classList.remove('active');
   // Réinitialiser le formulaire et les erreurs
@@ -795,7 +934,51 @@ document.getElementById('btn-livraison').addEventListener('click', () => {
 document.getElementById('btn-emporter').addEventListener('click', () => {
   document.getElementById('btn-emporter').classList.add('active');
   document.getElementById('btn-livraison').classList.remove('active');
-  deliveryInfo = { mode: 'emporter' };
+  // Ouvrir la mini-modal emporter (collecte prénom + téléphone + email optionnel)
+  document.getElementById('emporter-form').reset();
+  document.getElementById('e-promo-badge').style.display = 'none';
+  document.getElementById('emporter-modal').classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+});
+
+// ── Modal emporter ────────────────────────────────────────
+const emporterModal = document.getElementById('emporter-modal');
+document.getElementById('emporter-modal-close').addEventListener('click', () => {
+  emporterModal.classList.remove('is-open');
+  document.body.style.overflow = '';
+  document.getElementById('btn-emporter').classList.remove('active');
+});
+emporterModal.addEventListener('click', e => {
+  if (e.target === emporterModal) document.getElementById('emporter-modal-close').click();
+});
+document.getElementById('emporter-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const firstname = document.getElementById('e-firstname').value.trim();
+  const phone     = document.getElementById('e-phone').value.trim();
+  const email     = document.getElementById('e-email').value.trim();
+
+  let valid = true;
+  if (!firstname) {
+    document.getElementById('e-firstname').classList.add('input-error');
+    document.getElementById('e-firstname-err').textContent = 'Le prénom est obligatoire';
+    valid = false;
+  } else {
+    document.getElementById('e-firstname').classList.remove('input-error');
+    document.getElementById('e-firstname-err').textContent = '';
+  }
+  if (!phone) {
+    document.getElementById('e-phone').classList.add('input-error');
+    document.getElementById('e-phone-err').textContent = 'Le téléphone est obligatoire';
+    valid = false;
+  } else {
+    document.getElementById('e-phone').classList.remove('input-error');
+    document.getElementById('e-phone-err').textContent = '';
+  }
+  if (!valid) return;
+
+  deliveryInfo = { mode: 'emporter', firstname, phone, email: email || '' };
+  emporterModal.classList.remove('is-open');
+  document.body.style.overflow = '';
   payWithStripe();
 });
 
@@ -820,6 +1003,8 @@ deliveryForm.addEventListener('submit', (e) => {
     lastname:  { val: document.getElementById('d-lastname').value.trim(),  required: true,  errId: 'd-lastname-err',  msg: 'Le nom est obligatoire' },
     phone:     { val: document.getElementById('d-phone').value.trim(),     required: true,  errId: 'd-phone-err',     msg: 'Le téléphone est obligatoire' },
     address:   { val: document.getElementById('d-address').value.trim(),   required: true,  errId: 'd-address-err',   msg: 'L\'adresse est obligatoire' },
+    zip:       { val: document.getElementById('d-zip').value.trim(),       required: true,  errId: 'd-zip-err',       msg: 'Le code postal est obligatoire' },
+    city:      { val: document.getElementById('d-city').value.trim(),      required: true,  errId: 'd-city-err',      msg: 'La ville est obligatoire' },
   };
 
   let valid = true;
@@ -843,6 +1028,8 @@ deliveryForm.addEventListener('submit', (e) => {
     lastname:  fields.lastname.val,
     phone:     fields.phone.val,
     address:   fields.address.val,
+    zip:       fields.zip.val,
+    city:      fields.city.val,
     floor:     document.getElementById('d-floor').value.trim(),
     appt:      document.getElementById('d-appt').value.trim(),
     building:  document.getElementById('d-building').value.trim(),
@@ -855,8 +1042,64 @@ deliveryForm.addEventListener('submit', (e) => {
   payWithStripe();
 });
 
+// ── Vérification promo temps réel ────────────────────────
+let promoState = { eligible: false, email: '' };
+let promoTimer = null;
+
+function checkPromo(email, badgeId) {
+  clearTimeout(promoTimer);
+  const badge = document.getElementById(badgeId);
+  if (!email || !email.includes('@')) {
+    promoState = { eligible: false, email: '' };
+    if (badge) badge.style.display = 'none';
+    return;
+  }
+  promoTimer = setTimeout(async () => {
+    try {
+      const res  = await fetch(`/api/check-promo?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      promoState = { eligible: data.eligible, email };
+      if (badge) badge.style.display = data.eligible ? 'block' : 'none';
+    } catch {
+      promoState = { eligible: false, email: '' };
+    }
+  }, 500);
+}
+
+// Écoute sur les champs email des deux modals
+document.getElementById('d-email').addEventListener('input', e => {
+  checkPromo(e.target.value.trim(), 'd-promo-badge');
+});
+document.getElementById('e-email').addEventListener('input', e => {
+  checkPromo(e.target.value.trim(), 'e-promo-badge');
+});
+
 // ── Paiement Stripe ───────────────────────────────────────
 async function payWithStripe() {
+  // Filet de sécurité : vérifier une dernière fois que le resto est ouvert
+  if (!restaurantOpen) {
+    alert('Le restaurant est actuellement fermé. Les commandes en ligne ne sont pas disponibles pour le moment.');
+    return;
+  }
+
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+  // Bloquer les formules emporter-only en livraison
+  if (deliveryInfo?.mode === 'livraison') {
+    const blocked = cart.filter(i => EMPORTER_ONLY.includes(i.formuleType));
+    if (blocked.length) {
+      const names = blocked.map(i => `• ${i.name}`).join('\n');
+      alert(`Les articles suivants sont disponibles uniquement à emporter :\n${names}`);
+      return;
+    }
+  }
+
+  // Minimum 20€ pour toute commande
+  if (total < 20) {
+    alert(`Commande minimum 20€.\nVotre panier : ${total.toFixed(2).replace('.', ',')}€`);
+    return;
+  }
+
   const submitBtn = deliveryForm.querySelector('[type="submit"]');
   const emporterBtn = document.getElementById('btn-emporter');
   const activeBtn = deliveryInfo?.mode === 'emporter' ? emporterBtn : submitBtn;
@@ -864,10 +1107,20 @@ async function payWithStripe() {
   if (activeBtn) { activeBtn.disabled = true; activeBtn.textContent = 'Redirection...'; }
 
   try {
+    // Récupère l'email promo selon le mode (livraison = d-email, emporter = e-email via deliveryInfo)
+    const promoEmail = deliveryInfo?.mode === 'livraison'
+      ? document.getElementById('d-email').value.trim()
+      : (deliveryInfo?.email || '');
+
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: cart, delivery: deliveryInfo }),
+      body: JSON.stringify({
+        items:      cart,
+        delivery:   deliveryInfo,
+        applyPromo: promoState.eligible && promoState.email === promoEmail,
+        promoEmail: promoEmail || undefined,
+      }),
     });
 
     const data = await res.json();

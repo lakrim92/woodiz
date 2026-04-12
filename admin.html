@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Admin — PANUOZZO</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0b0d14;
+      --surface:  #13161f;
+      --card:     #1a1e2e;
+      --border:   rgba(255,255,255,.07);
+      --border2:  rgba(255,255,255,.12);
+      --white:    #f0f4ff;
+      --muted:    rgba(240,244,255,.45);
+      --green:    #22c55e;
+      --green-bg: rgba(34,197,94,.12);
+      --red:      #ef4444;
+      --red-bg:   rgba(239,68,68,.12);
+      --yellow:   #f59e0b;
+      --yellow-bg:rgba(245,158,11,.12);
+      --blue:     #3b82f6;
+      --blue-bg:  rgba(59,130,246,.12);
+      --purple:   #a78bfa;
+      --purple-bg:rgba(167,139,250,.12);
+      --sidebar-w: 230px;
+      --header-h:  60px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    /* ── Login ── */
+    #login-overlay {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    .login-box {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%; max-width: 380px;
+      text-align: center;
+    }
+    .login-logo { font-size: 2.5rem; margin-bottom: 8px; }
+    .login-box h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .login-box p { color: var(--muted); font-size: .84rem; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 13px 16px;
+      border-radius: 10px; border: 1.5px solid var(--border2);
+      background: rgba(255,255,255,.05); color: var(--white);
+      font-size: .95rem; margin-bottom: 12px; outline: none;
+      transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: var(--blue); }
+    .login-box button {
+      width: 100%; padding: 14px;
+      background: var(--blue); color: #fff;
+      border: none; border-radius: 10px;
+      font-size: .95rem; font-weight: 700; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .login-box button:hover { opacity: .88; }
+    .login-error { color: var(--red); font-size: .8rem; margin-top: 10px; min-height: 16px; }
+
+    /* ── Layout ── */
+    #app { display: none; min-height: 100vh; }
+
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      z-index: 50;
+      transition: transform .25s;
+    }
+    .sidebar-logo {
+      padding: 22px 20px 18px;
+      font-size: 1rem; font-weight: 800; letter-spacing: -.02em;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 9px;
+    }
+    .sidebar-logo span { color: var(--yellow); }
+    .sidebar-badge {
+      font-size: .65rem; background: var(--red); color: #fff;
+      padding: 2px 6px; border-radius: 99px; margin-left: auto;
+    }
+
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    .nav-section { font-size: .68rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .08em; padding: 12px 10px 6px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      color: var(--muted); font-weight: 500; font-size: .85rem;
+      cursor: pointer; transition: all .15s; text-decoration: none;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+    .nav-item.active { background: var(--blue-bg); color: var(--blue); }
+
+    .sidebar-footer {
+      padding: 14px 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    .topbar {
+      height: var(--header-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px;
+      gap: 14px;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .topbar-title { font-size: 1rem; font-weight: 700; flex: 1; }
+    .topbar-sub { color: var(--muted); font-size: .78rem; }
+
+    .topbar-date {
+      font-size: .78rem; color: var(--muted);
+      padding: 6px 12px; background: rgba(255,255,255,.05);
+      border-radius: 7px;
+    }
+    .btn-export {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px;
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid rgba(34,197,94,.25);
+      font-size: .8rem; font-weight: 700; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-export:hover { opacity: .8; }
+
+    .content { padding: 28px; flex: 1; }
+
+    /* ── Vues ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── KPI cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .kpi-label { font-size: .72rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .05em; margin-bottom: 8px; }
+    .kpi-value { font-size: 1.7rem; font-weight: 800; line-height: 1; }
+    .kpi-sub { font-size: .75rem; color: var(--muted); margin-top: 5px; }
+    .kpi-icon {
+      float: right; font-size: 1.6rem; margin-top: -2px;
+      opacity: .7;
+    }
+
+    /* ── Section titre ── */
+    .section-title {
+      font-size: .88rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--muted); margin-bottom: 14px;
+    }
+
+    /* ── Grille graphiques ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .chart-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .chart-card-title { font-size: .88rem; font-weight: 700; }
+    .chart-period-btns { display: flex; gap: 4px; }
+    .chart-period-btn {
+      padding: 4px 10px; border-radius: 6px;
+      font-size: .72rem; font-weight: 600;
+      border: 1px solid var(--border2);
+      background: transparent; color: var(--muted);
+      cursor: pointer; transition: all .15s;
+    }
+    .chart-period-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+
+    /* ── Top articles ── */
+    .top-items-list { display: flex; flex-direction: column; gap: 8px; }
+    .top-item-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .top-item-bar-wrap {
+      flex: 1; height: 6px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden;
+    }
+    .top-item-bar { height: 100%; border-radius: 99px; background: var(--blue); }
+    .top-item-name { font-size: .82rem; font-weight: 500; width: 160px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top-item-count { font-size: .78rem; color: var(--muted); width: 40px; text-align: right; }
+
+    /* ── Bottom grid ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Recent orders table ── */
+    .orders-table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+    th {
+      padding: 10px 14px; text-align: left;
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); cursor: pointer; }
+    .td-number { font-weight: 700; font-family: monospace; }
+    .td-name { font-weight: 600; }
+    .td-muted { color: var(--muted); font-size: .78rem; }
+    .td-total { font-weight: 700; }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .03em; white-space: nowrap;
+    }
+    .pill-nouveau       { background: var(--yellow-bg); color: var(--yellow); }
+    .pill-en_preparation { background: var(--blue-bg);   color: var(--blue); }
+    .pill-pret          { background: var(--green-bg);   color: var(--green); }
+    .pill-livre         { background: rgba(255,255,255,.05); color: var(--muted); }
+
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 6px;
+      font-size: .72rem; font-weight: 600;
+    }
+    .mode-livraison { background: var(--blue-bg); color: var(--blue); }
+    .mode-emporter  { background: var(--green-bg); color: var(--green); }
+
+    /* ── Filtres commandes ── */
+    .filters-bar {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      margin-bottom: 16px;
+      align-items: flex-end;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: .7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .filter-group select,
+    .filter-group input {
+      padding: 8px 10px; border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: rgba(255,255,255,.05); color: var(--white);
+      font-size: .82rem; outline: none; min-width: 130px;
+    }
+    .filter-group input[type="search"] { min-width: 200px; }
+    .filter-group select:focus,
+    .filter-group input:focus { border-color: var(--blue); }
+    .btn-filter-reset {
+      padding: 8px 14px; border-radius: 8px;
+      background: rgba(255,255,255,.06); color: var(--muted);
+      border: 1px solid var(--border2); font-size: .8rem;
+      cursor: pointer; align-self: flex-end;
+      transition: all .15s;
+    }
+    .btn-filter-reset:hover { color: var(--white); }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; font-size: .82rem; color: var(--muted);
+    }
+    .page-btns { display: flex; gap: 4px; }
+    .page-btn {
+      padding: 6px 11px; border-radius: 7px;
+      border: 1px solid var(--border2); background: transparent;
+      color: var(--muted); cursor: pointer; font-size: .8rem;
+      transition: all .15s;
+    }
+    .page-btn:hover:not(:disabled) { background: rgba(255,255,255,.08); color: var(--white); }
+    .page-btn.active { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+    .page-btn:disabled { opacity: .3; cursor: default; }
+
+    /* ── Modale détail commande ── */
+    #order-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    #order-modal.open { opacity: 1; pointer-events: all; }
+    .order-modal-box {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 18px;
+      width: 100%; max-width: 540px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(12px); transition: transform .2s;
+    }
+    #order-modal.open .order-modal-box { transform: translateY(0); }
+    .order-modal-header {
+      position: sticky; top: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 1;
+    }
+    .order-modal-title { font-size: 1rem; font-weight: 700; }
+    .modal-close {
+      background: rgba(255,255,255,.08); border: none; color: var(--white);
+      width: 32px; height: 32px; border-radius: 50%;
+      font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .order-modal-body { padding: 22px; }
+
+    .modal-section { margin-bottom: 22px; }
+    .modal-section-title {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+    }
+    .modal-info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .modal-info-item { }
+    .modal-info-label { font-size: .72rem; color: var(--muted); margin-bottom: 2px; }
+    .modal-info-value { font-size: .88rem; font-weight: 600; }
+
+    .modal-item-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+    }
+    .modal-item-row:last-child { border-bottom: none; }
+    .modal-item-name { font-weight: 600; font-size: .88rem; }
+    .modal-item-detail { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+    .modal-item-detail .removed { color: #f87171; }
+    .modal-item-detail .added   { color: #4ade80; }
+    .modal-item-price { font-weight: 700; font-size: .88rem; color: var(--yellow); white-space: nowrap; }
+
+    .modal-promo-row {
+      display: flex; justify-content: space-between;
+      padding: 8px 10px; margin-bottom: 6px;
+      background: rgba(22,163,74,.1); border: 1px solid rgba(22,163,74,.25);
+      border-radius: 6px; color: #4ade80; font-size: .85rem; font-weight: 600;
+    }
+
+    .modal-total-row {
+      display: flex; justify-content: space-between;
+      padding: 12px 0 0; font-weight: 800; font-size: 1rem;
+    }
+
+    .promo-tag {
+      display: inline-block; padding: 1px 6px; border-radius: 4px;
+      background: rgba(22,163,74,.15); border: 1px solid rgba(22,163,74,.3);
+      color: #4ade80; font-size: .72rem; font-weight: 700; vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    .modal-status-select {
+      width: 100%; padding: 10px 12px; border-radius: 9px;
+      border: 1.5px solid var(--border2);
+      background: rgba(255,255,255,.05); color: var(--white);
+      font-size: .88rem; cursor: pointer; outline: none;
+    }
+    .modal-status-select:focus { border-color: var(--blue); }
+    .btn-update-status {
+      margin-top: 10px; width: 100%;
+      padding: 11px; border-radius: 9px;
+      background: var(--blue); color: #fff;
+      border: none; font-size: .88rem; font-weight: 700;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .btn-update-status:hover { opacity: .85; }
+    .btn-delete {
+      margin-top: 8px; width: 100%;
+      padding: 9px; border-radius: 9px;
+      background: var(--red-bg); color: var(--red);
+      border: 1px solid rgba(239,68,68,.25);
+      font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .btn-delete:hover { opacity: .8; }
+
+    /* ── Stat donut ── */
+    .donut-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: .82rem; }
+    .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--green); color: #fff;
+      padding: 13px 18px; border-radius: 10px;
+      font-size: .84rem; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all .3s; z-index: 999;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Sidebar mobile toggle ── */
+    .menu-toggle {
+      display: none;
+      background: none; border: none; color: var(--white);
+      font-size: 1.4rem; cursor: pointer; padding: 4px;
+    }
+
+    @media (max-width: 900px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { transform: translateX(-230px); width: 230px; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .menu-toggle { display: block; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .content { padding: 16px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .modal-info-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Note 20 / petits mobiles (≤ 480px) ── */
+    @media (max-width: 480px) {
+      /* Topbar : ne garder que toggle + titre + sync dot */
+      .topbar { padding: 0 12px; gap: 8px; }
+      .topbar-date { display: none; }
+      #topbar-export { display: none; }
+      .topbar-sub { display: none; }
+      #sync-indicator { padding: 4px 7px; font-size: .7rem; }
+      #sync-label { display: none; }       /* juste le point coloré */
+
+      /* Content */
+      .content { padding: 12px; }
+
+      /* KPIs : 2 colonnes, valeurs plus compactes */
+      .kpi-grid { gap: 8px; }
+      .kpi-card { padding: 14px 14px; }
+      .kpi-value { font-size: 1.25rem; }
+      .kpi-icon { font-size: 1.2rem; }
+
+      /* Filtres : colonne pleine largeur */
+      .filters-bar { flex-direction: column; gap: 8px; padding: 12px; }
+      .filter-group { width: 100%; }
+      .filter-group select,
+      .filter-group input,
+      .filter-group input[type="search"] { min-width: unset; width: 100%; }
+      .btn-filter-reset { width: 100%; text-align: center; }
+
+      /* Tableau commandes : masquer colonnes secondaires */
+      #orders-table th:nth-child(4),
+      #orders-table td:nth-child(4),   /* Téléphone */
+      #orders-table th:nth-child(6),
+      #orders-table td:nth-child(6) { display: none; } /* Articles */
+
+      /* Tableau recent dashboard : masquer mode */
+      #recent-table th:nth-child(3),
+      #recent-table td:nth-child(3) { display: none; }
+
+      td, th { padding: 8px 10px; }
+
+      /* Pagination empilée */
+      .pagination { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+      /* Toast plein bas */
+      #toast { left: 12px; right: 12px; bottom: 16px; text-align: center; }
+
+      /* Modale : réduire padding */
+      .order-modal-body { padding: 14px; }
+      .order-modal-header { padding: 14px 16px; }
+      #order-modal { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Login ── -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">🍕</div>
+    <h2>PANUOZZO</h2>
+    <p>Administration — Accès restreint</p>
+    <input type="password" id="login-input" placeholder="Mot de passe administrateur" autocomplete="current-password" />
+    <button id="admin-login-btn">Connexion</button>
+    <p class="login-error" id="login-error"></p>
+  </div>
+</div>
+
+<!-- ── App ── -->
+<div id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      🍕 <span>PANUOZZO</span>
+      <span style="font-size:.65rem;color:var(--muted);font-weight:400">Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Navigation</div>
+      <button class="nav-item active" id="nav-dashboard">
+        <span class="icon">📊</span> Tableau de bord
+      </button>
+      <button class="nav-item" id="nav-orders">
+        <span class="icon">🧾</span> Commandes
+        <span class="sidebar-badge" id="sb-badge-orders"></span>
+      </button>
+      <div class="nav-section">Outils</div>
+      <button class="nav-item" id="nav-export">
+        <span class="icon">📥</span> Exporter CSV
+      </button>
+      <a class="nav-item" href="/tablette.html" target="_blank">
+        <span class="icon">📟</span> Tablette cuisine
+      </a>
+      <a class="nav-item" href="/" target="_blank">
+        <span class="icon">🌐</span> Voir le site
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" id="nav-logout" style="color:var(--red)">
+        <span class="icon">🚪</span> Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+      <div>
+        <div class="topbar-title" id="topbar-title">Tableau de bord</div>
+        <div class="topbar-sub" id="topbar-sub"></div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="topbar-date" id="topbar-date"></div>
+      <div id="sync-indicator" style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);padding:6px 10px;background:rgba(255,255,255,.04);border-radius:7px">
+        <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
+        <span id="sync-label">En direct</span>
+      </div>
+      <button class="btn-export" id="topbar-export">📥 Exporter CSV</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ── Vue Dashboard ── -->
+      <div class="view active" id="view-dashboard">
+
+        <!-- KPIs -->
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">💶</div>
+            <div class="kpi-label">CA aujourd'hui</div>
+            <div class="kpi-value" id="kpi-today-rev">—</div>
+            <div class="kpi-sub" id="kpi-today-orders">— commandes</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">📅</div>
+            <div class="kpi-label">CA ce mois</div>
+            <div class="kpi-value" id="kpi-month-rev">—</div>
+            <div class="kpi-sub" id="kpi-month-orders">— commandes</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🏦</div>
+            <div class="kpi-label">CA total</div>
+            <div class="kpi-value" id="kpi-total-rev">—</div>
+            <div class="kpi-sub" id="kpi-total-orders">— commandes</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🧺</div>
+            <div class="kpi-label">Panier moyen</div>
+            <div class="kpi-value" id="kpi-avg">—</div>
+            <div class="kpi-sub">par commande</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🛵</div>
+            <div class="kpi-label">Livraisons</div>
+            <div class="kpi-value" id="kpi-livraison">—</div>
+            <div class="kpi-sub" id="kpi-emporter">— à emporter</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">Chiffre d'affaires</div>
+              <div class="chart-period-btns" id="chart-period-btns">
+                <button class="chart-period-btn active" data-period="7">7j</button>
+                <button class="chart-period-btn" data-period="14">14j</button>
+                <button class="chart-period-btn" data-period="30">30j</button>
+              </div>
+            </div>
+            <canvas id="chart-revenue" height="80"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">Répartition statuts</div>
+            </div>
+            <canvas id="chart-status" height="160"></canvas>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+
+        <!-- Bottom row -->
+        <div class="bottom-grid">
+          <!-- Top articles -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">🏆 Top articles vendus</div>
+            </div>
+            <div class="top-items-list" id="top-items-list"></div>
+          </div>
+          <!-- Dernières commandes -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">🕐 Dernières commandes</div>
+              <button class="chart-period-btn active" id="btn-tout-voir">Tout voir →</button>
+            </div>
+            <div class="orders-table-wrap">
+              <table id="recent-table">
+                <thead>
+                  <tr>
+                    <th>Heure</th>
+                    <th>Client</th>
+                    <th>Mode</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /view-dashboard -->
+
+      <!-- ── Vue Commandes ── -->
+      <div class="view" id="view-orders">
+        <!-- Filtres -->
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label>Recherche</label>
+            <input type="search" id="f-search" placeholder="Nom, téléphone, email…" />
+          </div>
+          <div class="filter-group">
+            <label>Statut</label>
+            <select id="f-status">
+              <option value="">Tous</option>
+              <option value="nouveau">Nouvelle</option>
+              <option value="en_preparation">En préparation</option>
+              <option value="pret">Prête</option>
+              <option value="livre">Livrée</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Mode</label>
+            <select id="f-mode">
+              <option value="">Tous</option>
+              <option value="livraison">Livraison</option>
+              <option value="emporter">À emporter</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Du</label>
+            <input type="date" id="f-from" />
+          </div>
+          <div class="filter-group">
+            <label>Au</label>
+            <input type="date" id="f-to" />
+          </div>
+          <button class="btn-filter-reset" id="filter-reset">✕ Réinitialiser</button>
+        </div>
+
+        <!-- Tableau -->
+        <div class="chart-card" style="padding:0">
+          <div class="orders-table-wrap">
+            <table id="orders-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date / Heure</th>
+                  <th>Client</th>
+                  <th>Téléphone</th>
+                  <th>Mode</th>
+                  <th>Articles</th>
+                  <th>Total</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination" style="padding:14px 16px">
+            <span id="pagination-info">—</span>
+            <div class="page-btns" id="page-btns"></div>
+          </div>
+        </div>
+      </div><!-- /view-orders -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Modale détail commande -->
+<div id="order-modal">
+  <div class="order-modal-box">
+    <div class="order-modal-header">
+      <div class="order-modal-title" id="modal-title">Commande</div>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="order-modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Commande confirmée – PANUOZZO</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=18" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     body { display: flex; flex-direction: column; min-height: 100vh; justify-content: center; align-items: center; text-align: center; padding: 24px; background: var(--cream); }
@@ -24,5 +24,12 @@
     <p>Temps de préparation estimé : <strong>30 minutes</strong></p>
     <a href="/" class="btn-primary">← Retour à l'accueil</a>
   </div>
+  <script>
+    // Confirme la commande côté serveur dès l'arrivée sur cette page
+    const sessionId = new URLSearchParams(location.search).get('session_id');
+    if (sessionId) {
+      fetch(`/api/confirm?session_id=${encodeURIComponent(sessionId)}`).catch(() => {});
+    }
+  </script>
 </body>
 </html>

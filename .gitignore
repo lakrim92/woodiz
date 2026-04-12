@@ -1,5 +1,7 @@
 node_modules/
 .env
 orders.json
+pending_items.json
+promo_used.json
 *.log
 .DS_Store
