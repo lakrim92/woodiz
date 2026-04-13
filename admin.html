@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>Admin — PANUOZZO</title>
+  <title>Admin — Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -427,6 +427,24 @@
     .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: .82rem; }
     .donut-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
+    /* ── Switcher restaurant ── */
+    .resto-switcher {
+      display: flex; gap: 4px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border2);
+      border-radius: 9px; padding: 3px;
+    }
+    .resto-btn {
+      padding: 5px 13px; border-radius: 6px;
+      font-size: .78rem; font-weight: 700;
+      border: none; background: transparent;
+      color: var(--muted); cursor: pointer;
+      transition: all .15s; white-space: nowrap;
+    }
+    .resto-btn.active { color: #fff; }
+    .resto-btn[data-resto="panuozzo"].active { background: #e55a00; }
+    .resto-btn[data-resto="mythai"].active   { background: #C8390B; }
+
     /* ── Toast ── */
     #toast {
       position: fixed; bottom: 24px; right: 24px;
@@ -573,6 +591,10 @@
         <div class="topbar-sub" id="topbar-sub"></div>
       </div>
       <div style="flex:1"></div>
+      <div class="resto-switcher" id="resto-switcher">
+        <button class="resto-btn active" data-resto="panuozzo">🍕 Panuozzo</button>
+        <button class="resto-btn" data-resto="mythai">🌶 My Thai</button>
+      </div>
       <div class="topbar-date" id="topbar-date"></div>
       <div id="sync-indicator" style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);padding:6px 10px;background:rgba(255,255,255,.04);border-radius:7px">
         <span id="sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></span>

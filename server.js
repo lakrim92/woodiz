@@ -12,6 +12,7 @@ const express  = require('express');
 const path     = require('path');
 const fs       = require('fs');
 const crypto   = require('crypto');
+const http     = require('http');
 const https    = require('https');
 const net      = require('net');
 const stripe   = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -983,6 +984,94 @@ app.delete('/api/admin/orders/:id', adminAuth, (req, res) => {
   orders.splice(idx, 1);
   saveOrders(orders);
   res.json({ ok: true });
+});
+
+// ── Proxy My Thai admin API ────────────────────────────────
+// Permet au dashboard unifié d'interroger mythai sans CORS
+const MYTHAI_PORT = parseInt(process.env.MYTHAI_PORT) || 3006;
+let _mythaiToken = null;
+let _mythaiTokenExpiry = 0;
+
+function getMythaiToken() {
+  return new Promise((resolve) => {
+    if (_mythaiToken && Date.now() < _mythaiTokenExpiry) return resolve(_mythaiToken);
+    const pwd  = process.env.MYTHAI_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
+    const body = JSON.stringify({ password: pwd });
+    const req  = http.request(
+      { hostname: 'localhost', port: MYTHAI_PORT, path: '/api/auth/admin', method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
+      (res) => {
+        let raw = '';
+        res.on('data', c => raw += c);
+        res.on('end', () => {
+          try {
+            const d = JSON.parse(raw);
+            if (d.ok) { _mythaiToken = d.token; _mythaiTokenExpiry = Date.now() + 7 * 3600_000; }
+          } catch { /* ignore */ }
+          resolve(_mythaiToken);
+        });
+      }
+    );
+    req.on('error', () => resolve(null));
+    req.write(body);
+    req.end();
+  });
+}
+
+function proxyToMythai(apiPath, method, body, extraHeaders, res) {
+  const data = (body && Object.keys(body).length) ? JSON.stringify(body) : null;
+  const headers = { 'Content-Type': 'application/json', ...extraHeaders };
+  if (data) headers['Content-Length'] = Buffer.byteLength(data);
+  const req = http.request(
+    { hostname: 'localhost', port: MYTHAI_PORT, path: apiPath, method, headers },
+    (proxyRes) => {
+      const ct = proxyRes.headers['content-type'] || '';
+      res.status(proxyRes.statusCode);
+      if (ct.includes('text/csv')) {
+        res.setHeader('Content-Type', ct);
+        const cd = proxyRes.headers['content-disposition'];
+        if (cd) res.setHeader('Content-Disposition', cd);
+        proxyRes.pipe(res);
+      } else {
+        let raw = '';
+        proxyRes.on('data', c => raw += c);
+        proxyRes.on('end', () => {
+          try { res.json(JSON.parse(raw)); } catch { res.status(500).json({ error: 'Parse error' }); }
+        });
+      }
+    }
+  );
+  req.on('error', () => res.status(503).json({ error: 'My Thai server unavailable' }));
+  if (data) req.write(data);
+  req.end();
+}
+
+// SSE en temps réel pour mythai (proxy stream)
+app.get('/api/proxy/mythai/orders/stream', adminAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+  const pr = http.request(
+    { hostname: 'localhost', port: MYTHAI_PORT,
+      path: `/api/orders/stream?token=${encodeURIComponent(token)}`,
+      method: 'GET', headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache' } },
+    (proxyRes) => { proxyRes.pipe(res); proxyRes.on('end', () => res.end()); }
+  );
+  pr.on('error', () => { try { res.write('event: error\ndata: {}\n\n'); res.end(); } catch { /* closed */ } });
+  req.on('close', () => pr.destroy());
+  pr.end();
+});
+
+// Routes admin mythai (stats, orders, export, delete)
+app.use('/api/proxy/mythai', adminAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+  proxyToMythai(`/api/admin${req.url}`, req.method, req.body,
+    { 'x-admin-password': token }, res);
 });
 
 // ── Fichiers statiques ────────────────────────────────────
