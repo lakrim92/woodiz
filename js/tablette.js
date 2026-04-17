@@ -5,12 +5,31 @@
 
   // ── Audio Context (débloqué après geste utilisateur) ─────
   let audioCtx = null;
+
   function unlockAudio() {
-    if (audioCtx) return;
+    if (audioCtx) {
+      // Réactiver si suspendu (Android suspend le contexte après inactivité)
+      if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+      return;
+    }
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
     catch {}
   }
-  document.addEventListener('click', unlockAudio, { once: true });
+
+  // Tout clic sur la page maintient le contexte audio vivant
+  document.addEventListener('click', unlockAudio);
+
+  // Réactiver quand la tablette sort de veille / l'onglet redevient visible
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  });
+
+  // Keep-alive : prévient la suspension automatique sur Android (toutes les 20s)
+  setInterval(() => {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+  }, 20000);
 
   // ── Auth ─────────────────────────────────────────────────
   const SESSION_KEY = 'panuozzo_tablette_auth';
@@ -309,13 +328,13 @@
 
   // ── Son notification ──────────────────────────────────────
   // Joue un accord de 3 oscillateurs simultanés — sawtooth + limiteur hard
-  function playBips() {
+  async function playBips() {
     if (!audioCtx) {
       try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
       catch { return; }
     }
     try {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
       const comp = audioCtx.createDynamicsCompressor();
       comp.threshold.value = -20;
       comp.knee.value = 0;
