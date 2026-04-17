@@ -308,7 +308,7 @@
   }
 
   // ── Son notification ──────────────────────────────────────
-  // Joue une série de 3 bips (square + compresseur = son fort et percutant)
+  // Joue un accord de 3 oscillateurs simultanés — sawtooth + limiteur hard
   function playBips() {
     if (!audioCtx) {
       try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -317,22 +317,27 @@
     try {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const comp = audioCtx.createDynamicsCompressor();
-      comp.threshold.value = -6;
-      comp.ratio.value = 4;
+      comp.threshold.value = -20;
+      comp.knee.value = 0;
+      comp.ratio.value = 20;
+      comp.attack.value = 0.001;
+      comp.release.value = 0.08;
       comp.connect(audioCtx.destination);
-      [880, 1100, 1320].forEach((freq, i) => {
+      const t = audioCtx.currentTime;
+      // Fréquences 1760-2640Hz : plage maximale de sensibilité de l'oreille, coupe le bruit cuisine
+      [1760, 2200, 2640].forEach(freq => {
         const osc  = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(comp);
         osc.frequency.value = freq;
-        osc.type = 'square';
-        const t = audioCtx.currentTime + i * 0.2;
+        osc.type = 'sawtooth';
         gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.8, t + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+        gain.gain.linearRampToValueAtTime(0.9, t + 0.005);
+        gain.gain.setValueAtTime(0.9, t + 0.35);
+        gain.gain.linearRampToValueAtTime(0, t + 0.45);
         osc.start(t);
-        osc.stop(t + 0.34);
+        osc.stop(t + 0.46);
       });
     } catch {}
   }
