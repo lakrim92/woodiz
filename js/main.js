@@ -486,12 +486,10 @@ function filterBasePizzas(selectId, base) {
 }
 
 function getPanizzaOptions() {
-  return [...document.querySelectorAll('#tab-sandwichs .pizza-card')].filter(c => {
-    return c.closest('.menu-subsection')?.querySelector('.subsection-title')?.textContent === 'Panizza';
-  }).map(c => ({
-    name: c.querySelector('h3')?.textContent.trim(),
-    price: parseFloat((c.querySelector('.item-price')?.textContent || '0€').replace('€','').replace(',','.'))
-  }));
+  return [...document.querySelectorAll('#tab-sandwichs .btn-panizza-add')].map(btn => ({
+    name:  btn.dataset.name,
+    price: parseFloat(btn.dataset.price || '0')
+  })).filter(o => o.name);
 }
 
 function buildSelectHtml(id, label, options) {
