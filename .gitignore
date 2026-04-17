@@ -5,3 +5,4 @@ pending_items.json
 promo_used.json
 *.log
 .DS_Store
+backups/

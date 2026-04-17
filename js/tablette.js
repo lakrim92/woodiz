@@ -308,7 +308,7 @@
   }
 
   // ── Son notification ──────────────────────────────────────
-  // Joue une série de 3 bips
+  // Joue une série de 3 bips (square + compresseur = son fort et percutant)
   function playBips() {
     if (!audioCtx) {
       try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -316,28 +316,30 @@
     }
     try {
       if (audioCtx.state === 'suspended') audioCtx.resume();
+      const comp = audioCtx.createDynamicsCompressor();
+      comp.threshold.value = -6;
+      comp.ratio.value = 4;
+      comp.connect(audioCtx.destination);
       [880, 1100, 1320].forEach((freq, i) => {
         const osc  = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(comp);
         osc.frequency.value = freq;
-        osc.type = 'triangle';
-        const t = audioCtx.currentTime + i * 0.18;
+        osc.type = 'square';
+        const t = audioCtx.currentTime + i * 0.2;
         gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.4, t + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        gain.gain.linearRampToValueAtTime(0.8, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
         osc.start(t);
-        osc.stop(t + 0.3);
+        osc.stop(t + 0.34);
       });
     } catch {}
   }
 
-  // Joue 3 fois (3 séries de bips espacées de 1s)
+  // 3 groupes de 3 sonneries avec pause entre les groupes
   function playNotif() {
-    playBips();
-    setTimeout(playBips, 1000);
-    setTimeout(playBips, 2000);
+    [0, 900, 1800, 3300, 4200, 5100, 6600, 7500, 8400].forEach(d => setTimeout(playBips, d));
   }
 
   // ── Modale infos livraison ────────────────────────────────
@@ -404,6 +406,6 @@
         showToast(`⏰ Rappel — commande non traitée depuis 5 min !`);
         scheduleReminder(orderId); // replanifier tant que non traité
       }
-    }, 5 * 60 * 1000);
+    }, 3 * 60 * 1000);
     _reminders.set(orderId, t);
   }

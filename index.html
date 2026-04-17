@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -44,7 +45,7 @@
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
         "opens": "11:00",
-        "closes": "14:30"
+        "closes": "15:00"
       },
       {
         "@type": "OpeningHoursSpecification",
@@ -101,19 +102,29 @@
     <div class="hero-floating" aria-hidden="true">
       <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
     </div>
+    <img src="images/svg/halal-vector.png" alt="Halal" class="hero-halal-logo" aria-hidden="true">
     <div class="hero-content">
-      <h1 class="hero-brand"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></h1>
-      <p class="hero-tagline">Une pâte artisanale, un goût inoubliable</p>
-      <p class="hero-desc">Pâte fraîche maison, ingrédients frais, cuisson au feu de bois.<br>À emporter ou livré chez vous en 30 min.</p>
-      <div class="hero-actions">
+      <h1 class="hero-brand" aria-label="Panuozzo">
+        <span class="bl brand-red"   style="--i:0">P</span><!--
+        --><span class="bl brand-red"   style="--i:1">a</span><!--
+        --><span class="bl brand-red"   style="--i:2">n</span><!--
+        --><span class="bl brand-white" style="--i:3">u</span><!--
+        --><span class="bl brand-white" style="--i:4">o</span><!--
+        --><span class="bl brand-white" style="--i:5">z</span><!--
+        --><span class="bl brand-green" style="--i:6">z</span><!--
+        --><span class="bl brand-green" style="--i:7">o</span>
+      </h1>
+      <p class="hero-tagline hero-reveal" style="--i:8">Une pâte artisanale, un goût inoubliable</p>
+      <p class="hero-desc hero-reveal" style="--i:9">Pâte fraîche maison, ingrédients frais, cuisson au feu de bois.<br>À emporter ou livré chez vous en 30 min.</p>
+      <div class="hero-actions hero-reveal" style="--i:10">
         <a href="#menu" class="btn-secondary">Voir le menu</a>
       </div>
-      <div class="hero-badges">
+      <div class="hero-badges hero-reveal" style="--i:11">
         <span id="hero-statut"></span>
         <span>⏱ Livraison ~30 min</span>
         <span>🏠 À emporter</span>
         <span>⭐ 4.8 / 5</span>
-        <span class="badge-halal">☪ Viande Halal</span>
+
       </div>
     </div>
   </section>
@@ -127,9 +138,9 @@
       <span class="sep">|</span>
       <span id="statut-ouvert"></span>
       <span class="sep">|</span>
-      <span>Mar–Sam : 11h00–14h30 &amp; 18h00–23h00</span>
+      <span>Mar–Sam : 11h00–15h00 &amp; 18h00–23h00</span>
       <span class="sep">|</span>
-      <span>Dim : 11h00–14h30 &amp; 18h00–23h00</span>
+      <span>Dim : 11h00–15h00 &amp; 18h00–23h00</span>
     </div>
   </div>
 
@@ -137,15 +148,13 @@
   <section id="menu" class="section-menu">
     <div class="container">
       <h2 class="section-title">Notre Menu</h2>
-      <p class="section-sub">Tout préparé à la commande · Pâte fraîche maison · Cuisson au feu de bois · <span class="halal-inline">☪ Viande Halal</span></p>
+      <p class="section-sub">Tout préparé à la commande · Pâte fraîche maison · Cuisson au feu de bois</p>
 
 
       <!-- Offre exclusive lun–jeu -->
       <div class="offre-exclusive" role="button" tabindex="0" id="btn-offre-exclusive" style="cursor:pointer;" title="Voir les formules">
         <div class="offre-days-row">
-          <span class="day-pill">Mar</span><span class="day-pill">Mer</span>
-          <span class="day-pill">Jeu</span><span class="day-pill">Ven</span>
-          <span class="day-pill">Sam</span><span class="day-pill">Dim</span>
+          <span class="day-pill">Mar</span><span class="day-pill">Mer</span><span class="day-pill">Jeu</span>
           <span class="offre-condition">· À emporter uniquement</span>
         </div>
         <p class="offre-headline">🍕&nbsp; 2 pizzas achetées <strong>=</strong> 1 pizza offerte</p>
@@ -154,12 +163,31 @@
 
       <!-- Menu Midi -->
       <div class="menu-midi-banner" role="button" tabindex="0" id="btn-menu-midi" style="cursor:pointer;" title="Voir le menu midi">
-        <span class="midi-sun">☀️</span>
-        <div class="midi-text">
-          <strong>Menu Midi — Mar–Dim · À emporter uniquement</strong>
-          <span>Pizza au choix + canette offerte &nbsp;·&nbsp; Panizza au choix + canette offerte</span>
+
+        <div class="mmb-left">
+          <span class="mmb-sun">☀️</span>
+          <div class="mmb-info">
+            <strong class="mmb-title">Menu Midi</strong>
+            <div class="mmb-days">
+              <span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+            </div>
+            <span class="mmb-sub">À emporter · 11h–15h</span>
+          </div>
         </div>
-        <span class="offre-link">Voir →</span>
+
+        <div class="mmb-prices">
+          <div class="mmb-price-row">
+            <span>🍕 Pizza + canette offerte</span>
+            <strong>12,90€</strong>
+          </div>
+          <div class="mmb-price-row">
+            <span>🥪 Panizza + canette offerte</span>
+            <strong>9,90€</strong>
+          </div>
+        </div>
+
+        <span class="mmb-cta">Composer&nbsp;→</span>
+
       </div>
 
       <!-- Recherche pizza -->
@@ -193,7 +221,7 @@
         <div class="menu-grid">
 
           <div class="pizza-card">
-            <div class="pizza-img pg-red"></div>
+            <div class="pizza-img"><img src="images/products/margerita.webp" alt="Margherita" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Margherita</h3>
               <p>Tomate, mozzarella, olives, basilic frais</p>
@@ -205,7 +233,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-orange"></div>
+            <div class="pizza-img"><img src="images/products/reine.webp" alt="Reine" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Reine</h3>
               <p>Tomate, mozzarella, jambon, champignons frais, basilic frais</p>
@@ -217,7 +245,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-navy"></div>
+            <div class="pizza-img"><img src="images/products/tonara.webp" alt="Tonara" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Tonara</h3>
               <p>Tomate, mozzarella, thon, tomates cerises, olives, basilic frais</p>
@@ -229,7 +257,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-pepperoni"></div>
+            <div class="pizza-img"><img src="images/products/calzone.webp" alt="Calzone" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Calzone</h3>
               <p>Tomate, mozzarella, viande hachée au choix, oeuf</p>
@@ -241,7 +269,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-brown"></div>
+            <div class="pizza-img"><img src="images/products/napolitaine.webp" alt="Napolitaine" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Napolitaine</h3>
               <p>Tomate, mozzarella, anchois, câpres, olives</p>
@@ -253,7 +281,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-fire"></div>
+            <div class="pizza-img"><img src="images/products/fromaggie.webp" alt="Fromagie" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Fromagie</h3>
               <p>Tomate, mozzarella, gorgonzola, provolone, pecorino, basilic frais</p>
@@ -265,7 +293,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-green"></div>
+            <div class="pizza-img"><img src="images/products/quattro-staggioni.webp" alt="Quattro Stagioni" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Quattro Stagioni</h3>
               <p>Tomate, mozzarella, jambon, champignons frais, artichauts, basilic frais, olives</p>
@@ -277,7 +305,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-bbq"></div>
+            <div class="pizza-img"><img src="images/products/di-buffala.webp" alt="Di Buffala" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Di Buffala</h3>
               <p>Tomate, mozzarella, tomates cerises, mozzarella Di Buffala, olives</p>
@@ -289,7 +317,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-orient"></div>
+            <div class="pizza-img"><img src="images/products/campione.webp" alt="Campione" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
               <h3>Campione</h3>
@@ -302,7 +330,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-italo"></div>
+            <div class="pizza-img"><img src="images/products/chorizo.webp" alt="Chorizo" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
               <h3>Chorizo</h3>
@@ -315,7 +343,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-forest"></div>
+            <div class="pizza-img"><img src="images/products/legumes.webp" alt="Légumes" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Légumes</h3>
@@ -328,7 +356,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-sicilian"></div>
+            <div class="pizza-img"><img src="images/products/aubergine.webp" alt="Aubergines" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Aubergines</h3>
@@ -341,7 +369,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-bosca"></div>
+            <div class="pizza-img"><img src="images/products/boursin.webp" alt="Boursin" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Boursin</h3>
               <p>Tomate, mozzarella, boursin, oignons rouges, viande hachée, champignons</p>
@@ -353,7 +381,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-bbqchick"></div>
+            <div class="pizza-img"><img src="images/products/orientale.webp" alt="Orientale" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
               <h3>Orientale</h3>
@@ -366,7 +394,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-purple"></div>
+            <div class="pizza-img"><img src="images/products/luciano.webp" alt="Luciano" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Luciano</h3>
               <p>Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilic frais</p>
@@ -378,7 +406,7 @@
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-med"></div>
+            <div class="pizza-img"><img src="images/products/pescatore.webp" alt="Pescatore" loading="lazy"></div>
             <div class="pizza-info">
               <h3>Pescatore</h3>
               <p>Tomate, mozzarella, noix de fruits de mer, persillade, olives, basilic frais</p>
@@ -447,100 +475,100 @@
         <div class="menu-grid">
 
           <div class="pizza-card">
-            <div class="pizza-img pg-cream"></div>
+            <div class="pizza-img"><img src="images/products/moutarde.webp" alt="Moutarde" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>Bianca</h3>
-              <p>Crème fraîche, mozzarella, ail confit, herbes fraîches</p>
+              <h3>Moutarde</h3>
+              <p>Crème fraiche, Moutarde au miel, mozzarella, poulet mariné, oignons rouges</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>11€</strong></div>
+                <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-salmon"></div>
+            <div class="pizza-img"><img src="images/products/raclette.webp" alt="Raclette" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
-              <h3>Saumon</h3>
-              <p>Crème fraîche, mozzarella, saumon fumé, citron, aneth</p>
+              <h3>Raclette</h3>
+              <p>Crème fraîche, mozzarella, jambon, pommes de terre, raclette</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>15€</strong></div>
+                <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-mont"></div>
+            <div class="pizza-img"><img src="images/products/figue-chevre.webp" alt="Figue chèvre" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>Montagnarde</h3>
-              <p>Crème fraîche, mozzarella, lardons, reblochon, oignons</p>
+              <h3>Figue Chèvre</h3>
+              <p>Crème fraîche, mozzarella, jambon, fromage de chèvre, miel, figue séchées, noix</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>14€</strong></div>
+                <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-miel"></div>
+            <div class="pizza-img"><img src="images/products/norvegienne.webp" alt="Norvegienne" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
-              <h3>Chèvre Miel</h3>
-              <p>Crème fraîche, mozzarella, chèvre frais, miel, noix, roquette</p>
+              <h3>Norvegienne</h3>
+              <p>Crème fraîche, mozzarella, saumon fumé, tomates cerises, citron</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>13€</strong></div>
+                <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-alsace"></div>
+            <div class="pizza-img"><img src="images/products/maya.webp" alt="Maya" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>Alsacienne</h3>
-              <p>Crème fraîche, lardons fumés, oignons, emmental gratiné</p>
+              <h3>Maya</h3>
+              <p>Crème fraîche, mozzarella, fromage de chèvre, miel, olives</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>12€</strong></div>
+                <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-bleu"></div>
+            <div class="pizza-img"><img src="images/products/tartiflette.webp" alt="Tartiflette" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>4 Fromages</h3>
-              <p>Crème fraîche, mozzarella, gorgonzola, chèvre, parmesan</p>
+              <h3>Tartiflette</h3>
+              <p>Crème fraîche, mozzarella, lardons, pommes de terre, oignons, raclette</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>14€</strong></div>
+                <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-truffe"></div>
+            <div class="pizza-img"><img src="images/products/barbecue.webp" alt="Barbecue" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-sig">✦ Signature</span></div>
-              <h3>Truffe Noire</h3>
-              <p>Crème truffe noire, mozzarella, champignons sauvages, roquette</p>
+              <h3>Barbecue</h3>
+              <p>Sauce barbecue, mozzarella, viande hachée, champignons, poivrons grillés</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>17€</strong></div>
+                <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-burrata"></div>
+            <div class="pizza-img"><img src="images/products/indienne.webp" alt="Indienne" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
-              <h3>Burrata</h3>
-              <p>Crème fraîche, burrata entière, tomates cerises, jambon de Parme, basilic</p>
+              <h3>Indienne</h3>
+              <p>Curry, mozzarella, poulet mariné, oignons rouges, poivrons grillés</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>16€</strong></div>
+                <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
@@ -550,72 +578,72 @@
             <div class="pizza-img pg-sauav"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
-              <h3>Saumon Avocat</h3>
-              <p>Crème fraîche, mozzarella, saumon fumé, avocat, citron vert</p>
+              <h3>Roquette</h3>
+              <p>Crème fraîche, mozzarella, jambon, tomates cerices, roquette, huile d'olives</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>16€</strong></div>
+                <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-norm"></div>
+            <div class="pizza-img"><img src="images/products/la-truffe.webp" alt="La truffe" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>Normande</h3>
-              <p>Crème fraîche, mozzarella, camembert, lardons, oignons caramélisés</p>
+              <h3>La Truffe</h3>
+              <p>Crème fraîche, mozzarella, crème de truffe, roquette, eclat de parmesan</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>14€</strong></div>
+                <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-epinard"></div>
-            <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
-              <h3>Épinards Ricotta</h3>
-              <p>Crème fraîche, mozzarella, épinards frais, ricotta, ail</p>
-              <div class="pizza-footer">
-                <div class="pizza-price"><strong>13€</strong></div>
-                <button class="btn-add">Choisir</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="pizza-card">
-            <div class="pizza-img pg-pesto"></div>
-            <div class="pizza-info">
-              <h3>Poulet Pesto</h3>
-              <p>Crème pesto basilic, mozzarella, poulet grillé, tomates cerises</p>
-              <div class="pizza-footer">
-                <div class="pizza-price"><strong>13€</strong></div>
-                <button class="btn-add">Choisir</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="pizza-card">
-            <div class="pizza-img pg-champ"></div>
+            <div class="pizza-img"><img src="images/products/biggy.webp" alt="La Biggy" loading="lazy"></div>
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
-              <h3>Champignons</h3>
-              <p>Crème fraîche, mozzarella, champignons variés, ail, persil frais</p>
+              <h3>La Biggy</h3>
+              <p>Sauce biggy, mozzarella, viande hachée, oignons rouges, tomates cerises, cheddar</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>12€</strong></div>
+                <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
           </div>
 
           <div class="pizza-card">
-            <div class="pizza-img pg-tartif"></div>
+            <div class="pizza-img"><img src="images/products/printanniere.webp" alt="Printannière" loading="lazy"></div>
             <div class="pizza-info">
-              <h3>Tartiflette</h3>
-              <p>Crème fraîche, pommes de terre, lardons, reblochon, oignons</p>
+              <h3>La Printannière</h3>
+              <p>Crème fraiche, mozzarella, fromage de chèvre, courgette, roquette, basilic frais</p>
               <div class="pizza-footer">
-                <div class="pizza-price"><strong>15€</strong></div>
+                <div class="pizza-price"><strong>13,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img"><img src="images/products/fermiere.webp" alt="Fermière" loading="lazy"></div>
+            <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
+              <h3>Fermière</h3>
+              <p>Crème fraîche, mozzarella, poulet, pommes de terre, champignons</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>12,50€</strong></div>
+                <button class="btn-add">Choisir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pizza-card">
+            <div class="pizza-img"><img src="images/products/dianola.webp" alt="Dianola" loading="lazy"></div>
+            <div class="pizza-info">
+              <h3>Dianola</h3>
+              <p>Crème fraîche, mozzarella, oignons rouges, mozzarella Di Buffala</p>
+              <div class="pizza-footer">
+                <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
               </div>
             </div>
@@ -637,38 +665,37 @@
           <div class="menu-grid">
 
             <div class="pizza-card">
-              <div class="pizza-img pg-sand-classic"></div>
+              <div class="pizza-img"><img src="images/products/panuozzo-coppa.webp" alt="Panuozzo coppa" loading="lazy"></div>
               <div class="pizza-info">
-                <h3>Classico</h3>
-                <p>Jambon cuit, mozzarella filante, tomates fraîches, basilic</p>
+                <h3>Coppa</h3>
+                <p>Mozzarella, tomates cerises, roquette, huile d'olives</p>
                 <div class="pizza-footer">
-                  <strong class="item-price">9€</strong>
+                  <strong class="item-price">7,90€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
             </div>
 
             <div class="pizza-card">
-              <div class="pizza-img pg-sand-spicy"></div>
+              <div class="pizza-img"><img src="images/products/panuozzo-jambon-blanc.webp" alt="Panuozzo jambon blanc" loading="lazy"></div>
               <div class="pizza-info">
-                <div class="card-badges"><span class="badge badge-hot">🌶 Épicé</span></div>
-                <h3>Spicy</h3>
-                <p>Salami piquant, mozzarella, poivrons grillés, jalapeño</p>
+                <h3>Janbom blanc</h3>
+                <p>Mozzarella, tomates cerises, roquette, huile d'olives</p>
                 <div class="pizza-footer">
-                  <strong class="item-price">10€</strong>
+                  <strong class="item-price">7,90€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
             </div>
 
             <div class="pizza-card">
-              <div class="pizza-img pg-sand-veg"></div>
+              <div class="pizza-img"><img src="images/products/panuozzo-aubergine.webp" alt="Panuozzo aubergine" loading="lazy"></div>
               <div class="pizza-info">
                 <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
-                <h3>Végé</h3>
-                <p>Mozzarella, légumes grillés (courgette, aubergine, poivron), roquette</p>
+                <h3>Aubergine</h3>
+                <p>Mozzarella, tomates cerises, roquette, huiles d'olives</p>
                 <div class="pizza-footer">
-                  <strong class="item-price">9€</strong>
+                  <strong class="item-price">7,90€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
@@ -682,57 +709,80 @@
             <h3 class="subsection-title">Panizza</h3>
             <p class="subsection-desc">Calzone sandwich — pâte dorée croustillante, fermée et cuite au four</p>
           </div>
-          <div class="menu-grid">
+          <div class="panizza-card">
 
-            <div class="pizza-card">
-              <div class="pizza-img pg-pan-regi"></div>
-              <div class="pizza-info">
-                <h3>Reginella</h3>
-                <p>Jambon cuit, mozzarella, champignons, sauce tomate</p>
-                <div class="pizza-footer">
-                  <strong class="item-price">10€</strong>
-                  <button class="btn-add">Choisir</button>
-                </div>
+            <!-- Header image -->
+            <div class="panizza-card-hero">
+              <img src="images/products/panizza.webp" alt="Panizza" loading="lazy">
+              <div class="panizza-card-hero-overlay">
+                <span class="panizza-card-badge">4 recettes</span>
               </div>
             </div>
 
-            <div class="pizza-card">
-              <div class="pizza-img pg-pan-rust"></div>
-              <div class="pizza-info">
-                <h3>Rustica</h3>
-                <p>Saucisse italienne, mozzarella, poivrons rôtis</p>
-                <div class="pizza-footer">
-                  <strong class="item-price">10€</strong>
-                  <button class="btn-add">Choisir</button>
-                </div>
-              </div>
-            </div>
+            <!-- Options list -->
+            <div class="panizza-options">
 
-            <div class="pizza-card">
-              <div class="pizza-img pg-pan-diav"></div>
-              <div class="pizza-info">
-                <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
-                <h3>Diavola</h3>
-                <p>Chorizo piquant, mozzarella, olives, piment</p>
-                <div class="pizza-footer">
-                  <strong class="item-price">11€</strong>
-                  <button class="btn-add">Choisir</button>
-                </div>
-              </div>
-            </div>
+              <button class="panizza-option btn-panizza-add"
+                data-name="Panizza Regina"
+                data-desc="Jambon, mozzarella, champignons, sauce tomate, emmental"
+                data-price="8.90">
+                <span class="panizza-opt-dot" style="background:linear-gradient(135deg,#e55039,#c0392b)"></span>
+                <span class="panizza-opt-body">
+                  <strong>Regina</strong>
+                  <span>Jambon, mozzarella, champignons, sauce tomate, emmental</span>
+                </span>
+                <span class="panizza-opt-right">
+                  <span class="panizza-opt-price">8,90€</span>
+                  <span class="panizza-opt-cta">Choisir</span>
+                </span>
+              </button>
 
-            <div class="pizza-card">
-              <div class="pizza-img pg-pan-bian"></div>
-              <div class="pizza-info">
-                <h3>Bianca</h3>
-                <p>Crème fraîche, mozzarella, poulet rôti, herbes fraîches</p>
-                <div class="pizza-footer">
-                  <strong class="item-price">10€</strong>
-                  <button class="btn-add">Choisir</button>
-                </div>
-              </div>
-            </div>
+              <button class="panizza-option btn-panizza-add"
+                data-name="Panizza 4 Fromages"
+                data-desc="Sauce tomate, emmental, chèvre, bleu, raclette"
+                data-price="8.90">
+                <span class="panizza-opt-dot" style="background:linear-gradient(135deg,#e67e22,#ca6f1e)"></span>
+                <span class="panizza-opt-body">
+                  <strong>4 Fromages</strong>
+                  <span>Sauce tomate, emmental, chèvre, bleu, raclette</span>
+                </span>
+                <span class="panizza-opt-right">
+                  <span class="panizza-opt-price">8,90€</span>
+                  <span class="panizza-opt-cta">Choisir</span>
+                </span>
+              </button>
 
+              <button class="panizza-option btn-panizza-add"
+                data-name="Panizza Fermier"
+                data-desc="Crème fraîche, emmental, poulet rôti, pommes de terre, champignons"
+                data-price="8.90">
+                <span class="panizza-opt-dot" style="background:linear-gradient(135deg,#922b21,#c0392b)"></span>
+                <span class="panizza-opt-body">
+                  <strong>Fermier</strong>
+                  <span>Crème fraîche, emmental, poulet rôti, pommes de terre, champignons</span>
+                </span>
+                <span class="panizza-opt-right">
+                  <span class="panizza-opt-price">8,90€</span>
+                  <span class="panizza-opt-cta">Choisir</span>
+                </span>
+              </button>
+
+              <button class="panizza-option btn-panizza-add"
+                data-name="Panizza Hamburger"
+                data-desc="Sauce burger, emmental, viande hachée, oignons, cheddar, tomates cerises"
+                data-price="8.90">
+                <span class="panizza-opt-dot" style="background:linear-gradient(135deg,#f5cba7,#e59866)"></span>
+                <span class="panizza-opt-body">
+                  <strong>Hamburger</strong>
+                  <span>Sauce burger, emmental, viande hachée, oignons, cheddar, tomates cerises</span>
+                </span>
+                <span class="panizza-opt-right">
+                  <span class="panizza-opt-price">8,90€</span>
+                  <span class="panizza-opt-cta">Choisir</span>
+                </span>
+              </button>
+
+            </div>
           </div>
         </div>
       </div>
@@ -744,53 +794,49 @@
 
         <div class="menu-subsection">
           <div class="subsection-header">
-            <h3 class="subsection-title">Desserts Maison</h3>
+            <h3 class="subsection-title">Desserts</h3>
           </div>
           <div class="menu-grid">
 
             <div class="pizza-card">
-              <div class="pizza-img pg-tiram"></div>
+              <div class="pizza-img"><img src="images/products/tiramisu.webp" alt="Tiramisu" loading="lazy"></div>
               <div class="pizza-info">
-                <h3>Tiramisu Maison</h3>
-                <p>Mascarpone crémeux, café, cacao, biscuits savoiardi</p>
+                <h3>Tiramisu</h3>
                 <div class="pizza-footer">
-                  <strong class="item-price">6€</strong>
+                  <strong class="item-price">4,50€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
             </div>
 
             <div class="pizza-card">
-              <div class="pizza-img pg-choco"></div>
+              <div class="pizza-img"><img src="images/products/brownie.webp" alt="Brownie" loading="lazy"></div>
               <div class="pizza-info">
-                <h3>Mousse au Chocolat</h3>
-                <p>Chocolat noir intense, chantilly maison</p>
+                <h3>Brownie</h3>
                 <div class="pizza-footer">
-                  <strong class="item-price">5€</strong>
+                  <strong class="item-price">4,50€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
             </div>
 
             <div class="pizza-card">
-              <div class="pizza-img pg-tart"></div>
+              <div class="pizza-img"><img src="images/products/cheesecake.webp" alt="Cheesecake" loading="lazy"></div>
               <div class="pizza-info">
-                <h3>Tarte Tatin</h3>
-                <p>Pommes caramélisées, pâte feuilletée, crème fraîche</p>
+                <h3>Cheesecake</h3>
                 <div class="pizza-footer">
-                  <strong class="item-price">6€</strong>
+                  <strong class="item-price">4,50€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
             </div>
 
             <div class="pizza-card">
-              <div class="pizza-img pg-panna"></div>
+              <div class="pizza-img"><img src="images/products/tarte-daim.webp" alt="Tarte au daim" loading="lazy"></div>
               <div class="pizza-info">
-                <h3>Panna Cotta</h3>
-                <p>Vanille douce, coulis de fruits rouges</p>
+                <h3>Tarte au daim</h3>
                 <div class="pizza-footer">
-                  <strong class="item-price">5€</strong>
+                  <strong class="item-price">4,50€</strong>
                   <button class="btn-add">Choisir</button>
                 </div>
               </div>
@@ -803,7 +849,7 @@
         <div class="menu-subsection hd-section">
           <div class="subsection-header">
             <h3 class="hd-brand">Häagen-Dazs</h3>
-            <p class="subsection-desc">3 parfums au choix : <strong>Vanille</strong> · <strong>Fraise</strong> · <strong>Chocolat</strong></p>
+            <p class="subsection-desc">3 parfums au choix : <strong>Chocolat fudge brownie</strong> · <strong>Vanille pecan blondie</strong> · <strong>Cookie dough</strong></p>
           </div>
           <div class="hd-grid">
             <div class="hd-card">
@@ -814,7 +860,7 @@
               <div class="hd-pot-info">
                 <strong>Pot individuel</strong>
                 <p>Vanille · Fraise · Chocolat</p>
-                <span class="hd-price">4€</span>
+                <span class="hd-price">4,90€</span>
               </div>
               <button class="btn-add">Choisir</button>
             </div>
@@ -826,7 +872,7 @@
               <div class="hd-pot-info">
                 <strong>Pot famille</strong>
                 <p>Vanille · Fraise · Chocolat</p>
-                <span class="hd-price">12€</span>
+                <span class="hd-price">8,90€</span>
               </div>
               <button class="btn-add">Choisir</button>
             </div>
@@ -842,15 +888,15 @@
         <div class="menu-subsection">
           <div class="subsection-header">
             <h3 class="subsection-title">Canettes 33cl</h3>
-            <span class="price-tag-header">2,50€ / canette</span>
+            <span class="price-tag-header">2€ / canette</span>
           </div>
           <div class="drinks-grid">
             <div class="drink-card" data-name="Coca-Cola 33cl" data-price="2.50">🥤<span>Coca-Cola</span><button class="btn-add">Ajouter</button></div>
             <div class="drink-card" data-name="Coca-Cola Zéro 33cl" data-price="2.50">⚫<span>Coca-Cola Zéro</span><button class="btn-add">Ajouter</button></div>
-            <div class="drink-card" data-name="Fanta Orange 33cl" data-price="2.50">🍊<span>Fanta Orange</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Tropico 33cl" data-price="2.50">🍊<span>Tropico</span><button class="btn-add">Ajouter</button></div>
             <div class="drink-card" data-name="Sprite 33cl" data-price="2.50">💚<span>Sprite</span><button class="btn-add">Ajouter</button></div>
-            <div class="drink-card" data-name="Perrier 33cl" data-price="2.50">💧<span>Perrier</span><button class="btn-add">Ajouter</button></div>
-            <div class="drink-card" data-name="Ice Tea Pêche 33cl" data-price="2.50">🍑<span>Ice Tea Pêche</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Ice Tera 33cl" data-price="2.50">💧<span>Ice Tera</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card" data-name="Oasis Tropical 33cl" data-price="2.50">🍑<span>Oasis Tropical</span><button class="btn-add">Ajouter</button></div>
           </div>
         </div>
 
@@ -861,8 +907,8 @@
           </div>
           <div class="drinks-grid">
             <div class="drink-card drink-card-lg" data-name="Coca-Cola 1,25L" data-price="4">🥤<span>Coca-Cola</span><button class="btn-add">Ajouter</button></div>
+            <div class="drink-card drink-card-lg" data-name="Coca-Cola Zéro 1,25L" data-price="4">⚫<span>Coca-Cola Zéro</span><button class="btn-add">Ajouter</button></div>
             <div class="drink-card drink-card-lg" data-name="Fanta Orange 1,25L" data-price="4">🍊<span>Fanta Orange</span><button class="btn-add">Ajouter</button></div>
-            <div class="drink-card drink-card-lg" data-name="Sprite 1,25L" data-price="4">💚<span>Sprite</span><button class="btn-add">Ajouter</button></div>
             <div class="drink-card drink-card-lg" data-name="Ice Tea Pêche 1,25L" data-price="4">🍑<span>Ice Tea Pêche</span><button class="btn-add">Ajouter</button></div>
           </div>
         </div>
@@ -881,31 +927,48 @@
             </div>
             <h3>Menu Gourmand</h3>
             <p class="formule-desc">Pour un repas généreux !</p>
+            <div class="formule-price formule-price--gold">37,90€</div>
             <ul class="formule-items">
               <li>✓ <strong>3 pizzas</strong> au choix (tomate ou crème fraîche)</li>
               <li>✓ <strong>1 bouteille</strong> 1,25L au choix</li>
             </ul>
-            <div class="formule-note">Mix de bases libre · Tailles au choix</div>
+            <div class="formule-note">Mix de bases libre</div>
             <button class="btn-primary btn-formule" data-formule="gourmand">Composer ma formule</button>
           </div>
 
           <div class="formule-card formule-midi" id="formule-card-midi">
+
             <div class="formule-header">
               <span class="formule-icon-big">☀️</span>
-              <div class="formule-badge formule-badge-green">Menu Midi</div>
+              <div class="formule-badge formule-badge-midi">Menu Midi</div>
             </div>
+
             <h3>Menu Midi</h3>
-            <p class="formule-desc">Mar–Dim · À emporter uniquement · Service du midi</p>
-            <ul class="formule-items">
-              <li>🍕 <strong>Pizza</strong> au choix + <strong>canette offerte</strong></li>
-              <li><em>— ou —</em></li>
-              <li>🥪 <strong>Panizza</strong> au choix + <strong>canette offerte</strong></li>
-            </ul>
-            <div class="formule-days-footer">
+            <p class="formule-desc formule-desc--light">À emporter uniquement · Service du midi</p>
+
+            <!-- Les deux options -->
+            <div class="midi-options">
+              <div class="midi-opt">
+                <span class="midi-opt-emoji">🍕</span>
+                <span class="midi-opt-label">Pizza au choix</span>
+                <span class="midi-opt-bonus">+ canette offerte</span>
+                <span class="midi-opt-price">12,90€</span>
+              </div>
+              <div class="midi-divider">ou</div>
+              <div class="midi-opt">
+                <span class="midi-opt-emoji">🥪</span>
+                <span class="midi-opt-label">Panizza au choix</span>
+                <span class="midi-opt-bonus">+ canette offerte</span>
+                <span class="midi-opt-price">9,90€</span>
+              </div>
+            </div>
+
+            <!-- Jours disponibles -->
+            <div class="midi-days">
               <span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
             </div>
-            <div class="formule-note">La boisson est offerte avec votre plat</div>
-            <button class="btn-primary btn-formule" data-formule="midi">Composer ma formule</button>
+
+            <button class="btn-primary btn-formule btn-formule--light" data-formule="midi">Composer ma formule</button>
           </div>
 
           <div class="formule-card formule-exclusive" id="formule-card-exclusive">
@@ -914,13 +977,13 @@
               <div class="formule-badge formule-badge-red">Offre Exclusive</div>
             </div>
             <h3>2+1 Offert</h3>
-            <p class="formule-desc">Mar–Dim · À emporter uniquement</p>
+            <p class="formule-desc">Mar–jeu · À emporter uniquement</p>
             <ul class="formule-items">
               <li>🍕 Achetez <strong>2 pizzas</strong></li>
               <li>🎁 La <strong>3ème est offerte !</strong></li>
             </ul>
             <div class="formule-days-footer">
-              <span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+              <span>Mar</span><span>Mer</span><span>Jeu</span>
             </div>
             <div class="formule-note">Non cumulable avec d'autres offres</div>
             <button class="btn-primary btn-formule" data-formule="exclusive">Composer ma formule</button>
@@ -940,9 +1003,18 @@
       <p class="section-sub white">Ajoutez vos pizzas depuis le menu, puis choisissez livraison ou retrait</p>
 
       <div class="cart-infobadges">
-        <span>🛵 Livraison gratuite · minimum 20€</span>
+        <span>🛵 Livraison · gratuite ou +2€ · minimum 20€</span>
         <span>🏠 Retrait ~15 min · minimum 20€</span>
         <span>🔒 Paiement sécurisé</span>
+      </div>
+
+      <!-- Bandeau fermé — visible même panier vide, géré par JS -->
+      <div id="restaurant-closed-banner" class="restaurant-closed-banner" style="display:none;">
+        <span class="rcb-icon">🔴</span>
+        <div class="rcb-body">
+          <strong>Restaurant fermé</strong>
+          <span id="rcb-next"></span>
+        </div>
       </div>
 
       <div class="cart-wrap">
@@ -965,11 +1037,10 @@
             </div>
           </div>
           <div id="cart-closed-notice" class="cart-closed-notice" style="display:none;">
-            <span>🔴</span>
-            <div>
-              <strong>Restaurant fermé</strong>
-              <p>Les commandes en ligne ne sont pas disponibles en ce moment.<br>Revenez pendant nos horaires d'ouverture.</p>
-            </div>
+            <div class="closed-notice-icon">🔴</div>
+            <strong class="closed-notice-title">Restaurant fermé</strong>
+            <p class="closed-notice-next" id="cart-next-open"></p>
+            <p class="closed-notice-sub">Les commandes reprennent à l'ouverture</p>
           </div>
         </div>
         <p class="cmd-note">Paiement 100% sécurisé via Stripe</p>
@@ -982,53 +1053,40 @@
   <section id="livraison" class="section-livraison">
     <div class="container">
       <h2 class="section-title">Zone de livraison</h2>
-      <p class="section-sub">Livraison gratuite · Commande minimum 20€</p>
-      <div class="livraison-grid">
-        <div class="livraison-card active">
-          <span class="livraison-icon">📍</span>
-          <strong>Bougival</strong>
-          <span>Livraison gratuite</span>
+      <p class="section-sub">Livraison à domicile · Commande minimum 20€</p>
+      <div class="lv-cards">
+
+        <!-- Card livraison gratuite -->
+        <div class="lv-card lv-card--free">
+          <span class="lv-pill lv-pill--free">Offerte</span>
+          <div class="lv-emoji">🛵</div>
+          <h3 class="lv-title">Livraison gratuite</h3>
+          <p class="lv-desc">Dans ces 3 communes</p>
+          <ul class="lv-zones">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Bougival
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Louveciennes
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              La Celle-Saint-Cloud
+            </li>
+          </ul>
         </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Le Pecq</strong>
-          <span>Livraison gratuite</span>
+
+        <!-- Card livraison payante -->
+        <div class="lv-card lv-card--paid">
+          <span class="lv-pill lv-pill--paid">+ 2 €</span>
+          <div class="lv-emoji">🗺️</div>
+          <h3 class="lv-title">Autres zones</h3>
+          <p class="lv-desc">Toute commune à proximité</p>
+          <p class="lv-note">Frais de livraison appliqués<br>au moment de la commande</p>
         </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Croissy-sur-Seine</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Port-Marly</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Chatou</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Louveciennes</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Marly-le-Roi</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>La Celle-Saint-Cloud</strong>
-          <span>Livraison gratuite</span>
-        </div>
-        <div class="livraison-card">
-          <span class="livraison-icon">📍</span>
-          <strong>Rueil-Malmaison</strong>
-          <span>Livraison gratuite</span>
-        </div>
+
       </div>
       <div class="livraison-conditions">
         <span>🛒 Minimum de commande : <strong>20€</strong></span>
@@ -1135,7 +1193,7 @@
             <span class="contact-icon">🕐</span>
             <div>
               <strong>Horaires</strong>
-              <p>Mar–Sam : 11h00–14h30 &amp; 18h00–23h00<br>Dim : 11h00–14h30 &amp; 18h00–23h00<br><span style="color:#ef4444;font-size:.85em">Fermé le lundi</span></p>
+              <p>Mar–Sam : 11h00–15h00 &amp; 18h00–23h00<br>Dim : 11h00–15h00 &amp; 18h00–23h00<br><span style="color:#ef4444;font-size:.85em">Fermé le lundi</span></p>
             </div>
           </div>
           <div class="contact-item">
@@ -1353,7 +1411,7 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=18"></script>
+  <script src="js/main.js?v=20"></script>
 
   <!-- ===== BANNIÈRE COOKIES ===== -->
   <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:rgba(255,255,255,.85);padding:14px 20px;z-index:9999;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.8rem;box-shadow:0 -4px 20px rgba(0,0,0,.25);">
@@ -1366,16 +1424,5 @@
       <button id="cookie-accept" style="background:#1a6b4e;color:#fff;border:none;padding:7px 16px;border-radius:6px;font-weight:700;font-size:.8rem;cursor:pointer;">Accepter</button>
     </div>
   </div>
-  <script>
-    function setCookieConsent(val) {
-      localStorage.setItem('cookie_consent', val);
-      document.getElementById('cookie-banner').style.display = 'none';
-    }
-    document.getElementById('cookie-refuse').addEventListener('click', () => setCookieConsent('refused'));
-    document.getElementById('cookie-accept').addEventListener('click', () => setCookieConsent('accepted'));
-    if (!localStorage.getItem('cookie_consent')) {
-      document.getElementById('cookie-banner').style.display = 'flex';
-    }
-  </script>
 </body>
 </html>
