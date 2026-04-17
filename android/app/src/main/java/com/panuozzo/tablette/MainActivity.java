@@ -16,7 +16,7 @@ import android.webkit.WebChromeClient;
 
 public class MainActivity extends Activity {
 
-    private static final String URL = "https://panuozzo.ai-autoheal.com/tablette.html";
+    private static final String URL = "https://panuozzo-bougival.fr/tablette.html";
     private WebView webView;
     private SoundPool soundPool;
     private int soundId = -1;
