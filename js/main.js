@@ -342,7 +342,8 @@ function changeExtra(name, delta) {
 }
 
 // Event delegation for pizza base radio buttons (data-select-id / data-base)
-document.getElementById('menu').addEventListener('change', (e) => {
+// Attaché sur document car la modale formule est hors de #menu dans le DOM
+document.addEventListener('change', (e) => {
   const radio = e.target.closest('input[type="radio"][data-select-id]');
   if (radio) filterBasePizzas(radio.dataset.selectId, radio.dataset.base);
 });
