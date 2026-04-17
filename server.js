@@ -605,49 +605,55 @@ function generateReceiptHtml(order) {
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box}
-  body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:0 auto;padding:28px 20px;background:#f5f5f0;color:#1a1a1a}
-  .receipt{background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 18px rgba(0,0,0,.09)}
+  body{font-family:Arial,Helvetica,sans-serif;max-width:860px;margin:0 auto;padding:24px 16px;background:#f5f5f0;color:#1a1a1a}
+  .receipt{background:#fff;border-radius:12px;padding:36px 32px;box-shadow:0 2px 18px rgba(0,0,0,.09)}
   .btn-print{display:inline-flex;align-items:center;gap:8px;background:#1a6b4e;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:.93rem;cursor:pointer;margin-bottom:22px;text-decoration:none;font-family:Arial,sans-serif}
   .btn-print:hover{background:#155c42}
-  .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:22px;border-bottom:3px solid #1a6b4e;margin-bottom:26px;gap:24px}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px;padding-bottom:22px;border-bottom:3px solid #1a6b4e;margin-bottom:26px}
   .company-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .company-brand img{height:52px;width:auto;flex-shrink:0}
-  .company-brand-name{font-family:'Great Vibes',Georgia,serif;font-size:2.2rem;line-height:1}
-  .company h1{font-size:1.9rem;color:#1a6b4e;margin:0 0 4px;letter-spacing:2px}
+  .company-brand img{height:48px;width:auto;flex-shrink:0}
+  .company-brand-name{font-family:'Great Vibes',Georgia,serif;font-size:2rem;line-height:1}
   .company p{margin:2px 0;font-size:.81rem;color:#555}
-  .receipt-meta{text-align:right;min-width:220px}
+  .receipt-meta{text-align:right;min-width:0;flex-shrink:0}
   .receipt-meta h2{font-size:.9rem;font-weight:700;color:#1a1a1a;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px}
   .receipt-meta p{margin:3px 0;font-size:.83rem;color:#444}
-  .receipt-meta .ref{font-size:.7rem;color:#bbb;font-family:monospace;word-break:break-all}
+  .receipt-meta .ref{font-size:.68rem;color:#bbb;font-family:monospace;word-break:break-all;max-width:200px;display:inline-block}
   .section-title{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin:0 0 8px}
-  .info-row{display:flex;gap:16px;margin-bottom:24px}
-  .info-box{flex:1;background:#f8faf9;border:1px solid #e2ede8;border-radius:8px;padding:14px 16px;font-size:.86rem}
+  .info-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+  .info-box{flex:1;min-width:180px;background:#f8faf9;border:1px solid #e2ede8;border-radius:8px;padding:14px 16px;font-size:.86rem}
   .info-box p{margin:3px 0}
-  table.items{width:100%;border-collapse:collapse;font-size:.87rem;margin-bottom:0}
-  table.items thead th{background:#1a6b4e;color:#fff;padding:10px 10px;text-align:left;font-size:.8rem;font-weight:600}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:0}
+  table.items{width:100%;border-collapse:collapse;font-size:.86rem;min-width:480px}
+  table.items thead th{background:#1a6b4e;color:#fff;padding:10px 8px;text-align:left;font-size:.79rem;font-weight:600;white-space:nowrap}
   table.items thead th.r{text-align:right} table.items thead th.c{text-align:center}
   table.items tbody tr:nth-child(even){background:#f8faf9}
-  table.items tbody td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+  table.items tbody td{padding:8px;border-bottom:1px solid #eee;vertical-align:top}
   .totals-wrap{display:flex;justify-content:flex-end;margin-top:18px}
-  .totals-table{width:310px;border-collapse:collapse;font-size:.87rem}
+  .totals-table{width:100%;max-width:320px;border-collapse:collapse;font-size:.87rem}
   .totals-table td{padding:5px 8px}
   .totals-table .total-row td{font-weight:700;font-size:1rem;padding-top:10px;border-top:2px solid #1a6b4e}
-  .tva-wrap{margin-top:26px}
-  .tva-table{width:100%;border-collapse:collapse;font-size:.83rem}
-  .tva-table th{background:#f0f0f0;padding:7px 8px;text-align:left;color:#555;font-weight:600;font-size:.8rem}
+  .tva-wrap{margin-top:26px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tva-table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:320px}
+  .tva-table th{background:#f0f0f0;padding:7px 8px;text-align:left;color:#555;font-weight:600;font-size:.79rem;white-space:nowrap}
   .tva-table th.r{text-align:right}
   .tva-table td{padding:5px 8px;border-bottom:1px solid #eee}
   .tva-table .total-row td{font-weight:700;background:#f8f8f8}
   .footer{margin-top:30px;padding-top:18px;border-top:1px solid #eee;font-size:.74rem;color:#aaa;line-height:1.7}
+  @media(max-width:600px){
+    .receipt{padding:20px 14px}
+    .header{flex-direction:column}
+    .receipt-meta{text-align:left}
+    .receipt-meta .ref{max-width:100%}
+  }
   @media print{
     body{background:#fff;padding:0}
-    .receipt{box-shadow:none;border-radius:0;padding:20px}
+    .receipt{box-shadow:none;border-radius:0;padding:16px}
     .btn-print{display:none!important}
   }
 </style>
 </head>
 <body>
-<button class="btn-print" onclick="window.print()">🖨️ Imprimer / Télécharger en PDF</button>
+<button class="btn-print" id="btn-print">🖨️ Imprimer / Télécharger en PDF</button>
 <div class="receipt">
   <div class="header">
     <div class="company">
@@ -682,6 +688,7 @@ function generateReceiptHtml(order) {
     ${clientBox}
   </div>
 
+  <div class="table-scroll">
   <table class="items">
     <thead>
       <tr>
@@ -694,6 +701,7 @@ function generateReceiptHtml(order) {
     </thead>
     <tbody>${itemsRows}</tbody>
   </table>
+  </div>
 
   <div class="totals-wrap">
     <table class="totals-table">
@@ -734,6 +742,7 @@ function generateReceiptHtml(order) {
     <p>PANUOZZO — 30 Av. Jean Moulin, 78380 Bougival — SIRET 988 030 797 00019 — N° TVA FR62 988 030 797</p>
   </div>
 </div>
+<script>document.getElementById('btn-print').addEventListener('click',function(){window.print();});</script>
 </body>
 </html>`;
 }
@@ -747,6 +756,11 @@ app.get('/api/receipt/:sessionId', rlReceipt, (req, res) => {
   const order = loadOrders().find(o => o.id === sessionId);
   if (!order) return res.status(404).send('Reçu introuvable');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  // CSP assouplie pour cette page standalone (print via script inline)
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src https://fonts.gstatic.com; img-src 'self' https: data:;"
+  );
   res.send(generateReceiptHtml(order));
 });
 
