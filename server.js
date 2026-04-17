@@ -286,7 +286,7 @@ const mailer = nodemailer.createTransport({
 async function sendEmail(to, subject, html) {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER) return;
   try {
-    await mailer.sendMail({ from: `"PANUOZZO 🍕" <${process.env.SMTP_USER}>`, to, subject, html });
+    await mailer.sendMail({ from: process.env.SMTP_FROM || `"PANUOZZO" <${process.env.SMTP_USER}>`, to, subject, html });
     console.log(`📧 Email envoyé → ${to}`);
   } catch (err) {
     console.error('Email error:', err.message);
