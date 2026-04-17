@@ -3,33 +3,20 @@
     navigator.serviceWorker.register('/tablette-sw.js').catch(() => {});
   }
 
-  // ── Audio Context (débloqué après geste utilisateur) ─────
-  let audioCtx = null;
+  // ── Audio MP3 (plus fiable que Web Audio API sur Android) ──
+  const _notifAudio = new Audio('/sounds/notif.mp3');
+  _notifAudio.preload = 'auto';
+  let _audioUnlocked = false;
 
+  // Premier clic : charger et jouer silencieusement pour débloquer l'audio Android
   function unlockAudio() {
-    if (audioCtx) {
-      // Réactiver si suspendu (Android suspend le contexte après inactivité)
-      if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-      return;
-    }
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch {}
+    if (_audioUnlocked) return;
+    _audioUnlocked = true;
+    const silent = _notifAudio.cloneNode();
+    silent.volume = 0;
+    silent.play().catch(() => {});
   }
-
-  // Tout clic sur la page maintient le contexte audio vivant
   document.addEventListener('click', unlockAudio);
-
-  // Réactiver quand la tablette sort de veille / l'onglet redevient visible
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
-    }
-  });
-
-  // Keep-alive : prévient la suspension automatique sur Android (toutes les 20s)
-  setInterval(() => {
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-  }, 20000);
 
   // ── Auth ─────────────────────────────────────────────────
   const SESSION_KEY = 'panuozzo_tablette_auth';
@@ -42,7 +29,7 @@
   }
 
   function checkLogin() {
-    unlockAudio(); // débloquer l'audio dès le premier clic
+    unlockAudio();
     const pwd = document.getElementById('login-input').value;
     const err = document.getElementById('login-error');
     if (!pwd) { err.textContent = 'Entrez le mot de passe'; return; }
@@ -327,37 +314,12 @@
   }
 
   // ── Son notification ──────────────────────────────────────
-  // Joue un accord de 3 oscillateurs simultanés — sawtooth + limiteur hard
-  async function playBips() {
-    if (!audioCtx) {
-      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch { return; }
-    }
+  // Joue la sonnerie MP3
+  function playBips() {
     try {
-      if (audioCtx.state === 'suspended') await audioCtx.resume();
-      const comp = audioCtx.createDynamicsCompressor();
-      comp.threshold.value = -20;
-      comp.knee.value = 0;
-      comp.ratio.value = 20;
-      comp.attack.value = 0.001;
-      comp.release.value = 0.08;
-      comp.connect(audioCtx.destination);
-      const t = audioCtx.currentTime;
-      // Fréquences 1760-2640Hz : plage maximale de sensibilité de l'oreille, coupe le bruit cuisine
-      [1760, 2200, 2640].forEach(freq => {
-        const osc  = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(comp);
-        osc.frequency.value = freq;
-        osc.type = 'sawtooth';
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.9, t + 0.005);
-        gain.gain.setValueAtTime(0.9, t + 0.35);
-        gain.gain.linearRampToValueAtTime(0, t + 0.45);
-        osc.start(t);
-        osc.stop(t + 0.46);
-      });
+      const sound = _notifAudio.cloneNode();
+      sound.volume = 1.0;
+      sound.play().catch(() => {});
     } catch {}
   }
 
