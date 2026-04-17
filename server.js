@@ -420,9 +420,10 @@ async function processOrder(session) {
   console.log(`📧 Email client : ${order.customerEmail || '(aucun email)'}`);
   if (order.customerEmail) {
     await sendEmail(order.customerEmail, '🍕 Votre commande PANUOZZO est confirmée !', `
+      ${emailBrandBlock()}
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">
-        <div style="background:#1a6b4e;padding:24px 32px">
-          <h1 style="color:#fff;margin:0;font-size:1.5rem">🍕 Commande confirmée !</h1>
+        <div style="background:#1a6b4e;padding:18px 32px">
+          <h1 style="color:#fff;margin:0;font-size:1.3rem">🍕 Commande confirmée !</h1>
         </div>
         <div style="padding:28px 32px">
           <p style="margin-top:0">Bonjour <strong>${escHtml(delivery.firstname || delivery.prenom || '')}</strong>,</p>
@@ -452,9 +453,10 @@ async function processOrder(session) {
     await sendEmail(process.env.ADMIN_EMAIL,
       `🔔 Nouvelle commande${order.promoApplied ? ' 🎉 -10%' : ''} — ${escHtml(delivery.firstname || delivery.prenom || '')} ${escHtml(delivery.lastname || delivery.nom || '')} — ${order.total.toFixed(2)}€`,
       `
+      ${emailBrandBlock()}
       <div style="font-family:sans-serif;max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">
-        <div style="background:#dc2626;padding:20px 28px">
-          <h1 style="color:#fff;margin:0;font-size:1.3rem">🔔 Nouvelle commande</h1>
+        <div style="background:#dc2626;padding:16px 28px">
+          <h1 style="color:#fff;margin:0;font-size:1.2rem">🔔 Nouvelle commande</h1>
         </div>
         <div style="padding:24px 28px">
           <table style="width:100%;font-size:.9rem;margin-bottom:16px">
@@ -504,6 +506,19 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 });
 
 app.use(express.json());
+
+// ── Bloc marque réutilisé dans tous les emails ────────────
+function emailBrandBlock() {
+  const siteUrl = process.env.SITE_URL;
+  return `<style>@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');</style>
+<div style="text-align:center;padding:20px 20px 14px;background:#fff;border-bottom:1px solid #f0ede8">
+  <img src="${siteUrl}/images/svg/logo_panuozzo_transparent.png" alt="PANUOZZO" style="height:54px;width:auto;display:block;margin:0 auto 8px">
+  <div style="font-family:'Great Vibes',Georgia,serif;font-size:2.4rem;line-height:1.1">
+    <span style="color:#dc2626">Pan</span><span style="color:#1c1917">uoz</span><span style="color:#1a6b4e">zo</span>
+  </div>
+  <p style="margin:4px 0 0;font-size:.7rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-family:Arial,sans-serif">Pizza au feu de bois · Bougival</p>
+</div>`;
+}
 
 // ── Génération reçu fiscal (conforme CGI art. 242 nonies A) ──
 function generateReceiptHtml(order) {
@@ -586,6 +601,8 @@ function generateReceiptHtml(order) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reçu ${receiptNum} — PANUOZZO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box}
   body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:0 auto;padding:28px 20px;background:#f5f5f0;color:#1a1a1a}
@@ -593,6 +610,9 @@ function generateReceiptHtml(order) {
   .btn-print{display:inline-flex;align-items:center;gap:8px;background:#1a6b4e;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:.93rem;cursor:pointer;margin-bottom:22px;text-decoration:none;font-family:Arial,sans-serif}
   .btn-print:hover{background:#155c42}
   .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:22px;border-bottom:3px solid #1a6b4e;margin-bottom:26px;gap:24px}
+  .company-brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .company-brand img{height:52px;width:auto;flex-shrink:0}
+  .company-brand-name{font-family:'Great Vibes',Georgia,serif;font-size:2.2rem;line-height:1}
   .company h1{font-size:1.9rem;color:#1a6b4e;margin:0 0 4px;letter-spacing:2px}
   .company p{margin:2px 0;font-size:.81rem;color:#555}
   .receipt-meta{text-align:right;min-width:220px}
@@ -631,7 +651,10 @@ function generateReceiptHtml(order) {
 <div class="receipt">
   <div class="header">
     <div class="company">
-      <h1>PANUOZZO</h1>
+      <div class="company-brand">
+        <img src="${process.env.SITE_URL}/images/svg/logo_panuozzo_transparent.png" alt="Logo PANUOZZO">
+        <span class="company-brand-name"><span style="color:#dc2626">Pan</span><span style="color:#1c1917">uoz</span><span style="color:#1a6b4e">zo</span></span>
+      </div>
       <p>Pizza au feu de bois</p>
       <p>30 Av. Jean Moulin — 78380 Bougival</p>
       <p>Tél : 01 75 26 91 20</p>
@@ -921,9 +944,10 @@ app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, re
     if (status === 'en_preparation') {
       subject = '👨‍🍳 Votre commande PANUOZZO est en préparation';
       html = `
+        ${emailBrandBlock()}
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-          <div style="background:#1a6b4e;padding:20px 28px">
-            <h1 style="color:#fff;margin:0;font-size:1.3rem">👨‍🍳 En cours de préparation</h1>
+          <div style="background:#1a6b4e;padding:16px 28px">
+            <h1 style="color:#fff;margin:0;font-size:1.2rem">👨‍🍳 En cours de préparation</h1>
           </div>
           <div style="padding:24px 28px;background:#fff">
             <p>Bonjour <strong>${prenom}</strong>,</p>
@@ -937,9 +961,10 @@ app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, re
       if (isLivraison) {
         subject = '🛵 Votre commande PANUOZZO est en route !';
         html = `
+          ${emailBrandBlock()}
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-            <div style="background:#2563eb;padding:20px 28px">
-              <h1 style="color:#fff;margin:0;font-size:1.3rem">🛵 Votre commande arrive !</h1>
+            <div style="background:#2563eb;padding:16px 28px">
+              <h1 style="color:#fff;margin:0;font-size:1.2rem">🛵 Votre commande arrive !</h1>
             </div>
             <div style="padding:24px 28px;background:#fff">
               <p>Bonjour <strong>${prenom}</strong>,</p>
@@ -952,9 +977,10 @@ app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, re
       } else {
         subject = '✅ Votre commande PANUOZZO est prête !';
         html = `
+          ${emailBrandBlock()}
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-            <div style="background:#d97706;padding:20px 28px">
-              <h1 style="color:#fff;margin:0;font-size:1.3rem">✅ Commande prête à retirer !</h1>
+            <div style="background:#d97706;padding:16px 28px">
+              <h1 style="color:#fff;margin:0;font-size:1.2rem">✅ Commande prête à retirer !</h1>
             </div>
             <div style="padding:24px 28px;background:#fff">
               <p>Bonjour <strong>${prenom}</strong>,</p>
@@ -969,9 +995,10 @@ app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, re
       if (isLivraison) {
         subject = '🙏 Merci pour votre commande PANUOZZO !';
         html = `
+          ${emailBrandBlock()}
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-            <div style="background:#1a6b4e;padding:20px 28px">
-              <h1 style="color:#fff;margin:0;font-size:1.3rem">🙏 Merci pour votre confiance !</h1>
+            <div style="background:#1a6b4e;padding:16px 28px">
+              <h1 style="color:#fff;margin:0;font-size:1.2rem">🙏 Merci pour votre confiance !</h1>
             </div>
             <div style="padding:24px 28px;background:#fff">
               <p>Bonjour <strong>${prenom}</strong>,</p>
@@ -985,9 +1012,10 @@ app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, re
       } else {
         subject = '🙏 Merci pour votre visite chez PANUOZZO !';
         html = `
+          ${emailBrandBlock()}
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto">
-            <div style="background:#1a6b4e;padding:20px 28px">
-              <h1 style="color:#fff;margin:0;font-size:1.3rem">🙏 Merci pour votre confiance !</h1>
+            <div style="background:#1a6b4e;padding:16px 28px">
+              <h1 style="color:#fff;margin:0;font-size:1.2rem">🙏 Merci pour votre confiance !</h1>
             </div>
             <div style="padding:24px 28px;background:#fff">
               <p>Bonjour <strong>${prenom}</strong>,</p>
