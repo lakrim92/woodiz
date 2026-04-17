@@ -840,7 +840,7 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
         currency: 'eur',
         product_data: {
           name: String(item.name).trim().slice(0, 250),
-          ...((item.description || item.desc) ? { description: String(item.description || item.desc).slice(0, 500) } : {}),
+          ...((() => { const d = String(item.description || item.desc || '').trim().slice(0, 500); return d ? { description: d } : {}; })()),
           // item.image non transmis — évite SSRF via Stripe
         },
         unit_amount: Math.round(parseFloat(item.price) * 100),
