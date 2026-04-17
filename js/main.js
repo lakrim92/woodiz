@@ -39,9 +39,9 @@ function updateStatut() {
   const m   = now.getMinutes();
   const hm  = h * 60 + m;  // minutes depuis minuit
 
-  // Horaires : Mar–Dim 11h00-14h30 & 18h00-23h00 / Lundi fermé
+  // Horaires : Mar–Dim 11h00-15h00 & 18h00-23h00 / Lundi fermé
   const midi_open  = 11 * 60;
-  const midi_close = 14 * 60 + 30;
+  const midi_close = 15 * 60;
   const soir_open  = 18 * 60;
   const soir_close = 23 * 60;
 
@@ -51,7 +51,7 @@ function updateStatut() {
   // Lundi (day=1) : fermé toute la journée
   // Mar–Sam (2–6) et Dim (0) : mêmes horaires midi + soir
   if (day !== 1) {
-    if (hm >= midi_open && hm < midi_close) { isOpen = true; closesAt = '14h30'; }
+    if (hm >= midi_open && hm < midi_close) { isOpen = true; closesAt = '15h00'; }
     else if (hm >= soir_open && hm < soir_close) { isOpen = true; closesAt = '23h00'; }
   }
 
@@ -93,10 +93,19 @@ function updateStatut() {
   }
 
   // Blocage du panier si fermé
-  const notice  = document.getElementById('cart-closed-notice');
-  const btns    = document.getElementById('cart-delivery-btns');
-  if (notice) notice.style.display = isOpen ? 'none' : 'flex';
-  if (btns)   btns.style.display   = isOpen ? 'flex'  : 'none';
+  const notice    = document.getElementById('cart-closed-notice');
+  const btns      = document.getElementById('cart-delivery-btns');
+  const label     = document.querySelector('.cart-delivery-label');
+  const nextEl    = document.getElementById('cart-next-open');
+  const banner    = document.getElementById('restaurant-closed-banner');
+  const bannerNext = document.getElementById('rcb-next');
+
+  if (nextEl)     nextEl.textContent    = next;
+  if (bannerNext) bannerNext.textContent = next;
+  if (notice) notice.style.display = isOpen ? 'none'  : 'flex';
+  if (btns)   btns.style.display   = isOpen ? 'grid'  : 'none';
+  if (label)  label.style.display  = isOpen ? ''      : 'none';
+  if (banner) banner.style.display = isOpen ? 'none'  : 'flex';
 }
 
 updateStatut();
@@ -248,6 +257,22 @@ function copyPromo() {
 const header = document.getElementById('header');
 let lastScroll = 0;
 
+// IntersectionObserver pour basculer le style du header au passage du hero
+const heroSection = document.querySelector('.hero');
+if (heroSection) {
+  const heroObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        header.classList.remove('past-hero');
+      } else {
+        header.classList.add('past-hero');
+      }
+    },
+    { threshold: 0, rootMargin: '-62px 0px 0px 0px' }
+  );
+  heroObserver.observe(heroSection);
+}
+
 window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
 
@@ -283,11 +308,10 @@ window.addEventListener('scroll', () => {
 
 // ── Modal personnalisation pizza ──────────────────────────
 const EXTRAS = [
-  'Anchois','Artichaut','Avocat','Champignons','Chèvre','Chorizo',
-  'Cornichons','Feta','Gorgonzola','Jambon','Jambon de Parme','Lardons',
-  'Merguez','Mozzarella ×2','Œuf','Olives','Oignons','Parmesan',
-  'Pepperoni','Poivrons','Poulet','Roquette','Saumon fumé','Thon',
-  'Tomates fraîches'
+  'Crème fraiche','Sauce tomate','Champignons frais','Tomates cerises','Olives','Anchois',
+  'Câpres','Chèvre','Brie','Raclette','Emmental rapé','Artichauts',
+  'Aubergines grillées','Viande hachée','Merguez','Poivrons',
+  'Poulet mariné','Miel','Lardons de veau','Jambon de dinde','Chorizo de boeuf'
 ];
 
 const pizzaModal    = document.getElementById('pizza-modal');
@@ -329,6 +353,18 @@ document.getElementById('menu').addEventListener('click', (e) => {
   const formuleBtn = e.target.closest('.btn-formule');
   if (formuleBtn) { e.stopPropagation(); openFormuleModal(formuleBtn.dataset.formule); return; }
 
+  // Panizza selector — each option opens the modal directly
+  const panizzaBtn = e.target.closest('.btn-panizza-add');
+  if (panizzaBtn) {
+    e.stopPropagation();
+    const name      = panizzaBtn.dataset.name;
+    const desc      = panizzaBtn.dataset.desc;
+    const basePrice = parseFloat(panizzaBtn.dataset.price);
+    const priceText = panizzaBtn.dataset.price.replace('.', ',') + '€';
+    openPizzaModalFull(name, desc, priceText, basePrice, false);
+    return;
+  }
+
   const btn = e.target.closest('.btn-add');
   if (!btn) return;
   e.stopPropagation();
@@ -347,7 +383,7 @@ document.getElementById('menu').addEventListener('click', (e) => {
 function addDrinkToCart(drinkCard) {
   const name  = drinkCard.dataset.name;
   const price = parseFloat(drinkCard.dataset.price || '0');
-  addToCart({ name, desc: '', price });
+  addToCart({ name, desc: '', price, type: 'boisson' });
 }
 
 // ── Häagen-Dazs : choix du parfum ────────────────────────
@@ -469,11 +505,11 @@ function buildSelectHtml(id, label, options) {
 }
 
 function openFormuleModal(type) {
-  // Menu Midi : uniquement Mar–Dim 11h00–14h30
+  // Menu Midi : uniquement Mar–Dim 11h00–15h00
   if (type === 'midi') {
     const _n = new Date(), _day = _n.getDay(), _hm = _n.getHours() * 60 + _n.getMinutes();
-    if (_day === 1 || _hm < 11 * 60 || _hm >= 14 * 60 + 30) {
-      alert('Le Menu Midi est disponible uniquement du mardi au dimanche entre 11h00 et 14h30 🕚');
+    if (_day === 1 || _hm < 11 * 60 || _hm >= 15 * 60) {
+      alert('Le Menu Midi est disponible uniquement du mardi au dimanche entre 11h00 et 15h00 🕚');
       return;
     }
   }
@@ -481,9 +517,9 @@ function openFormuleModal(type) {
   const panizzas = getPanizzaOptions();
   const bouteilles = [
     { name: 'Coca-Cola 1,25L', price: 4 },
-    { name: 'Fanta Orange 1,25L', price: 4 },
-    { name: 'Sprite 1,25L', price: 4 },
-    { name: 'Ice Tea Pêche 1,25L', price: 4 },
+    { name: 'Coca-Cola Zéro 1,25L', price: 4 },
+    { name: 'Ice Tea 1,25L', price: 4 },
+    { name: 'Fanta orange 1,25L', price: 4 },
   ];
 
   let title = '', desc = '', bodyHtml = '';
@@ -502,10 +538,10 @@ function openFormuleModal(type) {
     const canettes = [
       { name: 'Coca-Cola 33cl',       price: 0 },
       { name: 'Coca-Cola Zéro 33cl',  price: 0 },
-      { name: 'Fanta Orange 33cl',    price: 0 },
+      { name: 'Tropico 33cl',    price: 0 },
       { name: 'Sprite 33cl',          price: 0 },
-      { name: 'Perrier 33cl',         price: 0 },
-      { name: 'Ice Tea Pêche 33cl',   price: 0 },
+      { name: 'Ice tera 33cl',         price: 0 },
+      { name: 'Oasis tropical  33cl',   price: 0 },
     ];
     title = 'Menu Midi';
     desc  = 'Mar–Dim · À emporter · pizza ou panizza + canette offerte';
@@ -1177,3 +1213,19 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     window.scrollTo({ top, behavior: 'smooth' });
   });
 });
+
+// ── Cookie consent banner ─────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.getElementById('cookie-banner');
+  if (!banner) return;
+  if (!localStorage.getItem('cookie_consent')) banner.style.display = 'flex';
+  document.getElementById('cookie-refuse').addEventListener('click', () => {
+    localStorage.setItem('cookie_consent', 'refused');
+    banner.style.display = 'none';
+  });
+  document.getElementById('cookie-accept').addEventListener('click', () => {
+    localStorage.setItem('cookie_consent', 'accepted');
+    banner.style.display = 'none';
+  });
+});
+

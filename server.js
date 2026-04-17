@@ -90,6 +90,7 @@ setInterval(() => {
 
 const rlAuth     = rateLimit(10, 60_000);  // 10 tentatives/min sur les routes auth
 const rlCheckout = rateLimit(30, 60_000);  // 30 req/min sur checkout + promo
+const rlReceipt  = rateLimit(20, 60_000);  // 20 req/min sur les reçus
 
 // ── Sessions serveur (token aléatoire — jamais stocker le mot de passe côté client) ──
 const _sessions = new Map(); // token → { role, expiresAt }
@@ -436,6 +437,9 @@ async function processOrder(session) {
           <p><strong>Mode :</strong> ${modeLabel}${delivery.mode === 'livraison' && addrLineEsc ? ` — ${addrLineEsc}` : ''}</p>
           <p style="color:#666;font-size:.88rem">⏱ Temps estimé : ~30 minutes</p>
           <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
+          <p style="margin-bottom:16px">
+            <a href="${process.env.SITE_URL}/api/receipt/${session.id}" style="display:inline-block;background:#1a6b4e;color:#fff;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:.9rem;font-weight:600">📄 Télécharger mon reçu</a>
+          </p>
           <p style="color:#999;font-size:.8rem;margin:0">PANUOZZO — 30 Av. Jean Moulin, 78380 Bougival · 01 75 26 91 20</p>
         </div>
       </div>
@@ -500,6 +504,228 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
 });
 
 app.use(express.json());
+
+// ── Génération reçu fiscal (conforme CGI art. 242 nonies A) ──
+function generateReceiptHtml(order) {
+  const d          = new Date(order.createdAt);
+  const dateStr    = d.toLocaleDateString('fr-FR');
+  const timeStr    = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const ymd        = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const seq        = String(order.orderNumber).slice(-6);
+  const receiptNum = `PANU-${ymd}-${seq}`;
+  const delivery   = order.delivery || {};
+  const clientName = [delivery.firstname || delivery.prenom, delivery.lastname || delivery.nom].filter(Boolean).join(' ');
+  const isLivraison = delivery.mode === 'livraison';
+  const addrLine   = [delivery.address || delivery.adresse, delivery.zip, delivery.city].filter(Boolean).join(' ');
+  const modeLabel  = isLivraison ? 'Livraison à domicile' : 'Retrait sur place';
+
+  // TVA : 10% sur plats cuisinés, 5.5% sur boissons
+  const tvaGroups  = {}; // rate → { baseHT, montantTVA, totalTTC }
+  const items      = order.items || [];
+  const subtotalBC = items.reduce((s, i) => s + (i.price || 0), 0);
+
+  const itemsRows = items.map(item => {
+    const qty       = item.qty || 1;
+    const priceTTC  = typeof item.price === 'number' ? item.price : 0;
+    const rate      = item.type === 'boisson' ? 5.5 : 10;
+    const prixUnit  = priceTTC / qty;
+    const ht        = priceTTC / (1 + rate / 100);
+    const tva       = priceTTC - ht;
+    if (!tvaGroups[rate]) tvaGroups[rate] = { baseHT: 0, montantTVA: 0, totalTTC: 0 };
+    tvaGroups[rate].baseHT     += ht;
+    tvaGroups[rate].montantTVA += tva;
+    tvaGroups[rate].totalTTC   += priceTTC;
+    const detailHtml = item.desc ? `<br><span style="font-size:.8rem;color:#777">${escHtml(item.desc)}</span>` : '';
+    return `<tr>
+      <td style="padding:8px 10px">${escHtml(item.name)}${detailHtml}</td>
+      <td style="padding:8px 10px;text-align:center">${qty}</td>
+      <td style="padding:8px 10px;text-align:right">${prixUnit.toFixed(2)} €</td>
+      <td style="padding:8px 10px;text-align:center">${rate}%</td>
+      <td style="padding:8px 10px;text-align:right">${priceTTC.toFixed(2)} €</td>
+    </tr>`;
+  }).join('');
+
+  // Si promo : ajuster les bases TVA proportionnellement au total réel
+  if (order.promoApplied && order.discount > 0 && subtotalBC > 0) {
+    const ratio = order.total / subtotalBC;
+    Object.values(tvaGroups).forEach(g => {
+      g.baseHT     *= ratio;
+      g.montantTVA *= ratio;
+      g.totalTTC   *= ratio;
+    });
+  }
+
+  const totalHT  = Object.values(tvaGroups).reduce((s, g) => s + g.baseHT, 0);
+  const totalTVA = Object.values(tvaGroups).reduce((s, g) => s + g.montantTVA, 0);
+
+  const tvaRecapRows = Object.entries(tvaGroups)
+    .sort(([a], [b]) => Number(b) - Number(a))
+    .map(([rate, g]) => `<tr>
+      <td style="padding:5px 8px;font-size:.83rem">${rate}%</td>
+      <td style="padding:5px 8px;text-align:right;font-size:.83rem">${g.baseHT.toFixed(2)} €</td>
+      <td style="padding:5px 8px;text-align:right;font-size:.83rem">${g.montantTVA.toFixed(2)} €</td>
+      <td style="padding:5px 8px;text-align:right;font-size:.83rem">${g.totalTTC.toFixed(2)} €</td>
+    </tr>`).join('');
+
+  const promoRow = order.promoApplied && order.discount > 0
+    ? `<tr><td style="color:#16a34a;padding:5px 8px">Réduction 1ère commande (-10%)</td><td style="text-align:right;color:#16a34a;padding:5px 8px">-${order.discount.toFixed(2)} €</td></tr>
+       <tr><td style="padding:5px 8px;color:#555">Sous-total avant réduction</td><td style="text-align:right;padding:5px 8px">${subtotalBC.toFixed(2)} €</td></tr>`
+    : '';
+
+  const clientBox = (clientName || isLivraison) ? `
+    <div class="info-box">
+      <p class="section-title">Client</p>
+      ${clientName ? `<p><strong>${escHtml(clientName)}</strong></p>` : ''}
+      ${order.customerEmail ? `<p>${escHtml(order.customerEmail)}</p>` : ''}
+      ${isLivraison && addrLine ? `<p>${escHtml(addrLine)}</p>` : ''}
+    </div>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reçu ${receiptNum} — PANUOZZO</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;max-width:840px;margin:0 auto;padding:28px 20px;background:#f5f5f0;color:#1a1a1a}
+  .receipt{background:#fff;border-radius:12px;padding:40px;box-shadow:0 2px 18px rgba(0,0,0,.09)}
+  .btn-print{display:inline-flex;align-items:center;gap:8px;background:#1a6b4e;color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:.93rem;cursor:pointer;margin-bottom:22px;text-decoration:none;font-family:Arial,sans-serif}
+  .btn-print:hover{background:#155c42}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:22px;border-bottom:3px solid #1a6b4e;margin-bottom:26px;gap:24px}
+  .company h1{font-size:1.9rem;color:#1a6b4e;margin:0 0 4px;letter-spacing:2px}
+  .company p{margin:2px 0;font-size:.81rem;color:#555}
+  .receipt-meta{text-align:right;min-width:220px}
+  .receipt-meta h2{font-size:.9rem;font-weight:700;color:#1a1a1a;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px}
+  .receipt-meta p{margin:3px 0;font-size:.83rem;color:#444}
+  .receipt-meta .ref{font-size:.7rem;color:#bbb;font-family:monospace;word-break:break-all}
+  .section-title{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin:0 0 8px}
+  .info-row{display:flex;gap:16px;margin-bottom:24px}
+  .info-box{flex:1;background:#f8faf9;border:1px solid #e2ede8;border-radius:8px;padding:14px 16px;font-size:.86rem}
+  .info-box p{margin:3px 0}
+  table.items{width:100%;border-collapse:collapse;font-size:.87rem;margin-bottom:0}
+  table.items thead th{background:#1a6b4e;color:#fff;padding:10px 10px;text-align:left;font-size:.8rem;font-weight:600}
+  table.items thead th.r{text-align:right} table.items thead th.c{text-align:center}
+  table.items tbody tr:nth-child(even){background:#f8faf9}
+  table.items tbody td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+  .totals-wrap{display:flex;justify-content:flex-end;margin-top:18px}
+  .totals-table{width:310px;border-collapse:collapse;font-size:.87rem}
+  .totals-table td{padding:5px 8px}
+  .totals-table .total-row td{font-weight:700;font-size:1rem;padding-top:10px;border-top:2px solid #1a6b4e}
+  .tva-wrap{margin-top:26px}
+  .tva-table{width:100%;border-collapse:collapse;font-size:.83rem}
+  .tva-table th{background:#f0f0f0;padding:7px 8px;text-align:left;color:#555;font-weight:600;font-size:.8rem}
+  .tva-table th.r{text-align:right}
+  .tva-table td{padding:5px 8px;border-bottom:1px solid #eee}
+  .tva-table .total-row td{font-weight:700;background:#f8f8f8}
+  .footer{margin-top:30px;padding-top:18px;border-top:1px solid #eee;font-size:.74rem;color:#aaa;line-height:1.7}
+  @media print{
+    body{background:#fff;padding:0}
+    .receipt{box-shadow:none;border-radius:0;padding:20px}
+    .btn-print{display:none!important}
+  }
+</style>
+</head>
+<body>
+<button class="btn-print" onclick="window.print()">🖨️ Imprimer / Télécharger en PDF</button>
+<div class="receipt">
+  <div class="header">
+    <div class="company">
+      <h1>PANUOZZO</h1>
+      <p>Pizza au feu de bois</p>
+      <p>30 Av. Jean Moulin — 78380 Bougival</p>
+      <p>Tél : 01 75 26 91 20</p>
+      <p style="margin-top:7px">SIRET : 988 030 797 00019</p>
+      <p>Code APE : 56.10C — Restauration rapide</p>
+      <p>N° TVA intracommunautaire : FR62 988 030 797</p>
+    </div>
+    <div class="receipt-meta">
+      <h2>Reçu de paiement</h2>
+      <p><strong>N° ${receiptNum}</strong></p>
+      <p>Date : ${dateStr} à ${timeStr}</p>
+      <p>Mode : ${modeLabel}</p>
+      <p>Paiement : Carte bancaire (Stripe)</p>
+      <p class="ref">Réf. ${escHtml(order.id)}</p>
+    </div>
+  </div>
+
+  <div class="info-row">
+    <div class="info-box">
+      <p class="section-title">Vendeur</p>
+      <p><strong>PANUOZZO</strong></p>
+      <p>30 Av. Jean Moulin, 78380 Bougival</p>
+      <p>contact@panuozzo-bougival.fr</p>
+    </div>
+    ${clientBox}
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th>Désignation</th>
+        <th class="c">Qté</th>
+        <th class="r">PU TTC</th>
+        <th class="c">TVA</th>
+        <th class="r">Total TTC</th>
+      </tr>
+    </thead>
+    <tbody>${itemsRows}</tbody>
+  </table>
+
+  <div class="totals-wrap">
+    <table class="totals-table">
+      ${promoRow}
+      <tr><td style="color:#555">Total HT</td><td style="text-align:right">${totalHT.toFixed(2)} €</td></tr>
+      <tr><td style="color:#555">Total TVA</td><td style="text-align:right">${totalTVA.toFixed(2)} €</td></tr>
+      <tr class="total-row"><td>Total TTC</td><td style="text-align:right">${order.total.toFixed(2)} €</td></tr>
+    </table>
+  </div>
+
+  <div class="tva-wrap">
+    <p class="section-title">Récapitulatif TVA</p>
+    <table class="tva-table">
+      <thead>
+        <tr>
+          <th>Taux TVA</th>
+          <th class="r">Base HT</th>
+          <th class="r">Montant TVA</th>
+          <th class="r">Total TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tvaRecapRows}
+        <tr class="total-row">
+          <td>Total</td>
+          <td style="text-align:right">${totalHT.toFixed(2)} €</td>
+          <td style="text-align:right">${totalTVA.toFixed(2)} €</td>
+          <td style="text-align:right">${order.total.toFixed(2)} €</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>TVA acquittée sur les débits · Restauration rapide (Code APE 56.10C)</p>
+    <p>Taux appliqués : 10% sur plats cuisinés à emporter/livrer · 5,5% sur boissons non alcoolisées</p>
+    <p>Ce document tient lieu de facture simplifiée conformément à l'article 242 nonies A de l'annexe II du CGI.</p>
+    <p>PANUOZZO — 30 Av. Jean Moulin, 78380 Bougival — SIRET 988 030 797 00019 — N° TVA FR62 988 030 797</p>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
+// ── Reçu fiscal client ────────────────────────────────────
+app.get('/api/receipt/:sessionId', rlReceipt, (req, res) => {
+  const { sessionId } = req.params;
+  if (!sessionId || !/^cs_(test|live)_/.test(sessionId)) {
+    return res.status(400).send('Identifiant invalide');
+  }
+  const order = loadOrders().find(o => o.id === sessionId);
+  if (!order) return res.status(404).send('Reçu introuvable');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(generateReceiptHtml(order));
+});
 
 // ── Confirmation après paiement (appelé par merci.html) ───
 app.get('/api/confirm', rlCheckout, async (req, res) => {

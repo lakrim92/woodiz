@@ -14,6 +14,8 @@
     .merci-box h1 { font-family: var(--font-head); font-size: 2rem; color: var(--green); margin-bottom: 12px; }
     .merci-box p { color: var(--gray); margin-bottom: 8px; }
     .merci-box .btn-primary { margin-top: 24px; display: inline-block; }
+    .btn-receipt { display: inline-block; margin-top: 12px; padding: 11px 22px; background: #f5f5f0; color: var(--green); border: 2px solid var(--green); border-radius: 8px; font-size: .9rem; font-weight: 600; text-decoration: none; }
+    .btn-receipt:hover { background: var(--green); color: #fff; }
   </style>
 </head>
 <body>
@@ -23,12 +25,17 @@
     <p>Merci pour ta commande. Tu recevras un email de confirmation.</p>
     <p>Temps de préparation estimé : <strong>30 minutes</strong></p>
     <a href="/" class="btn-primary">← Retour à l'accueil</a>
+    <br>
+    <a id="btn-receipt" href="#" class="btn-receipt" style="display:none">📄 Télécharger mon reçu</a>
   </div>
   <script>
     // Confirme la commande côté serveur dès l'arrivée sur cette page
     const sessionId = new URLSearchParams(location.search).get('session_id');
     if (sessionId) {
       fetch(`/api/confirm?session_id=${encodeURIComponent(sessionId)}`).catch(() => {});
+      const btn = document.getElementById('btn-receipt');
+      btn.href = `/api/receipt/${encodeURIComponent(sessionId)}`;
+      btn.style.display = 'inline-block';
     }
   </script>
 </body>
