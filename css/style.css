@@ -132,6 +132,12 @@ button { touch-action: manipulation; }
 .logo { display: flex; flex-direction: row; align-items: center; gap: 8px; line-height: 1.1; text-decoration: none; }
 .logo-brand-text { display: flex; flex-direction: column; }
 .logo-img { height: 44px; width: auto; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .logo-img { height: 30px; }
+  .logo-text { font-size: 1.45rem; }
+  .logo-sub { font-size: .5rem; letter-spacing: 1.5px; }
+  .logo { gap: 6px; }
+}
 .logo-text {
   font-family: 'Great Vibes', cursive;
   font-size: 1.9rem;
