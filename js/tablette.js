@@ -3,18 +3,22 @@
     navigator.serviceWorker.register('/tablette-sw.js').catch(() => {});
   }
 
-  // ── Audio MP3 (plus fiable que Web Audio API sur Android) ──
-  const _notifAudio = new Audio('/sounds/notif.mp3');
+  // ── Audio notifications ───────────────────────────────────
+  // App native : canal ALARM Android (indépendant du volume vidéo)
+  // Navigateur : MP3 HTML5 (fallback)
+  const _isNativeApp = /PanuozzoTabletteApp/.test(navigator.userAgent);
+  const _notifAudio  = new Audio('/sounds/notif.mp3');
   _notifAudio.preload = 'auto';
   let _audioUnlocked = false;
 
-  // Premier clic : charger et jouer silencieusement pour débloquer l'audio Android
   function unlockAudio() {
     if (_audioUnlocked) return;
     _audioUnlocked = true;
-    const silent = _notifAudio.cloneNode();
-    silent.volume = 0;
-    silent.play().catch(() => {});
+    if (!_isNativeApp) {
+      const silent = _notifAudio.cloneNode();
+      silent.volume = 0;
+      silent.play().catch(() => {});
+    }
   }
   document.addEventListener('click', unlockAudio);
 
@@ -314,12 +318,16 @@
   }
 
   // ── Son notification ──────────────────────────────────────
-  // Joue la sonnerie MP3
+  // Joue la sonnerie — canal alarme si app native, sinon MP3 HTML5
   function playBips() {
     try {
-      const sound = _notifAudio.cloneNode();
-      sound.volume = 1.0;
-      sound.play().catch(() => {});
+      if (_isNativeApp && window.AndroidNotif) {
+        window.AndroidNotif.playNotification();
+      } else {
+        const sound = _notifAudio.cloneNode();
+        sound.volume = 1.0;
+        sound.play().catch(() => {});
+      }
     } catch {}
   }
 
