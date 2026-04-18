@@ -102,7 +102,9 @@
   <link rel="stylesheet" href="css/style.css?v=21" />
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" href="images/hero/image_hero.webp" as="image" fetchpriority="high" />
+  <link rel="preload" href="images/svg/logo_panuozzo_transparent.webp" as="image" fetchpriority="high" />
+  <link rel="preload" href="images/hero/image_hero_mobile.webp" as="image" media="(max-width: 800px)" />
+  <link rel="preload" href="images/hero/image_hero.webp" as="image" media="(min-width: 801px)" />
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" /></noscript>
 
@@ -113,7 +115,7 @@
   <header id="header">
     <div class="header-inner">
       <a href="#accueil" class="logo">
-        <img src="images/svg/logo_panuozzo_transparent.webp" alt="Logo PANUOZZO" class="logo-img">
+        <img src="images/svg/logo_panuozzo_transparent.webp" alt="Logo PANUOZZO" class="logo-img" fetchpriority="high" width="200" height="149" decoding="async">
         <span class="logo-brand-text">
           <span class="logo-text"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></span>
           <span class="logo-sub">Bougival</span>
@@ -140,7 +142,10 @@
 
   <!-- ===== HERO ===== -->
   <section id="accueil" class="hero">
-    <img src="images/hero/image_hero.webp" alt="" class="hero-bg" fetchpriority="high" loading="eager" decoding="sync" width="1400" height="800" aria-hidden="true">
+    <picture>
+      <source media="(max-width: 800px)" srcset="images/hero/image_hero_mobile.webp" width="800" height="457">
+      <img src="images/hero/image_hero.webp" alt="" class="hero-bg" fetchpriority="high" loading="eager" decoding="sync" width="1400" height="800" aria-hidden="true">
+    </picture>
     <div class="hero-bg-overlay" aria-hidden="true"></div>
     <div class="hero-floating" aria-hidden="true">
       <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
@@ -1264,7 +1269,7 @@
     <div class="container footer-inner">
       <div class="footer-brand">
         <div class="footer-brand-top">
-          <img src="images/svg/logo_panuozzo_transparent.webp" alt="Logo PANUOZZO" class="footer-logo-img">
+          <img src="images/svg/logo_panuozzo_transparent.webp" alt="Logo PANUOZZO" class="footer-logo-img" width="200" height="149" loading="lazy">
           <span class="logo-text"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></span>
         </div>
         <p>Pizzeria artisanale à Bougival<br>Livraison &amp; à emporter</p>
