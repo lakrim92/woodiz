@@ -158,11 +158,21 @@
     es.onopen = () => { setConn(true); sseRetries = 0; };
   }
 
-  // Force reconnect when the app comes back to foreground (mobile kiosk)
+  // Prevent screen sleep (kiosk mode)
+  async function acquireWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      await navigator.wakeLock.request('screen');
+    } catch {}
+  }
+  acquireWakeLock();
+
+  // Force reconnect + re-acquire wake lock when app comes back to foreground
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       sseRetries = 0;
       initSSE();
+      acquireWakeLock();
     }
   });
 
