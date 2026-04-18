@@ -1255,7 +1255,11 @@ app.delete('/api/admin/orders/:id', adminAuth, (req, res) => {
 });
 
 // ── Google / SEO stats ───────────────────────────────────
+const { google } = require('googleapis');
 const GOOGLE_STATS_FILE = path.join(__dirname, 'google_stats.json');
+const SITE_URL          = process.env.SITE_URL || 'https://panuozzo-bougival.fr/';
+const GSC_SITE_URL      = 'sc-domain:panuozzo-bougival.fr';
+const PLACE_ID          = process.env.GOOGLE_PLACE_ID || '';
 
 function loadGoogleStats() {
   try { return JSON.parse(fs.readFileSync(GOOGLE_STATS_FILE, 'utf8')); }
@@ -1265,10 +1269,74 @@ function saveGoogleStats(data) {
   fs.writeFileSync(GOOGLE_STATS_FILE, JSON.stringify(data, null, 2));
 }
 
+function getGoogleAuth() {
+  const keyFile = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  if (!keyFile) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY manquant dans .env');
+  return new google.auth.GoogleAuth({
+    keyFile,
+    scopes: ['https://www.googleapis.com/auth/webmasters.readonly'],
+  });
+}
+
+async function fetchSearchConsole() {
+  const auth      = getGoogleAuth();
+  const sc        = google.searchconsole({ version: 'v1', auth });
+  const endDate   = new Date();
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - 27);
+  const fmt = d => d.toISOString().slice(0, 10);
+
+  // Résumé global 28j
+  const [summary, byDate, byQuery] = await Promise.all([
+    sc.searchanalytics.query({
+      siteUrl: GSC_SITE_URL,
+      requestBody: { startDate: fmt(startDate), endDate: fmt(endDate), dimensions: [] },
+    }),
+    sc.searchanalytics.query({
+      siteUrl: GSC_SITE_URL,
+      requestBody: { startDate: fmt(startDate), endDate: fmt(endDate), dimensions: ['date'], rowLimit: 28 },
+    }),
+    sc.searchanalytics.query({
+      siteUrl: GSC_SITE_URL,
+      requestBody: { startDate: fmt(startDate), endDate: fmt(endDate), dimensions: ['query'], rowLimit: 10 },
+    }),
+  ]);
+
+  const row = summary.data.rows?.[0] || {};
+  return {
+    impressions: Math.round(row.impressions || 0),
+    clicks:      Math.round(row.clicks || 0),
+    ctr:         parseFloat(((row.ctr || 0) * 100).toFixed(2)),
+    position:    parseFloat((row.position || 0).toFixed(1)),
+    history: (byDate.data.rows || []).map(r => ({
+      date:        r.keys[0],
+      impressions: Math.round(r.impressions || 0),
+      clicks:      Math.round(r.clicks || 0),
+    })),
+    topQueries: (byQuery.data.rows || []).map(r => ({
+      query:       r.keys[0],
+      clicks:      Math.round(r.clicks || 0),
+      impressions: Math.round(r.impressions || 0),
+      position:    parseFloat((r.position || 0).toFixed(1)),
+    })),
+    fetchedAt: new Date().toISOString(),
+  };
+}
+
+async function fetchPlacesRating() {
+  const placeId = PLACE_ID;
+  if (!placeId || !process.env.GOOGLE_API_KEY) return null;
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=rating,user_ratings_total&key=${process.env.GOOGLE_API_KEY}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const r = data.result || {};
+  return { rating: r.rating || null, reviewCount: r.user_ratings_total || null };
+}
+
 async function fetchPageSpeed() {
-  const siteUrl = process.env.SITE_URL || 'https://panuozzo-bougival.fr/';
-  const apiKey  = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
-  const url = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(siteUrl)}&strategy=mobile&category=performance${apiKey}`;
+  const apiKey = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
+  const url = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(SITE_URL)}&strategy=mobile&category=performance${apiKey}`;
   const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
   if (res.status === 429) throw Object.assign(new Error('quota'), { code: 'QUOTA' });
   if (!res.ok) throw new Error(`PageSpeed HTTP ${res.status}`);
@@ -1290,35 +1358,44 @@ async function fetchPageSpeed() {
   };
 }
 
-// Respond immediately with stored data — refresh PageSpeed in background if stale
+// GET — réponse immédiate, refresh en arrière-plan si données > 1h
 app.get('/api/admin/google', adminAuth, (req, res) => {
   const stats = loadGoogleStats() || {};
   res.json(stats);
-  const ps    = stats.pagespeed;
-  const psAge = ps?.fetchedAt ? Date.now() - new Date(ps.fetchedAt).getTime() : Infinity;
-  if (psAge > 3_600_000) {
-    fetchPageSpeed()
-      .then(ps => { stats.pagespeed = ps; saveGoogleStats(stats); })
-      .catch(e => console.error('PageSpeed bg error:', e.message));
+  const age = h => {
+    const t = stats[h]?.fetchedAt;
+    return t ? Date.now() - new Date(t).getTime() : Infinity;
+  };
+  if (age('pagespeed') > 3_600_000) {
+    fetchPageSpeed().then(ps => { stats.pagespeed = ps; saveGoogleStats(stats); }).catch(() => {});
+  }
+  if (age('searchConsole') > 3_600_000 && process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+    fetchSearchConsole().then(sc => { stats.searchConsole = sc; saveGoogleStats(stats); }).catch(() => {});
   }
 });
 
-app.post('/api/admin/google/refresh', adminAuth, async (req, res) => {
-  try {
-    const ps    = await fetchPageSpeed();
-    const stats = loadGoogleStats() || {};
-    stats.pagespeed = ps;
-    saveGoogleStats(stats);
-    res.json({ ok: true, pagespeed: ps });
-  } catch (e) {
-    const isQuota = e.code === 'QUOTA';
-    res.status(isQuota ? 429 : 500).json({
-      error: isQuota
-        ? 'Quota API dépassé (100 req/jour sans clé). Ajoutez GOOGLE_API_KEY dans .env pour débloquer (gratuit, 25 000 req/jour).'
-        : e.message,
-      code: e.code || 'ERROR',
-    });
-  }
+// POST /sync — force refresh de toutes les sources
+app.post('/api/admin/google/sync', adminAuth, async (req, res) => {
+  const stats  = loadGoogleStats() || {};
+  const errors = {};
+
+  await Promise.all([
+    fetchPageSpeed()
+      .then(ps => { stats.pagespeed = ps; })
+      .catch(e  => { errors.pagespeed = e.code === 'QUOTA' ? 'Quota dépassé' : e.message; }),
+
+    fetchSearchConsole()
+      .then(sc => { stats.searchConsole = sc; })
+      .catch(e  => { errors.searchConsole = e.message; }),
+
+    fetchPlacesRating()
+      .then(r => { if (r) { stats.myBusiness = { ...stats.myBusiness, ...r }; } })
+      .catch(() => {}),
+  ]);
+
+  stats.lastUpdated = new Date().toISOString();
+  saveGoogleStats(stats);
+  res.json({ ok: true, data: stats, errors: Object.keys(errors).length ? errors : undefined });
 });
 
 app.post('/api/admin/google', adminAuth, express.json(), (req, res) => {

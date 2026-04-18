@@ -798,31 +798,29 @@ async function refreshPageSpeed() {
   const btn = document.getElementById('btn-google-refresh');
   if (!btn) return;
   btn.disabled = true;
-  btn.textContent = '⏳ Analyse en cours…';
+  btn.textContent = '⏳ Synchronisation…';
   try {
-    const r = await googleFetch('/api/admin/google/refresh', { method: 'POST' });
+    const r = await googleFetch('/api/admin/google/sync', { method: 'POST' });
     const d = await r.json();
-    if (r.status === 429) {
-      showToast('⚠️ Quota Google dépassé — ajoutez GOOGLE_API_KEY dans .env', true);
-      document.getElementById('google-last-sync').textContent = '⚠️ Quota API dépassé (100 req/jour) — ajoutez GOOGLE_API_KEY dans .env pour débloquer';
-      return;
-    }
-    if (!r.ok || !d.ok) {
-      showToast('❌ ' + (d.error || 'Erreur PageSpeed'), true);
-      return;
-    }
-    if (googleData) {
-      googleData.pagespeed = d.pagespeed;
-      renderGoogleKPIs(googleData);
-      renderCoreWebVitals(googleData);
-    }
+    if (!r.ok || !d.ok) { showToast('❌ Erreur sync Google', true); return; }
+    googleData = d.data;
+    renderGoogleKPIs(googleData);
+    renderGoogleChart(googleData);
+    renderGoogleTopQueries(googleData);
+    renderGoogleMyBusiness(googleData);
+    renderCoreWebVitals(googleData);
+    renderSEOChecklist(googleData);
     document.getElementById('google-last-sync').textContent =
-      'PageSpeed : ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    showToast('⚡ PageSpeed actualisé !');
-  } catch { showToast('❌ Erreur réseau PageSpeed', true); }
+      'Sync : ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    if (d.errors?.searchConsole) {
+      showToast('⚠️ GSC : ' + d.errors.searchConsole, true);
+    } else {
+      showToast('✅ Google synchronisé !');
+    }
+  } catch { showToast('❌ Erreur réseau', true); }
   finally {
     btn.disabled = false;
-    btn.textContent = '🔄 Actualiser PageSpeed';
+    btn.textContent = '🔄 Synchroniser';
   }
 }
 
