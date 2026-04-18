@@ -973,8 +973,9 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">📍 Google Business Profile</div>
-              <span class="google-badge">Bougival</span>
+              <button class="btn-gsc" id="btn-gmb-edit" style="font-size:.72rem;padding:4px 10px">✏️ Modifier</button>
             </div>
+
             <!-- Note + étoiles -->
             <div style="display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid var(--border);margin-bottom:16px">
               <div style="text-align:center;min-width:60px">
@@ -990,29 +991,62 @@
                 </a>
               </div>
             </div>
-            <!-- Stats 30j -->
-            <div class="section-title">Activité — 30 derniers jours</div>
-            <div class="gmb-stats-grid">
-              <div class="gmb-stat">
-                <div class="gmb-stat-value" id="gmb-views">—</div>
-                <div class="gmb-stat-label">👁 Vues</div>
+
+            <!-- Stats affichage -->
+            <div id="gmb-stats-view">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div class="section-title" style="margin-bottom:0">Activité — 30 derniers jours</div>
+                <span style="font-size:.68rem;color:var(--muted)" id="gmb-updated-label"></span>
               </div>
-              <div class="gmb-stat">
-                <div class="gmb-stat-value" id="gmb-searches">—</div>
-                <div class="gmb-stat-label">🔍 Recherches</div>
+              <div class="gmb-stats-grid">
+                <div class="gmb-stat"><div class="gmb-stat-value" id="gmb-views">—</div><div class="gmb-stat-label">👁 Vues</div></div>
+                <div class="gmb-stat"><div class="gmb-stat-value" id="gmb-searches">—</div><div class="gmb-stat-label">🔍 Recherches</div></div>
+                <div class="gmb-stat"><div class="gmb-stat-value" id="gmb-calls">—</div><div class="gmb-stat-label">📞 Appels</div></div>
+                <div class="gmb-stat"><div class="gmb-stat-value" id="gmb-directions">—</div><div class="gmb-stat-label">🗺 Itinéraires</div></div>
               </div>
-              <div class="gmb-stat">
-                <div class="gmb-stat-value" id="gmb-calls">—</div>
-                <div class="gmb-stat-label">📞 Appels</div>
-              </div>
-              <div class="gmb-stat">
-                <div class="gmb-stat-value" id="gmb-directions">—</div>
-                <div class="gmb-stat-label">🗺 Itinéraires</div>
+              <div style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.5">
+                Copiez ces chiffres depuis <a href="https://business.google.com" target="_blank" rel="noopener" style="color:#4285F4">Google Business</a> → Statistiques, puis cliquez ✏️ Modifier.
               </div>
             </div>
+
+            <!-- Formulaire d'édition (caché par défaut) -->
+            <div id="gmb-stats-form" style="display:none">
+              <div class="section-title" style="margin-bottom:12px">✏️ Saisir les stats (depuis Google Business)</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                <div class="filter-group">
+                  <label>👁 Vues profil</label>
+                  <input type="number" id="gmb-input-views" placeholder="ex: 850" min="0" />
+                </div>
+                <div class="filter-group">
+                  <label>🔍 Recherches</label>
+                  <input type="number" id="gmb-input-searches" placeholder="ex: 420" min="0" />
+                </div>
+                <div class="filter-group">
+                  <label>📞 Appels</label>
+                  <input type="number" id="gmb-input-calls" placeholder="ex: 38" min="0" />
+                </div>
+                <div class="filter-group">
+                  <label>🗺 Itinéraires</label>
+                  <input type="number" id="gmb-input-directions" placeholder="ex: 62" min="0" />
+                </div>
+                <div class="filter-group">
+                  <label>⭐ Note</label>
+                  <input type="number" id="gmb-input-rating" placeholder="ex: 4.8" min="1" max="5" step="0.1" />
+                </div>
+                <div class="filter-group">
+                  <label>💬 Nb avis</label>
+                  <input type="number" id="gmb-input-reviews" placeholder="ex: 124" min="0" />
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn-update-status" id="btn-gmb-save" style="flex:1;margin-top:0;padding:9px">💾 Enregistrer</button>
+                <button class="btn-filter-reset" id="btn-gmb-cancel" style="padding:9px 14px">Annuler</button>
+              </div>
+            </div>
+
             <a href="https://business.google.com" target="_blank" rel="noopener"
                class="btn-gsc" style="display:inline-flex;margin-top:14px;font-size:.75rem">
-              📊 Gérer le profil Google →
+              📊 Ouvrir Google Business →
             </a>
           </div>
 
