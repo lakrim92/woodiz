@@ -804,30 +804,25 @@ function renderCoreWebVitals(d) {
   setCWVBar('lcp', ps.lcp, ps.lcpNum, 8000, ms => ms <= 2500 ? 'good' : ms <= 4000 ? 'warn' : 'bad');
   // FCP (good ≤1.8s, warn ≤3s)
   setCWVBar('fcp', ps.fcp, ps.fcpNum, 6000, ms => ms <= 1800 ? 'good' : ms <= 3000 ? 'warn' : 'bad');
-  // CLS (good ≤0.1, warn ≤0.25) — numericValue is raw CLS score
-  setCWVBar('cls', ps.cls, ps.clsNum, 0.5, v => v <= 0.1 ? 'good' : v <= 0.25 ? 'warn' : 'bad', 100);
+  // CLS (good ≤0.1, warn ≤0.25)
+  setCWVBar('cls', ps.cls, ps.clsNum ?? 0, 0.5, v => v <= 0.1 ? 'good' : v <= 0.25 ? 'warn' : 'bad');
   // TBT (good ≤200ms, warn ≤600ms)
-  setCWVBar('tbt', ps.tbt, ps.tbtNum, 1200, ms => ms <= 200 ? 'good' : ms <= 600 ? 'warn' : 'bad');
-  // SI (good ≤3.4s, warn ≤5.8s)
-  setCWVBar('si', ps.si, null, null, null);
-  document.getElementById('cwv-val-si').textContent = ps.si || '—';
-  if (ps.si && ps.si !== '—') {
-    document.getElementById('cwv-bar-si').style.width = '60%';
-    document.getElementById('cwv-bar-si').className = 'cwv-bar cwv-warn';
-  }
+  setCWVBar('tbt', ps.tbt, ps.tbtNum ?? 0, 1200, ms => ms <= 200 ? 'good' : ms <= 600 ? 'warn' : 'bad');
+  // SI (good ≤3.4s, warn ≤5.8s) — parse displayValue "2.7 s" → 2700ms
+  const siMs = ps.siNum ?? (ps.si ? parseFloat(ps.si) * 1000 : null);
+  setCWVBar('si', ps.si, siMs, 10000, ms => ms <= 3400 ? 'good' : ms <= 5800 ? 'warn' : 'bad');
 }
 
-function setCWVBar(metric, display, numericMs, maxMs, gradeFn, scaleFactor) {
+function setCWVBar(metric, display, numericMs, maxMs, gradeFn) {
   const bar = document.getElementById(`cwv-bar-${metric}`);
   const val = document.getElementById(`cwv-val-${metric}`);
   if (!bar || !val) return;
-  val.textContent = display || '—';
-  if (numericMs === null || numericMs === undefined || !maxMs) return;
-  const scale  = scaleFactor || 1;
-  const scaled = numericMs * (scale === 100 ? 1 : 1);
-  const pct    = Math.min(100, Math.round((numericMs / maxMs) * 100));
-  bar.style.width = pct + '%';
+  val.textContent = (display !== null && display !== undefined && display !== '') ? display : '—';
+  if (numericMs === null || numericMs === undefined || !maxMs || !gradeFn) return;
   const grade = gradeFn(numericMs);
+  // Minimum 4% width so the bar is always visible when a value exists
+  const pct = Math.max(4, Math.min(100, Math.round((numericMs / maxMs) * 100)));
+  bar.style.width = pct + '%';
   bar.className = `cwv-bar cwv-${grade}`;
 }
 

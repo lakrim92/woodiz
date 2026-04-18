@@ -1346,14 +1346,15 @@ async function fetchPageSpeed() {
   return {
     score:  Math.round((cats.performance?.score || 0) * 100),
     lcp:    audits['largest-contentful-paint']?.displayValue || '—',
-    tbt:    audits['total-blocking-time']?.displayValue || '—',
-    cls:    audits['cumulative-layout-shift']?.displayValue || '—',
-    fcp:    audits['first-contentful-paint']?.displayValue || '—',
-    si:     audits['speed-index']?.displayValue || '—',
-    lcpNum: audits['largest-contentful-paint']?.numericValue || null,
-    clsNum: audits['cumulative-layout-shift']?.numericValue || null,
-    fcpNum: audits['first-contentful-paint']?.numericValue || null,
-    tbtNum: audits['total-blocking-time']?.numericValue || null,
+    tbt:    audits['total-blocking-time']?.displayValue ?? '—',
+    cls:    audits['cumulative-layout-shift']?.displayValue ?? '—',
+    fcp:    audits['first-contentful-paint']?.displayValue ?? '—',
+    si:     audits['speed-index']?.displayValue ?? '—',
+    lcpNum: audits['largest-contentful-paint']?.numericValue ?? null,
+    clsNum: audits['cumulative-layout-shift']?.numericValue ?? null,
+    fcpNum: audits['first-contentful-paint']?.numericValue ?? null,
+    tbtNum: audits['total-blocking-time']?.numericValue ?? null,
+    siNum:  audits['speed-index']?.numericValue ?? null,
     fetchedAt: new Date().toISOString(),
   };
 }

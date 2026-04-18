@@ -1,12 +1,19 @@
 {
-  "lastUpdated": null,
+  "lastUpdated": "2026-04-18T13:03:21.073Z",
   "searchConsole": {
-    "impressions": null,
-    "clicks": null,
-    "ctr": null,
-    "position": null,
-    "history": [],
-    "topQueries": []
+    "impressions": 0,
+    "clicks": 0,
+    "ctr": 0,
+    "position": 0,
+    "history": [
+      {
+        "date": "2026-04-16",
+        "impressions": 0,
+        "clicks": 0
+      }
+    ],
+    "topQueries": [],
+    "fetchedAt": "2026-04-18T12:47:55.978Z"
   },
   "myBusiness": {
     "rating": 4.8,
@@ -17,17 +24,63 @@
     "directions": null
   },
   "seoChecklist": [
-    { "label": "robots.txt", "done": true },
-    { "label": "sitemap.xml", "done": true },
-    { "label": "Open Graph / og:image", "done": true },
-    { "label": "Schema.org Restaurant", "done": true },
-    { "label": "Google Search Console", "done": true },
-    { "label": "Google Business Profile", "done": true },
-    { "label": "Sitemap soumis à GSC", "done": true },
-    { "label": "DNS TXT (vérification GSC)", "done": true },
-    { "label": "DMARC record DNS", "done": true },
-    { "label": "AggregateRating Schema.org", "done": false },
-    { "label": "Avis Google (min. 5)", "done": false }
+    {
+      "label": "robots.txt",
+      "done": true
+    },
+    {
+      "label": "sitemap.xml",
+      "done": true
+    },
+    {
+      "label": "Open Graph / og:image",
+      "done": true
+    },
+    {
+      "label": "Schema.org Restaurant",
+      "done": true
+    },
+    {
+      "label": "Google Search Console",
+      "done": true
+    },
+    {
+      "label": "Google Business Profile",
+      "done": true
+    },
+    {
+      "label": "Sitemap soumis à GSC",
+      "done": true
+    },
+    {
+      "label": "DNS TXT (vérification GSC)",
+      "done": true
+    },
+    {
+      "label": "DMARC record DNS",
+      "done": true
+    },
+    {
+      "label": "AggregateRating Schema.org",
+      "done": false
+    },
+    {
+      "label": "Avis Google (min. 5)",
+      "done": false
+    }
   ],
-  "pagespeed": null
+  "pagespeed": {
+    "score": 97,
+    "lcp": "1.5 s",
+    "tbt": "0 ms",
+    "cls": "0",
+    "fcp": "1.5 s",
+    "si": "4.2 s",
+    "lcpNum": 1506.9133000000002,
+    "clsNum": 0,
+    "fcpNum": 1504.2174875,
+    "tbtNum": 0,
+    "siNum": 4165.278187000131,
+    "fetchedAt": "2026-04-18T13:03:21.072Z"
+  }
 }
