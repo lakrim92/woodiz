@@ -4,7 +4,7 @@
   "description": "Tableau des commandes en temps réel",
   "start_url": "/tablette.html",
   "scope": "/tablette.html",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#0f1117",
   "theme_color": "#1a6b4e",

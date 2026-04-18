@@ -158,6 +158,14 @@
     es.onopen = () => { setConn(true); sseRetries = 0; };
   }
 
+  // Force reconnect when the app comes back to foreground (mobile kiosk)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      sseRetries = 0;
+      initSSE();
+    }
+  });
+
   function setConn(ok) {
     document.getElementById('conn-dot').style.background = ok ? '#4ade80' : '#dc2626';
     document.getElementById('conn-label').textContent = ok ? 'En direct' : 'Reconnexion…';
