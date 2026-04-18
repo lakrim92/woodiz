@@ -5,7 +5,7 @@ const RESTOS = {
     name:     'Panuozzo',
     emoji:    '🍕',
     apiBase:  '',                   // same origin (woodiz)
-    sseBase:  '',
+    sseBase:  '/api',
     color:    '#e55a00',
     csvName:  'panuozzo',
     address:  '30 Av. Jean Moulin, Bougival',
@@ -123,7 +123,7 @@ function updateBranding() {
 
 // ── Nav ───────────────────────────────────────────────────
 let currentView = 'dashboard';
-const viewTitles = { dashboard: 'Tableau de bord', orders: 'Commandes' };
+const viewTitles = { dashboard: 'Tableau de bord', orders: 'Commandes', google: 'Google & SEO' };
 
 function showView(name, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -592,6 +592,240 @@ async function deleteOrder(id) {
   } catch { showToast('❌ Erreur', true); }
 }
 
+// ── Google & SEO ─────────────────────────────────────────
+let chartGoogle = null;
+let googleData  = null;
+
+async function googleFetch(path, options = {}) {
+  return fetch(path, { ...options, headers: { 'x-admin-password': tokens.panuozzo, ...(options.headers || {}) } });
+}
+
+async function loadGoogleData() {
+  try {
+    const r = await googleFetch('/api/admin/google');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    googleData = await r.json();
+    renderGoogleKPIs(googleData);
+    renderGoogleChart(googleData);
+    renderGoogleTopQueries(googleData);
+    renderGoogleMyBusiness(googleData);
+    renderCoreWebVitals(googleData);
+    renderSEOChecklist(googleData);
+    const sync = googleData.pagespeed?.fetchedAt || googleData.lastUpdated;
+    const syncEl = document.getElementById('google-last-sync');
+    if (sync) {
+      const d = new Date(sync);
+      syncEl.textContent = 'PageSpeed : ' + d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      syncEl.textContent = 'PageSpeed : cliquez sur Actualiser pour lancer l\'analyse';
+    }
+  } catch (err) { console.error('Google stats error:', err); }
+}
+
+function renderGoogleKPIs(d) {
+  const sc = d.searchConsole || {};
+  const ps = d.pagespeed;
+  const hasGSC = sc.impressions !== null && sc.impressions !== undefined;
+
+  document.getElementById('gkpi-impressions').textContent = hasGSC ? Number(sc.impressions).toLocaleString('fr-FR') : '—';
+  document.getElementById('gkpi-clicks').textContent      = hasGSC ? Number(sc.clicks).toLocaleString('fr-FR') : '—';
+  document.getElementById('gkpi-ctr').textContent         = hasGSC ? (sc.ctr || 0).toFixed(1) + '%' : '—';
+  document.getElementById('gkpi-position').textContent    = hasGSC ? '#' + Math.round(sc.position || 0) : '—';
+
+  const scoreEl    = document.getElementById('gkpi-score');
+  const scoreSubEl = document.getElementById('gkpi-score-sub');
+  if (ps?.score !== undefined && ps.score !== null) {
+    const score = ps.score;
+    scoreEl.textContent = score;
+    scoreEl.style.color = score >= 90 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+    scoreSubEl.textContent = 'PageSpeed mobile';
+  } else {
+    scoreEl.textContent = '—';
+    scoreEl.style.color = '';
+    scoreSubEl.textContent = 'PageSpeed (chargement…)';
+  }
+}
+
+function renderGoogleChart(d) {
+  const history = (d.searchConsole || {}).history || [];
+  const canvas  = document.getElementById('chart-google');
+  const empty   = document.getElementById('gsc-chart-empty');
+
+  if (!history.length) {
+    canvas.style.display = 'none';
+    empty.style.display  = 'flex';
+    return;
+  }
+  canvas.style.display = 'block';
+  empty.style.display  = 'none';
+
+  const labels      = history.map(h => new Date(h.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
+  const impressions = history.map(h => h.impressions);
+  const clicks      = history.map(h => h.clicks);
+
+  if (chartGoogle) chartGoogle.destroy();
+  chartGoogle = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Impressions', data: impressions, borderColor: 'rgba(66,133,244,.9)',
+          backgroundColor: 'rgba(66,133,244,.08)', fill: true, borderWidth: 2,
+          tension: .3, pointRadius: 2, yAxisID: 'y' },
+        { label: 'Clics', data: clicks, borderColor: 'rgba(52,168,83,.9)',
+          backgroundColor: 'transparent', borderWidth: 2,
+          tension: .3, pointRadius: 2, yAxisID: 'y2' },
+      ],
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: 'rgba(240,244,255,.6)', font: { size: 11 } } } },
+      scales: {
+        x:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 } } },
+        y:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(66,133,244,.7)', font: { size: 10 } } },
+        y2: { position: 'right', grid: { display: false }, ticks: { color: 'rgba(52,168,83,.7)', font: { size: 10 } } },
+      },
+    },
+  });
+}
+
+function renderGoogleTopQueries(d) {
+  const queries = (d.searchConsole || {}).topQueries || [];
+  const el = document.getElementById('google-top-queries');
+  if (!queries.length) {
+    el.innerHTML = `<div class="gsc-empty"><span style="font-size:2rem">🔍</span><p>Aucune requête disponible</p></div>`;
+    return;
+  }
+  const max = queries[0]?.clicks || 1;
+  el.innerHTML = queries.map(q => `
+    <div class="top-item-row" style="margin-bottom:8px">
+      <div class="top-item-name" title="${esc(q.query)}">${esc(q.query)}</div>
+      <div class="top-item-bar-wrap">
+        <div class="top-item-bar" style="width:${Math.round((q.clicks || 0) / max * 100)}%;background:#4285F4"></div>
+      </div>
+      <div class="top-item-count" style="width:50px;text-align:right;color:var(--muted);font-size:.75rem">
+        ${q.clicks}c / #${Math.round(q.position || 0)}
+      </div>
+    </div>`).join('');
+}
+
+function renderGoogleMyBusiness(d) {
+  const gmb = d.myBusiness || {};
+  document.getElementById('gmb-rating').textContent      = gmb.rating || '—';
+  document.getElementById('gmb-review-count').textContent = (gmb.reviewCount || '—') + ' avis Google';
+  document.getElementById('gmb-views').textContent       = gmb.views      !== null && gmb.views      !== undefined ? Number(gmb.views).toLocaleString('fr-FR')      : '—';
+  document.getElementById('gmb-searches').textContent    = gmb.searches   !== null && gmb.searches   !== undefined ? Number(gmb.searches).toLocaleString('fr-FR')   : '—';
+  document.getElementById('gmb-calls').textContent       = gmb.calls      !== null && gmb.calls      !== undefined ? Number(gmb.calls).toLocaleString('fr-FR')      : '—';
+  document.getElementById('gmb-directions').textContent  = gmb.directions !== null && gmb.directions !== undefined ? Number(gmb.directions).toLocaleString('fr-FR') : '—';
+
+  // Stars display
+  const rating = parseFloat(gmb.rating) || 0;
+  const full   = Math.floor(rating);
+  const half   = rating % 1 >= 0.5 ? 1 : 0;
+  const empty  = 5 - full - half;
+  document.getElementById('gmb-stars').textContent = '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+
+function renderCoreWebVitals(d) {
+  const ps = d.pagespeed;
+  if (!ps || ps.score === undefined || ps.score === null) return;
+
+  const score = ps.score;
+  const arc   = document.getElementById('ps-arc');
+  const circumference = 2 * Math.PI * 38;
+  const offset = circumference * (1 - score / 100);
+  arc.style.strokeDasharray  = circumference;
+  arc.style.strokeDashoffset = offset;
+  arc.style.stroke = score >= 90 ? '#22c55e' : score >= 50 ? '#f59e0b' : '#ef4444';
+
+  const valEl   = document.getElementById('ps-score-val');
+  const labelEl = document.getElementById('ps-score-label');
+  valEl.textContent   = score;
+  valEl.style.color   = score >= 90 ? 'var(--green)' : score >= 50 ? 'var(--yellow)' : 'var(--red)';
+  labelEl.textContent = score >= 90 ? '✅ Excellent' : score >= 50 ? '⚠️ À améliorer' : '❌ Faible';
+
+  // Date sync
+  const dateEl = document.getElementById('cwv-date');
+  if (ps.fetchedAt) {
+    dateEl.textContent = new Date(ps.fetchedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+
+  // Metrics: LCP (good ≤2.5s, warn ≤4s)
+  setCWVBar('lcp', ps.lcp, ps.lcpNum, 8000, ms => ms <= 2500 ? 'good' : ms <= 4000 ? 'warn' : 'bad');
+  // FCP (good ≤1.8s, warn ≤3s)
+  setCWVBar('fcp', ps.fcp, ps.fcpNum, 6000, ms => ms <= 1800 ? 'good' : ms <= 3000 ? 'warn' : 'bad');
+  // CLS (good ≤0.1, warn ≤0.25) — numericValue is raw CLS score
+  setCWVBar('cls', ps.cls, ps.clsNum, 0.5, v => v <= 0.1 ? 'good' : v <= 0.25 ? 'warn' : 'bad', 100);
+  // TBT (good ≤200ms, warn ≤600ms)
+  setCWVBar('tbt', ps.tbt, ps.tbtNum, 1200, ms => ms <= 200 ? 'good' : ms <= 600 ? 'warn' : 'bad');
+  // SI (good ≤3.4s, warn ≤5.8s)
+  setCWVBar('si', ps.si, null, null, null);
+  document.getElementById('cwv-val-si').textContent = ps.si || '—';
+  if (ps.si && ps.si !== '—') {
+    document.getElementById('cwv-bar-si').style.width = '60%';
+    document.getElementById('cwv-bar-si').className = 'cwv-bar cwv-warn';
+  }
+}
+
+function setCWVBar(metric, display, numericMs, maxMs, gradeFn, scaleFactor) {
+  const bar = document.getElementById(`cwv-bar-${metric}`);
+  const val = document.getElementById(`cwv-val-${metric}`);
+  if (!bar || !val) return;
+  val.textContent = display || '—';
+  if (numericMs === null || numericMs === undefined || !maxMs) return;
+  const scale  = scaleFactor || 1;
+  const scaled = numericMs * (scale === 100 ? 1 : 1);
+  const pct    = Math.min(100, Math.round((numericMs / maxMs) * 100));
+  bar.style.width = pct + '%';
+  const grade = gradeFn(numericMs);
+  bar.className = `cwv-bar cwv-${grade}`;
+}
+
+function renderSEOChecklist(d) {
+  const items = d.seoChecklist || [];
+  const el    = document.getElementById('seo-checklist');
+  const done  = items.filter(i => i.done).length;
+  document.getElementById('seo-score-badge').textContent = `${done}/${items.length}`;
+  el.innerHTML = items.map(item => `
+    <div class="checklist-item">
+      <span class="${item.done ? 'check-done' : 'check-todo'}">${item.done ? '✅' : '⬜'}</span>
+      <span style="${item.done ? '' : 'color:var(--muted)'}">${esc(item.label)}</span>
+    </div>`).join('');
+}
+
+async function refreshPageSpeed() {
+  const btn = document.getElementById('btn-google-refresh');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyse en cours…';
+  try {
+    const r = await googleFetch('/api/admin/google/refresh', { method: 'POST' });
+    const d = await r.json();
+    if (r.status === 429) {
+      showToast('⚠️ Quota Google dépassé — ajoutez GOOGLE_API_KEY dans .env', true);
+      document.getElementById('google-last-sync').textContent = '⚠️ Quota API dépassé (100 req/jour) — ajoutez GOOGLE_API_KEY dans .env pour débloquer';
+      return;
+    }
+    if (!r.ok || !d.ok) {
+      showToast('❌ ' + (d.error || 'Erreur PageSpeed'), true);
+      return;
+    }
+    if (googleData) {
+      googleData.pagespeed = d.pagespeed;
+      renderGoogleKPIs(googleData);
+      renderCoreWebVitals(googleData);
+    }
+    document.getElementById('google-last-sync').textContent =
+      'PageSpeed : ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    showToast('⚡ PageSpeed actualisé !');
+  } catch { showToast('❌ Erreur réseau PageSpeed', true); }
+  finally {
+    btn.disabled = false;
+    btn.textContent = '🔄 Actualiser PageSpeed';
+  }
+}
+
 // ── Export CSV ────────────────────────────────────────────
 async function exportCSV() {
   const params = new URLSearchParams();
@@ -628,6 +862,11 @@ function showToast(msg, isError = false) {
 // ── Event listeners ───────────────────────────────────────
 document.getElementById('nav-dashboard').addEventListener('click', function() { showView('dashboard', this); });
 document.getElementById('nav-orders').addEventListener('click', function() { showView('orders', this); });
+document.getElementById('nav-google').addEventListener('click', function() {
+  showView('google', this);
+  loadGoogleData();
+});
+document.getElementById('btn-google-refresh')?.addEventListener('click', refreshPageSpeed);
 document.getElementById('nav-export').addEventListener('click', exportCSV);
 document.getElementById('nav-logout').addEventListener('click', doLogout);
 document.getElementById('menu-toggle').addEventListener('click', toggleSidebar);

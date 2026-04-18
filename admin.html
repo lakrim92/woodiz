@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Admin — Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
   <style>
@@ -464,6 +464,17 @@
       font-size: 1.4rem; cursor: pointer; padding: 4px;
     }
 
+    /* ── Demi-écran laptop (ex: Dell G15 à ~960px) ── */
+    @media (max-width: 1100px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .topbar-date { display: none; }
+      .topbar-sub { display: none; }
+      .resto-btn { padding: 5px 9px; font-size: .72rem; }
+      .filter-group input[type="search"] { min-width: 140px; }
+      .filter-group select,
+      .filter-group input { min-width: 100px; }
+    }
+
     @media (max-width: 900px) {
       :root { --sidebar-w: 0px; }
       .sidebar { transform: translateX(-230px); width: 230px; }
@@ -478,6 +489,123 @@
       .content { padding: 16px; }
       .kpi-grid { grid-template-columns: 1fr 1fr; }
       .modal-info-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Google & SEO ── */
+    .google-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .google-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 6px;
+      font-size: .72rem; font-weight: 700;
+      background: rgba(66,133,244,.12); color: #4285F4;
+      border: 1px solid rgba(66,133,244,.25);
+    }
+    .cwv-grid { display: flex; flex-direction: column; gap: 14px; }
+    .cwv-row  { display: flex; align-items: center; gap: 10px; }
+    .cwv-label { font-size: .75rem; color: var(--muted); width: 36px; flex-shrink: 0; font-weight: 600; }
+    .cwv-bar-wrap { flex: 1; height: 7px; background: rgba(255,255,255,.07); border-radius: 99px; overflow: hidden; }
+    .cwv-bar  { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .cwv-value { font-size: .78rem; font-weight: 700; width: 64px; text-align: right; white-space: nowrap; }
+    .cwv-good { background: var(--green); }
+    .cwv-warn { background: var(--yellow); }
+    .cwv-bad  { background: var(--red); }
+
+    .ps-score-ring {
+      position: relative; width: 90px; height: 90px;
+      margin: 0 auto 10px;
+    }
+    .ps-score-ring svg { transform: rotate(-90deg); }
+    .ps-score-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .ps-score-num  { font-size: 1.6rem; font-weight: 900; line-height: 1; }
+    .ps-score-sub  { font-size: .6rem; color: var(--muted); }
+
+    .quick-link-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .quick-link-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 10px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      text-decoration: none; color: var(--white);
+      transition: all .15s;
+    }
+    .quick-link-card:hover { background: rgba(255,255,255,.07); border-color: var(--border2); }
+    .quick-link-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .quick-link-name { font-size: .8rem; font-weight: 700; }
+    .quick-link-desc { font-size: .68rem; color: var(--muted); margin-top: 1px; }
+
+    .checklist-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: .84rem;
+    }
+    .checklist-item:last-child { border-bottom: none; }
+    .check-done { color: var(--green); }
+    .check-todo { color: var(--muted); }
+
+    .gmb-stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 14px; }
+    .gmb-stat {
+      text-align: center; padding: 12px 8px;
+      background: rgba(255,255,255,.03);
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+    .gmb-stat-value { font-size: 1.35rem; font-weight: 800; }
+    .gmb-stat-label { font-size: .65rem; color: var(--muted); margin-top: 3px; }
+
+    .gsc-empty {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 28px 20px;
+      text-align: center; gap: 10px; color: var(--muted);
+    }
+    .gsc-empty p { font-size: .82rem; max-width: 260px; line-height: 1.5; }
+    .btn-gsc {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px;
+      background: rgba(66,133,244,.12); color: #4285F4;
+      border: 1px solid rgba(66,133,244,.25);
+      font-size: .8rem; font-weight: 700;
+      text-decoration: none; transition: opacity .15s; cursor: pointer;
+    }
+    .btn-gsc:hover { opacity: .8; }
+
+    .gmb-stars { color: #FBBC05; font-size: 1rem; letter-spacing: 2px; }
+    .btn-google-refresh {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px;
+      background: rgba(66,133,244,.12); color: #4285F4;
+      border: 1px solid rgba(66,133,244,.25);
+      font-size: .8rem; font-weight: 700; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-google-refresh:hover { opacity: .8; }
+    .btn-google-refresh:disabled { opacity: .4; cursor: default; }
+
+    @media (max-width: 1100px) {
+      .google-kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .google-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .gmb-stats-grid  { grid-template-columns: repeat(2, 1fr); }
+      .quick-link-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .google-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .gmb-stats-grid  { grid-template-columns: repeat(2, 1fr); }
+      .quick-link-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .google-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .gmb-stats-grid  { grid-template-columns: repeat(2, 1fr); }
+      .quick-link-grid { grid-template-columns: 1fr 1fr; }
+      .quick-link-desc { display: none; }
     }
 
     /* ── Note 20 / petits mobiles (≤ 480px) ── */
@@ -551,7 +679,7 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      🍕 <span>PANUOZZO</span>
+      <span id="sidebar-logo-emoji">🍕</span> <span id="sidebar-logo-name">PANUOZZO</span>
       <span style="font-size:.65rem;color:var(--muted);font-weight:400">Admin</span>
     </div>
     <nav class="sidebar-nav">
@@ -564,6 +692,9 @@
         <span class="sidebar-badge" id="sb-badge-orders"></span>
       </button>
       <div class="nav-section">Outils</div>
+      <button class="nav-item" id="nav-google">
+        <span class="icon">📈</span> Google & SEO
+      </button>
       <button class="nav-item" id="nav-export">
         <span class="icon">📥</span> Exporter CSV
       </button>
@@ -761,6 +892,242 @@
           </div>
         </div>
       </div><!-- /view-orders -->
+
+      <!-- ── Vue Google & SEO ── -->
+      <div class="view" id="view-google">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+          <div>
+            <div style="font-size:1.05rem;font-weight:800">📈 Google & SEO</div>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:2px" id="google-last-sync">Dernière sync : —</div>
+          </div>
+          <button class="btn-google-refresh" id="btn-google-refresh">🔄 Actualiser PageSpeed</button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="google-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">👁</div>
+            <div class="kpi-label">Impressions</div>
+            <div class="kpi-value" id="gkpi-impressions">—</div>
+            <div class="kpi-sub">28 derniers jours</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">👆</div>
+            <div class="kpi-label">Clics</div>
+            <div class="kpi-value" id="gkpi-clicks">—</div>
+            <div class="kpi-sub">28 derniers jours</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">CTR</div>
+            <div class="kpi-value" id="gkpi-ctr">—</div>
+            <div class="kpi-sub">taux de clic</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🏅</div>
+            <div class="kpi-label">Position moy.</div>
+            <div class="kpi-value" id="gkpi-position">—</div>
+            <div class="kpi-sub">résultats Google</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-label">Perf. mobile</div>
+            <div class="kpi-value" id="gkpi-score" style="font-size:1.5rem">—</div>
+            <div class="kpi-sub" id="gkpi-score-sub">PageSpeed</div>
+          </div>
+        </div>
+
+        <!-- Chart Search Console + Top requêtes -->
+        <div class="charts-grid" style="margin-bottom:24px">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">📊 Impressions & Clics (28j)</div>
+              <span class="google-badge">Search Console</span>
+            </div>
+            <canvas id="chart-google" height="80" style="display:none"></canvas>
+            <div class="gsc-empty" id="gsc-chart-empty">
+              <span style="font-size:2.5rem">📡</span>
+              <p>Données Search Console non configurées. Connectez l'API GSC pour afficher l'historique de performance.</p>
+              <a class="btn-gsc" href="https://search.google.com/search-console" target="_blank" rel="noopener">🔗 Ouvrir Search Console</a>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">🔍 Top requêtes</div>
+            </div>
+            <div id="google-top-queries">
+              <div class="gsc-empty">
+                <span style="font-size:2rem">🔍</span>
+                <p>Aucune requête disponible</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Google My Business + Core Web Vitals -->
+        <div class="bottom-grid" style="margin-bottom:24px">
+
+          <!-- Google My Business -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">📍 Google Business Profile</div>
+              <span class="google-badge">Bougival</span>
+            </div>
+            <!-- Note + étoiles -->
+            <div style="display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid var(--border);margin-bottom:16px">
+              <div style="text-align:center;min-width:60px">
+                <div style="font-size:2rem;font-weight:900;color:#FBBC05" id="gmb-rating">4.8</div>
+                <div class="gmb-stars" id="gmb-stars">★★★★★</div>
+              </div>
+              <div>
+                <div style="font-size:.88rem;font-weight:700" id="gmb-review-count">124 avis Google</div>
+                <div style="font-size:.73rem;color:var(--muted);margin-top:2px">PANUOZZO — 30 Av. Jean Moulin, Bougival</div>
+                <a href="https://www.google.com/maps?cid=15158477616899090332&action=WRITE_REVIEW" target="_blank" rel="noopener"
+                   style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:.73rem;color:#4285F4;text-decoration:none;font-weight:600">
+                  ✍️ Lien avis clients →
+                </a>
+              </div>
+            </div>
+            <!-- Stats 30j -->
+            <div class="section-title">Activité — 30 derniers jours</div>
+            <div class="gmb-stats-grid">
+              <div class="gmb-stat">
+                <div class="gmb-stat-value" id="gmb-views">—</div>
+                <div class="gmb-stat-label">👁 Vues</div>
+              </div>
+              <div class="gmb-stat">
+                <div class="gmb-stat-value" id="gmb-searches">—</div>
+                <div class="gmb-stat-label">🔍 Recherches</div>
+              </div>
+              <div class="gmb-stat">
+                <div class="gmb-stat-value" id="gmb-calls">—</div>
+                <div class="gmb-stat-label">📞 Appels</div>
+              </div>
+              <div class="gmb-stat">
+                <div class="gmb-stat-value" id="gmb-directions">—</div>
+                <div class="gmb-stat-label">🗺 Itinéraires</div>
+              </div>
+            </div>
+            <a href="https://business.google.com" target="_blank" rel="noopener"
+               class="btn-gsc" style="display:inline-flex;margin-top:14px;font-size:.75rem">
+              📊 Gérer le profil Google →
+            </a>
+          </div>
+
+          <!-- Core Web Vitals -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">⚡ Core Web Vitals</div>
+              <span class="google-badge" id="cwv-date">PageSpeed</span>
+            </div>
+            <!-- Score anneau -->
+            <div style="text-align:center;margin-bottom:18px">
+              <div class="ps-score-ring" id="ps-score-ring">
+                <svg width="90" height="90" viewBox="0 0 90 90">
+                  <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+                  <circle id="ps-arc" cx="45" cy="45" r="38" fill="none" stroke="#22c55e" stroke-width="7"
+                    stroke-dasharray="239" stroke-dashoffset="239" stroke-linecap="round"/>
+                </svg>
+                <div class="ps-score-inner">
+                  <span class="ps-score-num" id="ps-score-val">—</span>
+                  <span class="ps-score-sub">mobile</span>
+                </div>
+              </div>
+              <div style="font-size:.72rem;color:var(--muted)" id="ps-score-label">Score de performance</div>
+            </div>
+            <!-- Métriques -->
+            <div class="cwv-grid">
+              <div class="cwv-row">
+                <div class="cwv-label">LCP</div>
+                <div class="cwv-bar-wrap"><div class="cwv-bar" id="cwv-bar-lcp" style="width:0%"></div></div>
+                <div class="cwv-value" id="cwv-val-lcp">—</div>
+              </div>
+              <div class="cwv-row">
+                <div class="cwv-label">FCP</div>
+                <div class="cwv-bar-wrap"><div class="cwv-bar" id="cwv-bar-fcp" style="width:0%"></div></div>
+                <div class="cwv-value" id="cwv-val-fcp">—</div>
+              </div>
+              <div class="cwv-row">
+                <div class="cwv-label">CLS</div>
+                <div class="cwv-bar-wrap"><div class="cwv-bar" id="cwv-bar-cls" style="width:0%"></div></div>
+                <div class="cwv-value" id="cwv-val-cls">—</div>
+              </div>
+              <div class="cwv-row">
+                <div class="cwv-label">TBT</div>
+                <div class="cwv-bar-wrap"><div class="cwv-bar" id="cwv-bar-tbt" style="width:0%"></div></div>
+                <div class="cwv-value" id="cwv-val-tbt">—</div>
+              </div>
+              <div class="cwv-row">
+                <div class="cwv-label">SI</div>
+                <div class="cwv-bar-wrap"><div class="cwv-bar" id="cwv-bar-si" style="width:0%"></div></div>
+                <div class="cwv-value" id="cwv-val-si">—</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:12px;font-size:.7rem;color:var(--muted)">
+              <span style="color:var(--green)">● Bon</span>
+              <span style="color:var(--yellow)">● À améliorer</span>
+              <span style="color:var(--red)">● Faible</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checklist SEO + Outils Google -->
+        <div class="bottom-grid">
+
+          <!-- Checklist SEO -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">✅ Checklist SEO</div>
+              <span class="google-badge" id="seo-score-badge">—</span>
+            </div>
+            <div id="seo-checklist"></div>
+          </div>
+
+          <!-- Outils Google -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">🔗 Outils Google</div>
+            </div>
+            <div class="quick-link-grid">
+              <a class="quick-link-card" href="https://search.google.com/search-console" target="_blank" rel="noopener">
+                <div class="quick-link-icon">🔎</div>
+                <div><div class="quick-link-name">Search Console</div><div class="quick-link-desc">Clics, impressions, indexation</div></div>
+              </a>
+              <a class="quick-link-card" href="https://analytics.google.com" target="_blank" rel="noopener">
+                <div class="quick-link-icon">📊</div>
+                <div><div class="quick-link-name">Analytics</div><div class="quick-link-desc">Trafic, sessions, conversions</div></div>
+              </a>
+              <a class="quick-link-card" href="https://business.google.com" target="_blank" rel="noopener">
+                <div class="quick-link-icon">📍</div>
+                <div><div class="quick-link-name">Business Profile</div><div class="quick-link-desc">Fiche, avis, messages</div></div>
+              </a>
+              <a class="quick-link-card" href="https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fpanuozzo-bougival.fr%2F" target="_blank" rel="noopener">
+                <div class="quick-link-icon">⚡</div>
+                <div><div class="quick-link-name">PageSpeed</div><div class="quick-link-desc">Core Web Vitals, perf</div></div>
+              </a>
+              <a class="quick-link-card" href="https://www.google.com/maps/place/PANUOZZO+-+Pizza+au+feu+de+bois,+30+Av.+Jean+Moulin,+78380+Bougival/data=!4m2!3m1!1s0x47e67d37233744ad:0xd25dbb145afae79c" target="_blank" rel="noopener">
+                <div class="quick-link-icon">🗺</div>
+                <div><div class="quick-link-name">Google Maps</div><div class="quick-link-desc">Fiche locale, avis</div></div>
+              </a>
+              <a class="quick-link-card" href="https://www.google.com/maps?cid=15158477616899090332&action=WRITE_REVIEW" target="_blank" rel="noopener">
+                <div class="quick-link-icon">⭐</div>
+                <div><div class="quick-link-name">Laisser un avis</div><div class="quick-link-desc">Lien direct clients</div></div>
+              </a>
+              <a class="quick-link-card" href="https://search.google.com/test/rich-results" target="_blank" rel="noopener">
+                <div class="quick-link-icon">🧪</div>
+                <div><div class="quick-link-name">Rich Results</div><div class="quick-link-desc">Tester le Schema.org</div></div>
+              </a>
+              <a class="quick-link-card" href="https://developers.facebook.com/tools/debug/?q=https%3A%2F%2Fpanuozzo-bougival.fr%2F" target="_blank" rel="noopener">
+                <div class="quick-link-icon">🔗</div>
+                <div><div class="quick-link-name">OG Debugger</div><div class="quick-link-desc">Tester Open Graph</div></div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /view-google -->
 
     </div><!-- /content -->
   </div><!-- /main -->

@@ -1,0 +1,33 @@
+{
+  "lastUpdated": null,
+  "searchConsole": {
+    "impressions": null,
+    "clicks": null,
+    "ctr": null,
+    "position": null,
+    "history": [],
+    "topQueries": []
+  },
+  "myBusiness": {
+    "rating": 4.8,
+    "reviewCount": 124,
+    "views": null,
+    "searches": null,
+    "calls": null,
+    "directions": null
+  },
+  "seoChecklist": [
+    { "label": "robots.txt", "done": true },
+    { "label": "sitemap.xml", "done": true },
+    { "label": "Open Graph / og:image", "done": true },
+    { "label": "Schema.org Restaurant", "done": true },
+    { "label": "Google Search Console", "done": true },
+    { "label": "Google Business Profile", "done": true },
+    { "label": "Sitemap soumis à GSC", "done": true },
+    { "label": "DNS TXT (vérification GSC)", "done": true },
+    { "label": "DMARC record DNS", "done": true },
+    { "label": "AggregateRating Schema.org", "done": false },
+    { "label": "Avis Google (min. 5)", "done": false }
+  ],
+  "pagespeed": null
+}

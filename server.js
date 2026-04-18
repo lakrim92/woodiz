@@ -1254,6 +1254,83 @@ app.delete('/api/admin/orders/:id', adminAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Google / SEO stats ───────────────────────────────────
+const GOOGLE_STATS_FILE = path.join(__dirname, 'google_stats.json');
+
+function loadGoogleStats() {
+  try { return JSON.parse(fs.readFileSync(GOOGLE_STATS_FILE, 'utf8')); }
+  catch { return null; }
+}
+function saveGoogleStats(data) {
+  fs.writeFileSync(GOOGLE_STATS_FILE, JSON.stringify(data, null, 2));
+}
+
+async function fetchPageSpeed() {
+  const siteUrl = process.env.SITE_URL || 'https://panuozzo-bougival.fr/';
+  const apiKey  = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
+  const url = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(siteUrl)}&strategy=mobile&category=performance${apiKey}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (res.status === 429) throw Object.assign(new Error('quota'), { code: 'QUOTA' });
+  if (!res.ok) throw new Error(`PageSpeed HTTP ${res.status}`);
+  const data = await res.json();
+  const cats   = data.lighthouseResult?.categories || {};
+  const audits = data.lighthouseResult?.audits || {};
+  return {
+    score:  Math.round((cats.performance?.score || 0) * 100),
+    lcp:    audits['largest-contentful-paint']?.displayValue || '—',
+    tbt:    audits['total-blocking-time']?.displayValue || '—',
+    cls:    audits['cumulative-layout-shift']?.displayValue || '—',
+    fcp:    audits['first-contentful-paint']?.displayValue || '—',
+    si:     audits['speed-index']?.displayValue || '—',
+    lcpNum: audits['largest-contentful-paint']?.numericValue || null,
+    clsNum: audits['cumulative-layout-shift']?.numericValue || null,
+    fcpNum: audits['first-contentful-paint']?.numericValue || null,
+    tbtNum: audits['total-blocking-time']?.numericValue || null,
+    fetchedAt: new Date().toISOString(),
+  };
+}
+
+// Respond immediately with stored data — refresh PageSpeed in background if stale
+app.get('/api/admin/google', adminAuth, (req, res) => {
+  const stats = loadGoogleStats() || {};
+  res.json(stats);
+  const ps    = stats.pagespeed;
+  const psAge = ps?.fetchedAt ? Date.now() - new Date(ps.fetchedAt).getTime() : Infinity;
+  if (psAge > 3_600_000) {
+    fetchPageSpeed()
+      .then(ps => { stats.pagespeed = ps; saveGoogleStats(stats); })
+      .catch(e => console.error('PageSpeed bg error:', e.message));
+  }
+});
+
+app.post('/api/admin/google/refresh', adminAuth, async (req, res) => {
+  try {
+    const ps    = await fetchPageSpeed();
+    const stats = loadGoogleStats() || {};
+    stats.pagespeed = ps;
+    saveGoogleStats(stats);
+    res.json({ ok: true, pagespeed: ps });
+  } catch (e) {
+    const isQuota = e.code === 'QUOTA';
+    res.status(isQuota ? 429 : 500).json({
+      error: isQuota
+        ? 'Quota API dépassé (100 req/jour sans clé). Ajoutez GOOGLE_API_KEY dans .env pour débloquer (gratuit, 25 000 req/jour).'
+        : e.message,
+      code: e.code || 'ERROR',
+    });
+  }
+});
+
+app.post('/api/admin/google', adminAuth, express.json(), (req, res) => {
+  const stats  = loadGoogleStats() || {};
+  const merged = { ...stats, lastUpdated: new Date().toISOString() };
+  if (req.body.searchConsole) merged.searchConsole = { ...stats.searchConsole, ...req.body.searchConsole };
+  if (req.body.myBusiness)    merged.myBusiness    = { ...stats.myBusiness,    ...req.body.myBusiness };
+  if (req.body.seoChecklist)  merged.seoChecklist  = req.body.seoChecklist;
+  saveGoogleStats(merged);
+  res.json({ ok: true, data: merged });
+});
+
 // ── Proxy My Thai admin API ────────────────────────────────
 // Permet au dashboard unifié d'interroger mythai sans CORS
 const MYTHAI_PORT = parseInt(process.env.MYTHAI_PORT) || 3006;
