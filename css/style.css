@@ -276,7 +276,10 @@ nav a:hover::after { transform: scaleX(1); }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background: url('../images/hero/image_hero.jpg') center center / cover no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   z-index: 0;
 }
 .hero-bg::before {

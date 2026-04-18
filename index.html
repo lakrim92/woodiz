@@ -15,7 +15,18 @@
   <meta property="og:locale" content="fr_FR" />
   <meta property="og:url" content="https://panuozzo-bougival.fr" />
   <meta property="og:image" content="https://panuozzo-bougival.fr/images/og-image.jpg" />
-  <link rel="canonical" href="https://panuozzo-bougival.fr" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="PANUOZZO – Pizzeria artisanale à Bougival" />
+  <meta property="og:site_name" content="PANUOZZO Bougival" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PANUOZZO – Pizzeria Bougival" />
+  <meta name="twitter:description" content="Pizzas artisanales à emporter ou en livraison. Commandez en ligne maintenant !" />
+  <meta name="twitter:image" content="https://panuozzo-bougival.fr/images/og-image.jpg" />
+
+  <link rel="canonical" href="https://panuozzo-bougival.fr/" />
 
   <!-- Schema.org LocalBusiness -->
   <script type="application/ld+json">
@@ -58,14 +69,42 @@
       "Bougival", "Rueil-Malmaison", "Chatou", "Le Pecq",
       "Croissy-sur-Seine", "Louveciennes", "Marly-le-Roi",
       "La Celle-Saint-Cloud", "Port-Marly"
-    ]
+    ],
+    "description": "Pizzeria artisanale à Bougival. Pâtes maison, ingrédients frais, cuisson au four à bois. Commande en ligne, livraison rapide à Bougival, Rueil-Malmaison, Chatou et alentours.",
+    "image": "https://panuozzo-bougival.fr/images/og-image.jpg",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://panuozzo-bougival.fr/images/svg/logo_square.png",
+      "width": 512,
+      "height": 512
+    },
+    "hasMap": "https://maps.google.com/?q=30+Av.+Jean+Moulin+78380+Bougival",
+    "sameAs": [
+      "https://maps.google.com/?q=PANUOZZO+Bougival"
+    ],
+    "menu": "https://panuozzo-bougival.fr/#menu",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.7",
+      "reviewCount": "23",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "acceptsReservations": "False",
+    "paymentAccepted": "Cash, Credit Card",
+    "currenciesAccepted": "EUR"
   }
   </script>
 
   <title>PANUOZZO – Pizzeria Bougival | Livraison & À emporter</title>
-  <link rel="stylesheet" href="css/style.css?v=19" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/images/svg/logo_panuozzo.png" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="images/hero/image_hero.webp" as="image" fetchpriority="high" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" /></noscript>
 
 </head>
 <body>
@@ -101,7 +140,7 @@
 
   <!-- ===== HERO ===== -->
   <section id="accueil" class="hero">
-    <div class="hero-bg"></div>
+    <img src="images/hero/image_hero.webp" alt="" class="hero-bg" fetchpriority="high" loading="eager" decoding="sync" width="1400" height="800" aria-hidden="true">
     <div class="hero-floating" aria-hidden="true">
       <span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span><span>🍕</span>
     </div>
