@@ -282,12 +282,12 @@ nav a:hover::after { transform: scaleX(1); }
   object-position: center;
   z-index: 0;
 }
-.hero-bg::before {
-  content: '';
+.hero-bg-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(145deg, rgba(11,29,20,.78) 0%, rgba(22,45,31,.65) 40%, rgba(13,35,24,.72) 70%, rgba(21,8,8,.80) 100%);
   animation: heroPulse 9s ease-in-out infinite alternate;
+  z-index: 1;
 }
 @keyframes heroPulse {
   from { opacity: .7; transform: scale(1); }
@@ -301,7 +301,7 @@ nav a:hover::after { transform: scaleX(1); }
   width: 90px;
   opacity: .75;
   filter: invert(1);
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
 }
 
@@ -332,7 +332,7 @@ nav a:hover::after { transform: scaleX(1); }
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 780px;
   margin: 0 auto;
 }
@@ -2111,7 +2111,7 @@ nav a:hover::after { transform: scaleX(1); }
    ========================================= */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-  .hero-bg::before { animation: none; }
+  .hero-bg-overlay { animation: none; }
   .hero-floating span { animation: none; }
   html { scroll-behavior: auto; }
 }
