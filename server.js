@@ -1337,7 +1337,7 @@ async function fetchPlacesRating() {
 async function fetchPageSpeed() {
   const apiKey = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
   const url = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(SITE_URL)}&strategy=mobile&category=performance${apiKey}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
   if (res.status === 429) throw Object.assign(new Error('quota'), { code: 'QUOTA' });
   if (!res.ok) throw new Error(`PageSpeed HTTP ${res.status}`);
   const data = await res.json();
