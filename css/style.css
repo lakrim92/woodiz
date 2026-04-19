@@ -511,7 +511,7 @@ nav a:hover::after { transform: scaleX(1); }
 .section-contact   { padding: var(--s20) 0; background: var(--cream); }
 .section-livraison { padding: var(--s20) 0; background: var(--white); }
 .section-commander { padding: var(--s20) 0; background: var(--green); }
-.section-promo     { padding: var(--s10) 0; background: var(--red);   color: var(--white); }
+.section-promo     { padding: var(--s4) 0; background: var(--red);   color: var(--white); }
 
 .section-title {
   font-family: var(--font-head);
@@ -1686,7 +1686,7 @@ nav a:hover::after { transform: scaleX(1); }
 .promo-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s6); }
 .promo-inner h2 { font-family: var(--font-head); font-size: 1.55rem; color: var(--white); letter-spacing: -.02em; }
 .promo-inner p { color: rgba(255,255,255,.78); font-size: .9rem; margin-top: 4px; }
-.promo-code-box { display: flex; align-items: center; gap: var(--s3); background: rgba(0,0,0,.2); border-radius: var(--r); padding: 12px var(--s5); }
+.promo-code-box { display: flex; align-items: center; gap: var(--s3); background: rgba(0,0,0,.2); border-radius: var(--r); padding: 8px var(--s4); }
 #promo-code { font-size: 1.35rem; font-weight: 700; letter-spacing: 3px; color: var(--white); font-family: monospace; }
 #btn-copy { background: var(--white); color: var(--red); border: none; padding: 8px 16px; border-radius: var(--r-sm); font-weight: 700; cursor: pointer; font-size: .8rem; transition: opacity var(--t-fast); touch-action: manipulation; }
 #btn-copy:hover { opacity: .85; }
@@ -2327,4 +2327,61 @@ nav a:hover::after { transform: scaleX(1); }
   .modal-box { padding: var(--s5); }
   .modal-footer { flex-direction: column; align-items: stretch; }
   .modal-total-line { text-align: center; }
+}
+
+/* ===== SECTION MY THAI CROSS-PROMO ===== */
+.section-mythai {
+  background: #0f0f0f;
+  border-top: 1px solid rgba(245,166,35,.15);
+  border-bottom: 1px solid rgba(245,166,35,.15);
+  padding: 28px 0;
+}
+.mythai-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.mythai-left { display: flex; flex-direction: column; gap: 6px; }
+.mythai-brand { display: flex; flex-direction: column; line-height: 1.1; }
+.mythai-b1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #fff;
+}
+.mythai-b2 {
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: #F5A623;
+}
+.mythai-desc {
+  font-size: .82rem;
+  color: rgba(255,255,255,.5);
+  max-width: 420px;
+  margin: 0;
+  line-height: 1.5;
+}
+.mythai-cta {
+  display: inline-block;
+  padding: 10px 22px;
+  border: 1.5px solid rgba(245,166,35,.5);
+  border-radius: 50px;
+  color: #F5A623;
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .2s, border-color .2s;
+}
+.mythai-cta:hover {
+  background: rgba(245,166,35,.1);
+  border-color: #F5A623;
+}
+@media (max-width: 600px) {
+  .mythai-inner { flex-direction: column; align-items: flex-start; }
+  .mythai-cta { align-self: stretch; text-align: center; }
 }

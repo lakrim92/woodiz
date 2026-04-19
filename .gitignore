@@ -6,3 +6,5 @@ promo_used.json
 *.log
 .DS_Store
 backups/
+google-service-account.json
+GOOGLE_API_KEY
