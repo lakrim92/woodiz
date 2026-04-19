@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /tablette.html
+Disallow: /android/
+Disallow: /backups/
+Disallow: /logs/
+Disallow: /node_modules/
+Disallow: /merci.html
+Disallow: /legal.html
+
+Sitemap: https://panuozzo-bougival.fr/sitemap.xml

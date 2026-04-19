@@ -13,7 +13,7 @@
       }
     ],
     "topQueries": [],
-    "fetchedAt": "2026-04-18T12:47:55.978Z"
+    "fetchedAt": "2026-04-18T19:27:09.294Z"
   },
   "myBusiness": {
     "rating": 4.8,
@@ -70,17 +70,17 @@
     }
   ],
   "pagespeed": {
-    "score": 97,
-    "lcp": "1.5 s",
+    "score": 99,
+    "lcp": "1.8 s",
     "tbt": "0 ms",
     "cls": "0",
     "fcp": "1.5 s",
-    "si": "4.2 s",
-    "lcpNum": 1506.9133000000002,
+    "si": "2.6 s",
+    "lcpNum": 1805,
     "clsNum": 0,
-    "fcpNum": 1504.2174875,
+    "fcpNum": 1506,
     "tbtNum": 0,
-    "siNum": 4165.278187000131,
-    "fetchedAt": "2026-04-18T13:03:21.072Z"
+    "siNum": 2569.9892879918652,
+    "fetchedAt": "2026-04-18T19:27:26.151Z"
   }
 }
