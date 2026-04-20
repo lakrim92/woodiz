@@ -14,7 +14,6 @@ const fs       = require('fs');
 const crypto   = require('crypto');
 const http     = require('http');
 const https    = require('https');
-const net      = require('net');
 const stripe   = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const nodemailer = require('nodemailer');
 
@@ -199,11 +198,7 @@ function prTxt(s) {
 }
 function prLine(s) { return Buffer.concat([prTxt(s), Buffer.from([0x0A])]); }
 
-function printOrder(order) {
-  const host = process.env.PRINTER_HOST;
-  const port = parseInt(process.env.PRINTER_PORT || '9100');
-  if (!host) return;
-
+function buildTicket(order) {
   const d          = order.delivery || {};
   const now        = new Date(order.createdAt);
   const dateStr    = now.toLocaleDateString('fr-FR');
@@ -257,16 +252,7 @@ function printOrder(order) {
   if (instructions) { chunks.push(prLine('')); chunks.push(prLine(`Note: ${instructions}`)); }
 
   chunks.push(PR.FEED, PR.CUT);
-
-  const data   = Buffer.concat(chunks);
-  const socket = new net.Socket();
-  socket.setTimeout(5000);
-  socket.connect(port, host, () => {
-    socket.write(data, () => socket.destroy());
-    console.log(`🖨️  Ticket imprimé → ${host}:${port} (commande #${orderNum})`);
-  });
-  socket.on('error', err => console.error(`Printer error: ${err.message}`));
-  socket.on('timeout', () => { console.error('Printer timeout'); socket.destroy(); });
+  return Buffer.concat(chunks);
 }
 
 // ── SSE — tablette temps réel ──────────────────────────────
@@ -479,9 +465,6 @@ async function processOrder(session) {
       </div>
     `);
   }
-
-  // ── Impression ticket cuisine ──
-  printOrder(order);
 
   console.log(`✅ Commande #${order.orderNumber} traitée — ${order.total}€`);
 }
@@ -923,9 +906,9 @@ app.get('/api/orders', tabletteAuth, (req, res) => {
 app.post('/api/orders/:id/print', tabletteAuth, (req, res) => {
   const order = loadOrders().find(o => o.id === req.params.id);
   if (!order) return res.status(404).json({ error: 'Commande introuvable' });
-  if (!process.env.PRINTER_HOST) return res.status(503).json({ error: 'Imprimante non configurée' });
-  printOrder(order);
-  res.json({ ok: true });
+  const bytes = buildTicket(order);
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.send(bytes);
 });
 
 app.patch('/api/orders/:id/status', express.json(), tabletteAuth, async (req, res) => {
@@ -1469,8 +1452,8 @@ function proxyToMythai(apiPath, method, body, extraHeaders, res) {
   req.end();
 }
 
-// SSE en temps réel pour mythai (proxy stream)
-app.get('/api/proxy/mythai/orders/stream', adminAuth, async (req, res) => {
+// SSE en temps réel pour mythai (proxy stream — admin dashboard)
+app.get('/api/proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
   const token = await getMythaiToken();
   if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
   res.setHeader('Content-Type', 'text/event-stream');
@@ -1480,13 +1463,62 @@ app.get('/api/proxy/mythai/orders/stream', adminAuth, async (req, res) => {
   res.flushHeaders();
   const pr = http.request(
     { hostname: 'localhost', port: MYTHAI_PORT,
-      path: `/api/orders/stream?token=${encodeURIComponent(token)}`,
-      method: 'GET', headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache' } },
+      path: '/api/orders/stream',
+      method: 'GET', headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', 'x-session-token': token } },
     (proxyRes) => { proxyRes.pipe(res); proxyRes.on('end', () => res.end()); }
   );
   pr.on('error', () => { try { res.write('event: error\ndata: {}\n\n'); res.end(); } catch { /* closed */ } });
   req.on('close', () => pr.destroy());
   pr.end();
+});
+
+// ── Proxy My Thai — accès tablette cuisine ─────────────────
+// tabletteAuth woodiz, proxie vers My Thai avec token admin My Thai (x-session-token)
+
+app.get('/api/tablette-proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+  if (!token) {
+    res.write('event: error\ndata: {"error":"My Thai unavailable"}\n\n');
+    return res.end();
+  }
+  const pr = http.request(
+    { hostname: 'localhost', port: MYTHAI_PORT,
+      path: '/api/orders/stream',
+      method: 'GET',
+      headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', 'x-session-token': token } },
+    (proxyRes) => { proxyRes.pipe(res); proxyRes.on('end', () => res.end()); }
+  );
+  pr.on('error', () => { try { res.write('event: error\ndata: {}\n\n'); res.end(); } catch { /* closed */ } });
+  req.on('close', () => pr.destroy());
+  pr.end();
+});
+
+app.patch('/api/tablette-proxy/mythai/orders/:id/status', express.json(), tabletteAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+  proxyToMythai(`/api/orders/${req.params.id}/status`, 'PATCH', req.body,
+    { 'x-session-token': token }, res);
+});
+
+app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+  const proxyReq = http.request(
+    { hostname: 'localhost', port: MYTHAI_PORT, path: `/api/orders/${req.params.id}/print`, method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token } },
+    (proxyRes) => {
+      res.status(proxyRes.statusCode);
+      res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'application/octet-stream');
+      proxyRes.pipe(res);
+    }
+  );
+  proxyReq.on('error', () => res.status(503).json({ error: 'My Thai server unavailable' }));
+  proxyReq.end();
 });
 
 // Routes admin mythai (stats, orders, export, delete)

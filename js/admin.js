@@ -4,7 +4,7 @@ const RESTOS = {
     key:      'panuozzo_admin_token',
     name:     'Panuozzo',
     emoji:    '🍕',
-    apiBase:  '',                   // same origin (woodiz)
+    apiBase:  '',
     sseBase:  '/api',
     color:    '#e55a00',
     csvName:  'panuozzo',
@@ -15,7 +15,7 @@ const RESTOS = {
     key:      'mythai_admin_token',
     name:     'My Thai',
     emoji:    '🌶',
-    apiBase:  '/api/proxy/mythai', // proxied via woodiz server
+    apiBase:  '/api/proxy/mythai',
     sseBase:  '/api/proxy/mythai',
     color:    '#C8390B',
     csvName:  'mythai',
@@ -24,8 +24,9 @@ const RESTOS = {
   },
 };
 
-let currentResto = 'panuozzo';
-function cfg() { return RESTOS[currentResto]; }
+let currentResto = 'panuozzo'; // 'panuozzo' | 'mythai' | 'both'
+function cfg() { return RESTOS[currentResto] || RESTOS.panuozzo; }
+const isBoth = () => currentResto === 'both';
 
 // ── Auth ──────────────────────────────────────────────────
 const tokens = {
@@ -42,30 +43,20 @@ async function doLogin() {
   const err = document.getElementById('login-error');
   if (!pwd) { err.textContent = 'Mot de passe requis'; return; }
 
-  // Authenticate on both servers simultaneously
   try {
-    const [rP, rM] = await Promise.all([
-      fetch('/api/auth/admin', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd }),
-      }),
-      fetch('/api/proxy/mythai/auth/admin', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd }),
-      }).catch(() => ({ json: async () => ({ ok: false }) })),
-    ]);
-
-    const [dP, dM] = await Promise.all([rP.json(), rM.json()]);
+    const rP = await fetch('/api/auth/admin', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pwd }),
+    });
+    const dP = await rP.json();
 
     if (!dP.ok) { err.textContent = 'Mot de passe incorrect'; document.getElementById('login-input').value = ''; return; }
 
+    // Le proxy woodiz gère l'auth mythai côté serveur — on réutilise le token panuozzo
     tokens.panuozzo = dP.token;
+    tokens.mythai   = dP.token;
     sessionStorage.setItem(RESTOS.panuozzo.key, dP.token);
-
-    if (dM.ok) {
-      tokens.mythai = dM.token;
-      sessionStorage.setItem(RESTOS.mythai.key, dM.token);
-    }
+    sessionStorage.setItem(RESTOS.mythai.key,   dP.token);
 
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('app').style.display = 'block';
@@ -90,8 +81,8 @@ if (savedToken) {
     .then(r => r.json()).then(d => {
       if (d.ok && d.role === 'admin') {
         tokens.panuozzo = savedToken;
-        const mt = sessionStorage.getItem(RESTOS.mythai.key);
-        if (mt) tokens.mythai = mt;
+        tokens.mythai   = savedToken;
+        sessionStorage.setItem(RESTOS.mythai.key, savedToken);
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         initApp();
@@ -116,9 +107,20 @@ document.getElementById('resto-switcher').addEventListener('click', e => {
 
 function updateBranding() {
   const r = cfg();
-  document.getElementById('sidebar-logo-name').textContent = r.name;
-  document.getElementById('sidebar-logo-emoji').textContent = r.emoji;
-  document.title = `Admin — ${r.name}`;
+  if (isBoth()) {
+    document.getElementById('sidebar-logo-name').textContent = 'Les deux';
+    document.getElementById('sidebar-logo-emoji').textContent = '🍽';
+    document.title = 'Admin — Vue consolidée';
+  } else {
+    document.getElementById('sidebar-logo-name').textContent = r.name;
+    document.getElementById('sidebar-logo-emoji').textContent = r.emoji;
+    document.title = `Admin — ${r.name}`;
+  }
+  // Afficher le filtre restaurant et la colonne uniquement en mode 'both'
+  const fRestoGroup = document.getElementById('f-resto-group');
+  const thResto     = document.getElementById('th-resto');
+  if (fRestoGroup) fRestoGroup.style.display = isBoth() ? '' : 'none';
+  if (thResto)     thResto.style.display     = isBoth() ? '' : 'none';
 }
 
 // ── Nav ───────────────────────────────────────────────────
@@ -161,6 +163,7 @@ let totalPages   = 1;
 let totalCount   = 0;
 
 function resetState() {
+  closeAllSSE();
   statsData = null; ordersData = []; currentPage = 1; totalPages = 1; totalCount = 0;
   if (chartRevenue) { chartRevenue.destroy(); chartRevenue = null; }
   if (chartStatus)  { chartStatus.destroy();  chartStatus  = null; }
@@ -175,10 +178,18 @@ function resetState() {
 }
 
 // ── API helpers ───────────────────────────────────────────
-async function apiFetch(path, options = {}) {
-  const r = cfg();
+async function apiFetch(path, options = {}, restoKey) {
+  const key = restoKey || (isBoth() ? 'panuozzo' : currentResto);
+  const r   = RESTOS[key];
   const url = `${r.apiBase}${path}`;
-  return fetch(url, { ...options, headers: { ...authHeaders(currentResto), ...(options.headers || {}) } });
+  return fetch(url, { ...options, headers: { ...authHeaders(key), ...(options.headers || {}) } });
+}
+
+async function apiFetchBoth(path, options = {}) {
+  return Promise.all([
+    apiFetch(path, options, 'panuozzo'),
+    apiFetch(path, options, 'mythai'),
+  ]);
 }
 
 // ── Init ──────────────────────────────────────────────────
@@ -191,10 +202,11 @@ async function initApp() {
 }
 
 // ── SSE ───────────────────────────────────────────────────
-let activeES = null;
-let lastRefresh = null;
-let sseRetries = 0;
-const SSE_MAX  = 10;
+let activeES        = null;
+let activeESMythai  = null;
+let lastRefresh     = null;
+let sseRetries      = 0;
+const SSE_MAX       = 10;
 
 function setSyncStatus(ok) {
   const dot   = document.getElementById('sync-dot');
@@ -209,21 +221,35 @@ function setSyncStatus(ok) {
   }
 }
 
-function initSSE() {
-  if (sseRetries >= SSE_MAX) { setSyncStatus(false); return; }
-  if (activeES) { activeES.close(); activeES = null; }
-  const r = cfg();
-  const sseUrl = `${r.sseBase}/orders/stream?token=${encodeURIComponent(tokens[currentResto])}`;
-  const es = new EventSource(sseUrl);
-  activeES = es;
+function closeAllSSE() {
+  if (activeES)       { activeES.close();       activeES       = null; }
+  if (activeESMythai) { activeESMythai.close();  activeESMythai = null; }
+}
+
+function openAdminStream(restoKey) {
+  const r   = RESTOS[restoKey];
+  const url = `${r.sseBase}/orders/stream?token=${encodeURIComponent(tokens[restoKey])}`;
+  const es  = new EventSource(url);
   es.addEventListener('init',          async () => { await refresh(); });
-  es.addEventListener('new-order',     async () => { await refresh(); showToast('🔔 Nouvelle commande !'); });
+  es.addEventListener('new-order',     async () => { await refresh(); showToast(`🔔 ${r.emoji} Nouvelle commande !`); });
   es.addEventListener('status-update', async () => { await refresh(); });
   es.onopen  = () => { setSyncStatus(true); sseRetries = 0; };
   es.onerror = () => {
     setSyncStatus(false);
     if (es.readyState === EventSource.CLOSED) { sseRetries++; setTimeout(initSSE, 5000); }
   };
+  return es;
+}
+
+function initSSE() {
+  if (sseRetries >= SSE_MAX) { setSyncStatus(false); return; }
+  closeAllSSE();
+  if (isBoth()) {
+    activeES       = openAdminStream('panuozzo');
+    if (tokens.mythai) activeESMythai = openAdminStream('mythai');
+  } else {
+    activeES = openAdminStream(currentResto);
+  }
 }
 
 async function refresh() {
@@ -239,13 +265,58 @@ function startAutoRefresh() {
 // ── Stats ─────────────────────────────────────────────────
 async function loadStats() {
   try {
-    const r   = await apiFetch('/api/admin/stats');
-    statsData = await r.json();
+    if (isBoth()) {
+      const [rP, rM] = await apiFetchBoth('/api/admin/stats');
+      const [sP, sM] = await Promise.all([rP.json(), rM.json()]);
+      statsData = mergeStats(sP, sM);
+      statsData._panuozzo = sP;
+      statsData._mythai   = sM;
+    } else {
+      const r   = await apiFetch('/api/admin/stats');
+      statsData = await r.json();
+    }
     renderKPIs(statsData);
     renderCharts(statsData);
     renderTopItems(statsData.topItems);
     renderRecentOrders();
   } catch (err) { console.error('Stats error:', err); }
+}
+
+function mergeStats(p, m) {
+  const sumDay = (a, b) => {
+    const map = {};
+    (a || []).forEach(d => { map[d.date] = { date: d.date, revenue: d.revenue, count: d.count }; });
+    (b || []).forEach(d => {
+      if (map[d.date]) { map[d.date].revenue += d.revenue; map[d.date].count += d.count; }
+      else map[d.date] = { date: d.date, revenue: d.revenue, count: d.count };
+    });
+    return Object.values(map).sort((a, b) => a.date.localeCompare(b.date));
+  };
+  const sumItems = (a, b) => {
+    const map = {};
+    (a || []).forEach(i => { map[i.name] = { name: i.name, qty: i.qty }; });
+    (b || []).forEach(i => {
+      if (map[i.name]) map[i.name].qty += i.qty;
+      else map[i.name] = { name: i.name, qty: i.qty };
+    });
+    return Object.values(map).sort((a, b) => b.qty - a.qty);
+  };
+  return {
+    today:    { revenue: (p.today?.revenue || 0) + (m.today?.revenue || 0), orders: (p.today?.orders || 0) + (m.today?.orders || 0) },
+    month:    { revenue: (p.month?.revenue || 0) + (m.month?.revenue || 0), orders: (p.month?.orders || 0) + (m.month?.orders || 0) },
+    total:    { revenue: (p.total?.revenue || 0) + (m.total?.revenue || 0), orders: (p.total?.orders || 0) + (m.total?.orders || 0) },
+    avgBasket: ((p.total?.revenue || 0) + (m.total?.revenue || 0)) / Math.max(1, (p.total?.orders || 0) + (m.total?.orders || 0)),
+    byMode:   { livraison: (p.byMode?.livraison || 0) + (m.byMode?.livraison || 0), emporter: (p.byMode?.emporter || 0) + (m.byMode?.emporter || 0) },
+    byStatus: {
+      nouveau:        (p.byStatus?.nouveau || 0)        + (m.byStatus?.nouveau || 0),
+      en_preparation: (p.byStatus?.en_preparation || 0) + (m.byStatus?.en_preparation || 0),
+      pret:           (p.byStatus?.pret || 0)           + (m.byStatus?.pret || 0),
+      livre:          (p.byStatus?.livre || 0)          + (m.byStatus?.livre || 0),
+    },
+    last30:   sumDay(p.last30, m.last30),
+    topItems: sumItems(p.topItems, m.topItems),
+    serverTime: p.serverTime,
+  };
 }
 
 function fmt(n) {
@@ -262,43 +333,85 @@ function renderKPIs(s) {
   document.getElementById('kpi-avg').textContent          = fmt(s.avgBasket);
   document.getElementById('kpi-livraison').textContent    = s.byMode.livraison;
   document.getElementById('kpi-emporter').textContent     = s.byMode.emporter + ' à emporter';
-  document.getElementById('topbar-sub').textContent       = `${cfg().emoji} ${cfg().name} · ${s.total.orders} commandes · CA total ${fmt(s.total.revenue)}`;
+  const label = isBoth() ? '🍽 Les deux restaurants' : `${cfg().emoji} ${cfg().name}`;
+  document.getElementById('topbar-sub').textContent = `${label} · ${s.total.orders} commandes · CA total ${fmt(s.total.revenue)}`;
   const sbBadge = document.getElementById('sb-badge-orders');
   const active  = (s.byStatus.nouveau || 0) + (s.byStatus.en_preparation || 0) + (s.byStatus.pret || 0);
   sbBadge.textContent = active || '';
 }
 
 function renderCharts(s) {
-  const days     = s.last30.slice(-chartPeriod);
-  const labels   = days.map(d => new Date(d.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
-  const revenues = days.map(d => d.revenue);
-  const counts   = days.map(d => d.count);
-  const accent   = cfg().color;
+  const days   = s.last30.slice(-chartPeriod);
+  const labels = days.map(d => new Date(d.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
 
   if (chartRevenue) chartRevenue.destroy();
-  chartRevenue = new Chart(document.getElementById('chart-revenue').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'CA (€)', data: revenues,
-          backgroundColor: accent + '8c', borderColor: accent, borderWidth: 1.5, borderRadius: 4, yAxisID: 'y' },
-        { label: 'Commandes', data: counts, type: 'line',
-          borderColor: 'rgba(245,158,11,.9)', backgroundColor: 'transparent',
-          borderWidth: 2, tension: .3, pointRadius: 3, pointBackgroundColor: 'rgba(245,158,11,.9)', yAxisID: 'y2' },
-      ],
-    },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { labels: { color: 'rgba(240,244,255,.6)', font: { size: 11 } } } },
-      scales: {
-        x:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 } } },
-        y:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 }, callback: v => v + '€' } },
-        y2: { position: 'right', grid: { display: false }, ticks: { color: 'rgba(245,158,11,.7)', font: { size: 10 } } },
+
+  if (isBoth() && s._panuozzo && s._mythai) {
+    // Mode consolidé : 2 courbes de CA (une par restaurant)
+    const pDays = s._panuozzo.last30.slice(-chartPeriod);
+    const mDays = s._mythai.last30.slice(-chartPeriod);
+    const allLabels = [...new Set([
+      ...pDays.map(d => d.date),
+      ...mDays.map(d => d.date),
+    ])].sort().slice(-chartPeriod).map(d => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
+
+    const pMap = Object.fromEntries(pDays.map(d => [new Date(d.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }), d.revenue]));
+    const mMap = Object.fromEntries(mDays.map(d => [new Date(d.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }), d.revenue]));
+    const pRevs = allLabels.map(l => pMap[l] || 0);
+    const mRevs = allLabels.map(l => mMap[l] || 0);
+
+    chartRevenue = new Chart(document.getElementById('chart-revenue').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: allLabels,
+        datasets: [
+          { label: '🍕 Panuozzo (€)', data: pRevs,
+            borderColor: RESTOS.panuozzo.color, backgroundColor: RESTOS.panuozzo.color + '22',
+            borderWidth: 2.5, fill: true, tension: .3, pointRadius: 3, yAxisID: 'y' },
+          { label: '🌶 My Thai (€)', data: mRevs,
+            borderColor: RESTOS.mythai.color, backgroundColor: RESTOS.mythai.color + '22',
+            borderWidth: 2.5, fill: true, tension: .3, pointRadius: 3, yAxisID: 'y' },
+        ],
       },
-    },
-  });
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: 'rgba(240,244,255,.6)', font: { size: 11 } } } },
+        scales: {
+          x:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 } } },
+          y:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 }, callback: v => v + '€' } },
+        },
+      },
+    });
+  } else {
+    const revenues = days.map(d => d.revenue);
+    const counts   = days.map(d => d.count);
+    const accent   = cfg().color;
+
+    chartRevenue = new Chart(document.getElementById('chart-revenue').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'CA (€)', data: revenues,
+            backgroundColor: accent + '8c', borderColor: accent, borderWidth: 1.5, borderRadius: 4, yAxisID: 'y' },
+          { label: 'Commandes', data: counts, type: 'line',
+            borderColor: 'rgba(245,158,11,.9)', backgroundColor: 'transparent',
+            borderWidth: 2, tension: .3, pointRadius: 3, pointBackgroundColor: 'rgba(245,158,11,.9)', yAxisID: 'y2' },
+        ],
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { color: 'rgba(240,244,255,.6)', font: { size: 11 } } } },
+        scales: {
+          x:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 } } },
+          y:  { grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: 'rgba(240,244,255,.5)', font: { size: 10 }, callback: v => v + '€' } },
+          y2: { position: 'right', grid: { display: false }, ticks: { color: 'rgba(245,158,11,.7)', font: { size: 10 } } },
+        },
+      },
+    });
+  }
 
   const statusColors = {
     nouveau: '#f59e0b', en_preparation: '#3b82f6', pret: '#22c55e', livre: 'rgba(255,255,255,.2)',
@@ -350,23 +463,45 @@ function renderTopItems(items) {
 
 // ── Commandes ─────────────────────────────────────────────
 async function loadOrders() {
-  const search = document.getElementById('f-search')?.value || '';
-  const status = document.getElementById('f-status')?.value || '';
-  const mode   = document.getElementById('f-mode')?.value   || '';
-  const from   = document.getElementById('f-from')?.value   || '';
-  const to     = document.getElementById('f-to')?.value     || '';
-  const params = new URLSearchParams({ page: currentPage, limit: 25 });
+  const search    = document.getElementById('f-search')?.value || '';
+  const status    = document.getElementById('f-status')?.value || '';
+  const mode      = document.getElementById('f-mode')?.value   || '';
+  const from      = document.getElementById('f-from')?.value   || '';
+  const to        = document.getElementById('f-to')?.value     || '';
+  const restoFilt = document.getElementById('f-resto')?.value  || '';
+
+  const params = new URLSearchParams({ page: 1, limit: isBoth() ? 50 : 25 });
   if (search) params.set('search', search);
   if (status) params.set('status', status);
   if (mode)   params.set('mode',   mode);
   if (from)   params.set('from',   from);
   if (to)     params.set('to',     to);
+
   try {
-    const r    = await apiFetch(`/api/admin/orders?${params}`);
-    const data = await r.json();
-    ordersData  = data.orders;
-    totalPages  = data.pages;
-    totalCount  = data.total;
+    if (isBoth()) {
+      // Fetch from both, merge, paginate client-side
+      const fetchP = (restoFilt === 'mythai')
+        ? Promise.resolve({ orders: [], total: 0 })
+        : apiFetch(`/api/admin/orders?${params}`, {}, 'panuozzo').then(r => r.json()).then(d => ({ orders: (d.orders || []).map(o => ({ ...o, _source: 'panuozzo' })), total: d.total || 0 }));
+      const fetchM = (restoFilt === 'panuozzo')
+        ? Promise.resolve({ orders: [], total: 0 })
+        : apiFetch(`/api/admin/orders?${params}`, {}, 'mythai').then(r => r.json()).then(d => ({ orders: (d.orders || []).map(o => ({ ...o, _source: 'mythai' })), total: d.total || 0 }));
+
+      const [dP, dM] = await Promise.all([fetchP, fetchM]);
+      const merged   = [...dP.orders, ...dM.orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      totalCount = dP.total + dM.total;
+      const pageSize = 25;
+      totalPages = Math.max(1, Math.ceil(merged.length / pageSize));
+      ordersData = merged.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    } else {
+      params.set('page', currentPage);
+      params.set('limit', 25);
+      const r    = await apiFetch(`/api/admin/orders?${params}`);
+      const data = await r.json();
+      ordersData = (data.orders || []).map(o => ({ ...o, _source: currentResto }));
+      totalPages = data.pages;
+      totalCount = data.total;
+    }
     renderOrdersTable();
     renderPagination();
     renderRecentOrders();
@@ -382,26 +517,33 @@ function esc(str) {
 
 function renderOrdersTable() {
   const tbody = document.getElementById('orders-tbody');
+  const colSpan = isBoth() ? 9 : 8;
   if (!ordersData.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">Aucune commande trouvée</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center;color:var(--muted);padding:32px">Aucune commande trouvée</td></tr>`;
     return;
   }
   tbody.innerHTML = ordersData.map(o => {
-    const d     = o.delivery || {};
-    const name  = esc(`${d.firstname || d.prenom || ''} ${d.lastname || d.nom || ''}`.trim() || '—');
-    const phone = esc(d.phone || d.telephone || '—');
-    const email = esc(o.customerEmail || '');
-    const isLiv = d.mode === 'livraison';
-    const dt    = new Date(o.createdAt);
+    const d       = o.delivery || {};
+    const name    = esc(`${d.firstname || d.prenom || ''} ${d.lastname || d.nom || ''}`.trim() || '—');
+    const phone   = esc(d.phone || d.telephone || '—');
+    const email   = esc(o.customerEmail || '');
+    const isLiv   = d.mode === 'livraison';
+    const dt      = new Date(o.createdAt);
     const dateStr = dt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
     const timeStr = dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    const items = esc((o.items || []).map(i => `${i.qty || 1}× ${i.name}`).join(', '));
-    return `<tr data-order-id="${esc(o.id)}" style="cursor:pointer">
+    const items   = esc((o.items || []).map(i => `${i.qty || 1}× ${i.name}`).join(', '));
+    const source  = o._source || currentResto;
+    const rc      = RESTOS[source] || RESTOS.panuozzo;
+    const restoCell = isBoth()
+      ? `<td><span class="resto-tag resto-tag-${source}">${rc.emoji} ${rc.name}</span></td>`
+      : '';
+    return `<tr data-order-id="${esc(o.id)}" data-order-source="${source}" style="cursor:pointer">
       <td class="td-number">${String(o.orderNumber).slice(-6)}</td>
       <td><div>${dateStr}</div><div class="td-muted">${timeStr}</div></td>
       <td class="td-name">${name}<div class="td-muted">${email}</div></td>
       <td class="td-muted">${phone}</td>
       <td><span class="mode-badge ${isLiv ? 'mode-livraison' : 'mode-emporter'}">${isLiv ? '🛵 Livraison' : '🏠 Emporter'}</span></td>
+      ${restoCell}
       <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${items}</td>
       <td class="td-total">${(o.total || 0).toFixed(2)}€${o.promoApplied ? ' <span class="promo-tag">-10%</span>' : ''}</td>
       <td><span class="status-pill ${STATUS_CLASSES[o.status] || ''}">${STATUS_LABELS[o.status] || esc(o.status)}</span></td>
@@ -418,13 +560,16 @@ function renderRecentOrders() {
     return;
   }
   tbody.innerHTML = recent.map(o => {
-    const d    = o.delivery || {};
-    const name = esc(`${d.firstname || d.prenom || ''} ${d.lastname || d.nom || ''}`.trim() || '—');
-    const isLiv = d.mode === 'livraison';
-    const time  = new Date(o.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    return `<tr data-order-id="${esc(o.id)}" style="cursor:pointer">
+    const d      = o.delivery || {};
+    const name   = esc(`${d.firstname || d.prenom || ''} ${d.lastname || d.nom || ''}`.trim() || '—');
+    const isLiv  = d.mode === 'livraison';
+    const time   = new Date(o.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const source = o._source || currentResto;
+    const rc     = RESTOS[source] || RESTOS.panuozzo;
+    const badge  = isBoth() ? `<span class="resto-tag resto-tag-${source}" style="margin-left:4px">${rc.emoji}</span>` : '';
+    return `<tr data-order-id="${esc(o.id)}" data-order-source="${source}" style="cursor:pointer">
       <td class="td-muted">${time}</td>
-      <td class="td-name">${name}</td>
+      <td class="td-name">${name}${badge}</td>
       <td><span class="mode-badge ${isLiv ? 'mode-livraison' : 'mode-emporter'}">${isLiv ? '🛵' : '🏠'}</span></td>
       <td class="td-total">${(o.total || 0).toFixed(2)}€${o.promoApplied ? ' <span class="promo-tag">-10%</span>' : ''}</td>
       <td><span class="status-pill ${STATUS_CLASSES[o.status] || ''}">${STATUS_LABELS[o.status] || o.status}</span></td>
@@ -460,19 +605,22 @@ function goPage(p) {
 function applyFilters() { currentPage = 1; loadOrders(); }
 
 function resetFilters() {
-  ['f-search','f-status','f-mode','f-from','f-to'].forEach(id => {
-    document.getElementById(id).value = '';
+  ['f-search','f-status','f-mode','f-from','f-to','f-resto'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
   applyFilters();
 }
 
 // ── Modale commande ───────────────────────────────────────
-let modalOrderId = null;
+let modalOrderId     = null;
+let modalOrderSource = null;
 
-function openModal(orderId) {
+function openModal(orderId, orderSource) {
   const order = ordersData.find(o => o.id === orderId);
   if (!order) return;
-  modalOrderId = orderId;
+  modalOrderId     = orderId;
+  modalOrderSource = orderSource || order._source || currentResto;
   const d    = order.delivery || {};
   const name = `${esc(d.firstname || d.prenom || '')} ${esc(d.lastname || d.nom || '')}`.trim() || '—';
   const isLiv = d.mode === 'livraison';
@@ -558,6 +706,7 @@ function openModal(orderId) {
 function closeModal() {
   document.getElementById('order-modal').classList.remove('open');
   modalOrderId = null;
+  modalOrderSource = null;
 }
 
 async function updateStatusFromModal() {
@@ -566,7 +715,7 @@ async function updateStatusFromModal() {
   try {
     await apiFetch(`/api/orders/${modalOrderId}/status`, {
       method: 'PATCH', body: JSON.stringify({ status }),
-    });
+    }, modalOrderSource);
     const o = ordersData.find(o => o.id === modalOrderId);
     if (o) o.status = status;
     showToast(`✅ Statut mis à jour : ${STATUS_LABELS[status]}`);
@@ -580,7 +729,7 @@ async function updateStatusFromModal() {
 async function deleteOrder(id) {
   if (!confirm('Supprimer cette commande définitivement ?')) return;
   try {
-    await apiFetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/admin/orders/${id}`, { method: 'DELETE' }, modalOrderSource);
     ordersData = ordersData.filter(o => o.id !== id);
     totalCount--;
     showToast('🗑 Commande supprimée');
@@ -873,20 +1022,38 @@ async function exportCSV() {
   const params = new URLSearchParams();
   ['f-search','f-status','f-mode','f-from','f-to'].forEach(id => {
     const v = document.getElementById(id)?.value;
-    const key = id.replace('f-', '');
-    if (v) params.set(key === 'search' ? 'search' : key, v);
+    if (v) params.set(id.replace('f-', ''), v);
   });
+
+  const date = new Date().toISOString().slice(0, 10);
+
   try {
-    const r = await apiFetch(`/api/admin/export/csv?${params}`);
-    if (!r.ok) { showToast('❌ Erreur export', true); return; }
-    const blob = await r.blob();
-    const date = new Date().toISOString().slice(0, 10);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `${cfg().csvName}-commandes-${date}.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(a.href);
-    showToast('📥 Export CSV téléchargé');
+    if (isBoth()) {
+      // Export consolidé : télécharger les deux CSV séparément
+      const restoFilt = document.getElementById('f-resto')?.value || '';
+      const targets = restoFilt ? [restoFilt] : ['panuozzo', 'mythai'];
+      for (const key of targets) {
+        const r = await apiFetch(`/api/admin/export/csv?${params}`, {}, key);
+        if (!r.ok) continue;
+        const blob = await r.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${RESTOS[key].csvName}-commandes-${date}.csv`;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(a.href);
+      }
+      showToast('📥 Exports CSV téléchargés');
+    } else {
+      const r = await apiFetch(`/api/admin/export/csv?${params}`);
+      if (!r.ok) { showToast('❌ Erreur export', true); return; }
+      const blob = await r.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${cfg().csvName}-commandes-${date}.csv`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href);
+      showToast('📥 Export CSV téléchargé');
+    }
   } catch { showToast('❌ Erreur export', true); }
 }
 
@@ -928,6 +1095,7 @@ document.getElementById('f-status').addEventListener('change', applyFilters);
 document.getElementById('f-mode').addEventListener('change',   applyFilters);
 document.getElementById('f-from').addEventListener('change',   applyFilters);
 document.getElementById('f-to').addEventListener('change',     applyFilters);
+document.getElementById('f-resto')?.addEventListener('change', applyFilters);
 document.getElementById('filter-reset').addEventListener('click', resetFilters);
 
 document.getElementById('order-modal').addEventListener('click', e => {
@@ -941,11 +1109,11 @@ document.getElementById('modal-close-btn').addEventListener('click', closeModal)
 
 document.getElementById('orders-tbody').addEventListener('click', e => {
   const tr = e.target.closest('[data-order-id]');
-  if (tr) openModal(tr.dataset.orderId);
+  if (tr) openModal(tr.dataset.orderId, tr.dataset.orderSource);
 });
 document.getElementById('recent-tbody').addEventListener('click', e => {
   const tr = e.target.closest('[data-order-id]');
-  if (tr) openModal(tr.dataset.orderId);
+  if (tr) openModal(tr.dataset.orderId, tr.dataset.orderSource);
 });
 
 document.getElementById('page-btns').addEventListener('click', e => {
