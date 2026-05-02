@@ -160,6 +160,8 @@ document.getElementById('btn-offre-exclusive')?.addEventListener('click', () => 
 document.getElementById('btn-offre-exclusive')?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchToTabAndScroll('formules', 'formule-card-exclusive'); } });
 document.getElementById('btn-menu-midi')?.addEventListener('click', () => switchToTabAndScroll('formules', 'formule-card-midi'));
 document.getElementById('btn-menu-midi')?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchToTabAndScroll('formules', 'formule-card-midi'); } });
+document.getElementById('btn-menu-gourmand')?.addEventListener('click', () => switchToTabAndScroll('formules', 'formule-card-gourmand'));
+document.getElementById('btn-menu-gourmand')?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchToTabAndScroll('formules', 'formule-card-gourmand'); } });
 
 tabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -308,10 +310,20 @@ window.addEventListener('scroll', () => {
 
 // ── Modal personnalisation pizza ──────────────────────────
 const EXTRAS = [
-  'Crème fraiche','Sauce tomate','Champignons frais','Tomates cerises','Olives','Anchois',
-  'Câpres','Chèvre','Brie','Raclette','Emmental rapé','Artichauts',
-  'Aubergines grillées','Viande hachée','Merguez','Poivrons',
-  'Poulet mariné','Miel','Lardons de veau','Jambon de dinde','Chorizo de boeuf'
+  // Bases
+  'Crème fraiche','Sauce tomate','Sauce barbecue',
+  // Fromages
+  'Mozzarella Di Buffala','Burrata','Emmental rapé','Raclette','Chèvre','Brie',
+  'Gorgonzola','Provolone','Pecorino','Parmesan','Cheddar','Boursin',
+  // Viandes & charcuteries
+  'Jambon','Jambon de dinde','Lardons','Lardons de veau','Viande hachée',
+  'Merguez','Chorizo de boeuf','Thon','Saumon fumé','Fruits de mer',
+  // Légumes & garnitures
+  'Champignons frais','Tomates cerises','Olives','Artichauts','Poivrons',
+  'Aubergines grillées','Oignons rouges','Pommes de terre','Courgette',
+  'Roquette','Basilic frais','Persillade',
+  // Autres
+  'Anchois','Câpres','Œuf','Poulet mariné','Miel','Figues séchées','Noix',
 ];
 
 const pizzaModal    = document.getElementById('pizza-modal');
@@ -941,6 +953,14 @@ const deliveryModal      = document.getElementById('delivery-modal');
 const deliveryModalClose = document.getElementById('delivery-modal-close');
 const deliveryForm       = document.getElementById('delivery-form');
 
+const FREE_DELIVERY_ZIPS = new Set(['78380', '78430', '78170']);
+
+document.getElementById('d-zip').addEventListener('input', (e) => {
+  const zip = e.target.value.trim();
+  const notice = document.getElementById('d-delivery-fee-notice');
+  if (notice) notice.style.display = (zip.length === 5 && !FREE_DELIVERY_ZIPS.has(zip)) ? 'block' : 'none';
+});
+
 // Formules disponibles uniquement à emporter
 const EMPORTER_ONLY = ['midi', 'exclusive'];
 
@@ -956,6 +976,8 @@ document.getElementById('btn-livraison').addEventListener('click', () => {
   document.getElementById('btn-emporter').classList.remove('active');
   // Réinitialiser le formulaire et les erreurs
   deliveryForm.reset();
+  const feeNotice = document.getElementById('d-delivery-fee-notice');
+  if (feeNotice) feeNotice.style.display = 'none';
   ['d-firstname','d-lastname','d-phone','d-address'].forEach(id => {
     document.getElementById(id)?.classList.remove('input-error');
   });

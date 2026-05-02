@@ -99,14 +99,17 @@
   <title>PANUOZZO – Pizzeria Bougival | Livraison & À emporter</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/images/svg/logo_panuozzo.png" />
-  <link rel="stylesheet" href="css/style.css?v=23" />
+  <link rel="stylesheet" href="css/style.css?v=24" />
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" href="images/svg/logo_panuozzo_transparent.webp" as="image" fetchpriority="high" />
   <link rel="preload" href="images/hero/image_hero_mobile.webp" as="image" media="(max-width: 800px)" />
   <link rel="preload" href="images/hero/image_hero.webp" as="image" media="(min-width: 801px)" />
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Great+Vibes&display=swap" /></noscript>
+  <!-- Great Vibes en synchrone — garanti logo + hero dès le premier rendu -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" />
+  <!-- Playfair + Inter en async — non bloquants -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" /></noscript>
 
 </head>
 <body>
@@ -162,17 +165,19 @@
         --><span class="bl brand-green" style="--i:6">z</span><!--
         --><span class="bl brand-green" style="--i:7">o</span>
       </h1>
-      <p class="hero-tagline hero-reveal" style="--i:8">Une pâte artisanale, un goût inoubliable</p>
-      <p class="hero-desc hero-reveal" style="--i:9">Pâte fraîche maison, ingrédients frais, cuisson au feu de bois.<br>À emporter ou livré chez vous en 30 min.</p>
+      <p class="hero-tagline hero-reveal" style="--i:8">Le goût du four à bois, livré chez vous en 30 min.</p>
+      <p class="hero-desc hero-reveal" style="--i:9">Une pâte alvéolée qui craque sous la dent, des ingrédients frais choisis chaque matin, ce petit goût fumé qu'aucun four électrique ne reproduit.</p>
       <div class="hero-actions hero-reveal" style="--i:10">
+        <a href="#menu" class="btn-primary">Commander — livré en 30 min</a>
         <a href="#menu" class="btn-secondary">Voir le menu</a>
       </div>
       <div class="hero-badges hero-reveal" style="--i:11">
         <span id="hero-statut"></span>
         <span>⏱ Livraison ~30 min</span>
-        <span>🏠 À emporter</span>
-        <span>⭐ 4.8 / 5</span>
-
+        <span>🔥 Four à bois 450°C</span>
+        <span>✅ Certifié Halal</span>
+        <span>⭐ 4.8 / 5 · 124 avis</span>
+        <a href="#menu" class="hero-badge-promo">🎉 -10% sur votre 1ère commande</a>
       </div>
     </div>
   </section>
@@ -196,12 +201,13 @@
   <section class="section-promo">
     <div class="container promo-inner">
       <div>
-        <h2>-10% sur votre première commande</h2>
-        <p>La remise est appliquée automatiquement — entrez simplement votre email lors du paiement.</p>
+        <h2>-10% sur votre 1ère commande en ligne</h2>
+        <p>Vous découvrez Panuozzo ? Profitez de -10% automatiquement. Aucun code — entrez votre email au paiement, c'est tout.</p>
+        <a href="#menu" style="display:inline-block;margin-top:12px;padding:10px 22px;background:#fff;color:#dc2626;font-weight:700;font-size:.9rem;border-radius:9999px;text-decoration:none;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Profiter de l'offre →</a>
       </div>
       <div class="promo-code-box" style="font-size:.95rem;letter-spacing:0;gap:0;">
         <span style="font-size:1.6rem;">🎉</span>
-        <span style="color:#fff;font-weight:600;">Aucun code à saisir</span>
+        <span style="color:#fff;font-weight:600;">Réduction automatique — aucun code à saisir</span>
       </div>
     </div>
   </section>
@@ -210,18 +216,11 @@
   <section id="menu" class="section-menu">
     <div class="container">
       <h2 class="section-title">Notre Menu</h2>
-      <p class="section-sub">Tout préparé à la commande · Pâte fraîche maison · Cuisson au feu de bois</p>
+      <p class="section-sub">Préparé à la commande · Jamais congelé, jamais précuit · Pâte pétrie à la main · Four à bois</p>
 
 
-      <!-- Offre exclusive lun–jeu -->
-      <div class="offre-exclusive" role="button" tabindex="0" id="btn-offre-exclusive" style="cursor:pointer;" title="Voir les formules">
-        <div class="offre-days-row">
-          <span class="day-pill">Mar</span><span class="day-pill">Mer</span><span class="day-pill">Jeu</span>
-          <span class="offre-condition">· À emporter uniquement</span>
-        </div>
-        <p class="offre-headline">🍕&nbsp; 2 pizzas achetées <strong>=</strong> 1 pizza offerte</p>
-        <div class="offre-badge-wrap"><span class="offre-badge">−33%</span> <span class="offre-link">Voir la formule →</span></div>
-      </div>
+      <!-- Offres du moment -->
+      <p style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:var(--s3);">Offres du moment · Non cumulables</p>
 
       <!-- Menu Midi -->
       <div class="menu-midi-banner" role="button" tabindex="0" id="btn-menu-midi" style="cursor:pointer;" title="Voir le menu midi">
@@ -250,6 +249,43 @@
 
         <span class="mmb-cta">Composer&nbsp;→</span>
 
+      </div>
+
+      <!-- Menu Gourmand -->
+      <div class="menu-gourmand-banner" role="button" tabindex="0" id="btn-menu-gourmand" style="cursor:pointer;" title="Voir le menu gourmand">
+
+        <div class="mmb-left">
+          <span class="mmb-sun">🍕</span>
+          <div class="mmb-info">
+            <strong class="mmb-title">Menu Gourmand</strong>
+            <span class="mmb-sub">3 pizzas + 1 bouteille · Mix de bases libre</span>
+          </div>
+        </div>
+
+        <div class="mmb-prices">
+          <div class="mmb-price-row">
+            <span>🍕 3 pizzas au choix (tomate ou crème fraîche)</span>
+            <strong>37,90€</strong>
+          </div>
+          <div class="mmb-price-row">
+            <span>🥤 1 bouteille 1,25L incluse</span>
+            <strong>offerte</strong>
+          </div>
+        </div>
+
+        <span class="mmb-cta">Composer&nbsp;→</span>
+
+      </div>
+
+      <!-- Offre exclusive mar–jeu -->
+      <div class="offre-exclusive" role="button" tabindex="0" id="btn-offre-exclusive" style="cursor:pointer;" title="Voir les formules">
+        <div class="offre-days-row">
+          <span class="day-pill">Mar</span><span class="day-pill">Mer</span><span class="day-pill">Jeu</span>
+          <span class="offre-condition">· À emporter uniquement</span>
+        </div>
+        <p class="offre-headline">🍕&nbsp; Achetez <strong>2 pizzas</strong>, la 3ème est offerte — économisez jusqu'à <strong>14€</strong></p>
+        <div class="offre-badge-wrap"><span class="offre-badge">−33%</span> <span class="offre-link">Voir la formule →</span></div>
+        <span class="mmb-cta">Composer&nbsp;→</span>
       </div>
 
       <!-- Recherche pizza -->
@@ -285,8 +321,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/margerita.webp" alt="Margherita" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Margherita</h3>
-              <p>Tomate, mozzarella, olives, basilic frais</p>
+              <p>La napolitaine d'origine — quand la simplicité suffit à impressionner. Tomate, mozzarella, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>11,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -298,7 +335,7 @@
             <div class="pizza-img"><img src="images/products/reine.webp" alt="Reine" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Reine</h3>
-              <p>Tomate, mozzarella, jambon, champignons frais, basilic frais</p>
+              <p>Jambon de qualité, champignons frais cueillis — le classique qu'on ne se lasse pas de commander. Tomate, mozzarella, jambon, champignons frais, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -310,7 +347,7 @@
             <div class="pizza-img"><img src="images/products/tonara.webp" alt="Tonara" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Tonara</h3>
-              <p>Tomate, mozzarella, thon, tomates cerises, olives, basilic frais</p>
+              <p>Légère, fraîche, marine — pour ceux qui veulent une pizza qui ne pèse pas. Tomate, mozzarella, thon, tomates cerises, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -322,7 +359,7 @@
             <div class="pizza-img"><img src="images/products/calzone.webp" alt="Calzone" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Calzone</h3>
-              <p>Tomate, mozzarella, viande hachée au choix, oeuf</p>
+              <p>Fermée et dorée au four à bois — elle déborde à l'ouverture. Tomate, mozzarella, viande hachée au choix, œuf</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -334,7 +371,7 @@
             <div class="pizza-img"><img src="images/products/napolitaine.webp" alt="Napolitaine" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Napolitaine</h3>
-              <p>Tomate, mozzarella, anchois, câpres, olives</p>
+              <p>L'authentique recette de Naples — anchois, câpres, olives, intense et sans concession. Tomate, mozzarella, anchois, câpres, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -346,7 +383,7 @@
             <div class="pizza-img"><img src="images/products/fromaggie.webp" alt="Fromagie" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Fromagie</h3>
-              <p>Tomate, mozzarella, gorgonzola, provolone, pecorino, basilic frais</p>
+              <p>Quatre fromages italiens qui se fondent au feu de bois — une pizza pour les vrais amateurs. Tomate, mozzarella, gorgonzola, provolone, pecorino, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -358,7 +395,7 @@
             <div class="pizza-img"><img src="images/products/quattro-staggioni.webp" alt="Quattro Stagioni" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Quattro Stagioni</h3>
-              <p>Tomate, mozzarella, jambon, champignons frais, artichauts, basilic frais, olives</p>
+              <p>Chaque quartier raconte une saison — une pizza, quatre saveurs distinctes. Tomate, mozzarella, jambon, champignons frais, artichauts, basilic frais, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -370,7 +407,7 @@
             <div class="pizza-img"><img src="images/products/di-buffala.webp" alt="Di Buffala" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Di Buffala</h3>
-              <p>Tomate, mozzarella, tomates cerises, mozzarella Di Buffala, olives</p>
+              <p>Mozzarella Di Buffala importée, fondante et crémeuse — le vrai goût. Tomate, mozzarella, tomates cerises, mozzarella Di Buffala, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -383,7 +420,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
               <h3>Campione</h3>
-              <p>Tomate, mozzarella, viande hachée, champignons frais, oeufs, persillade</p>
+              <p>Généreuse, caractérielle, pour ceux qui n'aiment pas les demi-mesures. Tomate, mozzarella, viande hachée, champignons frais, œufs, persillade</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -394,9 +431,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/chorizo.webp" alt="Chorizo" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
+              <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span><span class="badge badge-pop">⭐ Populaire</span></div>
               <h3>Chorizo</h3>
-              <p>Tomate, mozzarella, chorizo, champignons frais, olives</p>
+              <p>Notre best-seller — le piquant du chorizo adouci par les champignons frais. Tomate, mozzarella, chorizo, champignons frais, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -409,7 +446,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Légumes</h3>
-              <p>Tomate, mozzarella, champignons, poivrons, artichauts, tomates cerises, olives, basilic frais</p>
+              <p>Colorée et généreuse — la végétarienne qui prouve qu'on n'a rien à sacrifier. Tomate, mozzarella, champignons, poivrons, artichauts, tomates cerises, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -422,7 +459,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Aubergines</h3>
-              <p>Tomate, mozzarella, aubergines grillées, olives, parmesan, basilic frais, filet d'huile d'olives</p>
+              <p>Aubergines grillées, parmesan, filet d'huile d'olive — le soleil du Sud dans chaque bouchée. Tomate, mozzarella, aubergines grillées, olives, parmesan, basilic frais, filet d'huile d'olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -434,7 +471,7 @@
             <div class="pizza-img"><img src="images/products/boursin.webp" alt="Boursin" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Boursin</h3>
-              <p>Tomate, mozzarella, boursin, oignons rouges, viande hachée, champignons</p>
+              <p>Le boursin fondu crée une onctuosité inattendue sur base tomate — surprenant et addictif. Tomate, mozzarella, boursin, oignons rouges, viande hachée, champignons</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -445,9 +482,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/orientale.webp" alt="Orientale" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
+              <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span><span class="badge badge-new">Nouveauté</span></div>
               <h3>Orientale</h3>
-              <p>Tomate, mozzarella, merguez, poivrons, olives, oeuf</p>
+              <p>Les saveurs du Maghreb sur une pâte napolitaine — une rencontre qui fonctionne. Tomate, mozzarella, merguez, poivrons, olives, œuf</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -459,7 +496,7 @@
             <div class="pizza-img"><img src="images/products/luciano.webp" alt="Luciano" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Luciano</h3>
-              <p>Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilic frais</p>
+              <p>La Méditerranée dans une pizza — soleil, légèreté, caractère. Tomate, mozzarella, aubergines, fromage de chèvre, tomates cerises, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -471,7 +508,7 @@
             <div class="pizza-img"><img src="images/products/pescatore.webp" alt="Pescatore" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Pescatore</h3>
-              <p>Tomate, mozzarella, noix de fruits de mer, persillade, olives, basilic frais</p>
+              <p>L'océan rencontre Naples — fruits de mer généreux, persillade parfumée. Tomate, mozzarella, fruits de mer, persillade, olives, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -483,7 +520,7 @@
             <div class="pizza-img"><img src="images/products/gaetano.webp" alt="Gaetano" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Gaetano</h3>
-              <p>Tomate, mozzarella, poulet, tomates cerises, oeuf</p>
+              <p>Poulet fondant, tomates cerises sucrées, œuf doré — simple, généreux, efficace. Tomate, mozzarella, poulet, tomates cerises, œuf</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -495,7 +532,7 @@
             <div class="pizza-img"><img src="images/products/burrata.webp" alt="Burrata" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Burrata</h3>
-              <p>Tomate, mozzarella, mozzarella burrata, roquette, huile d'olives</p>
+              <p>La burrata déposée à chaud — elle fond sur la pizza, c'est la bonne idée. Tomate, mozzarella, mozzarella burrata, roquette, huile d'olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -507,7 +544,7 @@
             <div class="pizza-img"><img src="images/products/la-polo.webp" alt="La Polo" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>La Polo</h3>
-              <p>Tomate, mozzarella, poulet, oignons rouges, pommes de terre</p>
+              <p>Réconfortante comme un plat du dimanche — pommes de terre, poulet, oignons confits. Tomate, mozzarella, poulet, oignons rouges, pommes de terre</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -518,8 +555,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/del-capo.webp" alt="Del Capo" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span></div>
               <h3>Del Capo</h3>
-              <p>Tomate, mozzarella, viande hachée, merguez, oeuf</p>
+              <p>Deux viandes, un œuf, une pizza qui tient — pour les grandes faims. Tomate, mozzarella, viande hachée, merguez, œuf</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -540,7 +578,7 @@
             <div class="pizza-img"><img src="images/products/moutarde.webp" alt="Moutarde" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Moutarde</h3>
-              <p>Crème fraiche, Moutarde au miel, mozzarella, poulet mariné, oignons rouges</p>
+              <p>La moutarde au miel change tout — douce, acidulée, inattendue sur une pizza. Crème fraîche, moutarde au miel, mozzarella, poulet mariné, oignons rouges</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -553,7 +591,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
               <h3>Raclette</h3>
-              <p>Crème fraîche, mozzarella, jambon, pommes de terre, raclette</p>
+              <p>Fondante, généreuse, réconfortante — notre best-seller crème. Crème fraîche, mozzarella, jambon, pommes de terre, raclette</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -565,7 +603,7 @@
             <div class="pizza-img"><img src="images/products/figue-chevre.webp" alt="Figue chèvre" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Figue Chèvre</h3>
-              <p>Crème fraîche, mozzarella, jambon, fromage de chèvre, miel, figue séchées, noix</p>
+              <p>Le sucré-salé qu'on commande une fois et qu'on redemande. Crème fraîche, mozzarella, jambon, fromage de chèvre, miel, figues séchées, noix</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -576,9 +614,8 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/norvegienne.webp" alt="Norvegienne" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Norvegienne</h3>
-              <p>Crème fraîche, mozzarella, saumon fumé, tomates cerises, citron</p>
+              <p>Fraîche et élégante — le saumon fumé sur crème, relevé d'un zeste de citron. Crème fraîche, mozzarella, saumon fumé, tomates cerises, citron</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -590,7 +627,7 @@
             <div class="pizza-img"><img src="images/products/maya.webp" alt="Maya" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Maya</h3>
-              <p>Crème fraîche, mozzarella, fromage de chèvre, miel, olives</p>
+              <p>Doux, salin, presque délicat — le chèvre au miel est une évidence sur crème fraîche. Crème fraîche, mozzarella, fromage de chèvre, miel, olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -602,7 +639,7 @@
             <div class="pizza-img"><img src="images/products/tartiflette.webp" alt="Tartiflette" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Tartiflette</h3>
-              <p>Crème fraîche, mozzarella, lardons, pommes de terre, oignons, raclette</p>
+              <p>La tartiflette en version pizza — fromage fondu, lardons grillés, pommes de terre moelleuses. Crème fraîche, mozzarella, lardons, pommes de terre, oignons, raclette</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -615,7 +652,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-sig">✦ Signature</span></div>
               <h3>Barbecue</h3>
-              <p>Sauce barbecue, mozzarella, viande hachée, champignons, poivrons grillés</p>
+              <p>Sauce maison fumée, poivrons grillés — notre signature hors base tomate/crème. Sauce barbecue, mozzarella, viande hachée, champignons, poivrons grillés</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -626,9 +663,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/indienne.webp" alt="Indienne" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-pop">⭐ Populaire</span></div>
+              <div class="card-badges"><span class="badge badge-hot">🌶 Épicée</span><span class="badge badge-pop">⭐ Populaire</span></div>
               <h3>Indienne</h3>
-              <p>Curry, mozzarella, poulet mariné, oignons rouges, poivrons grillés</p>
+              <p>Poulet mariné au curry, poivrons grillés — une pizza qui change tout. Curry, mozzarella, poulet mariné, oignons rouges, poivrons grillés</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -641,7 +678,7 @@
             <div class="pizza-info">
               <div class="card-badges"><span class="badge badge-new">Nouveauté</span></div>
               <h3>Roquette</h3>
-              <p>Crème fraîche, mozzarella, jambon, tomates cerices, roquette, huile d'olives</p>
+              <p>La roquette posée à la sortie du four — amère, fraîche, elle allège et réveille. Crème fraîche, mozzarella, jambon, tomates cerises, roquette, huile d'olives</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -652,8 +689,9 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/la-truffe.webp" alt="La truffe" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
+              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>La Truffe</h3>
-              <p>Crème fraîche, mozzarella, crème de truffe, roquette, eclat de parmesan</p>
+              <p>Le luxe discret — la truffe se révèle à chaque bouchée, le parmesan tient la balance. Crème fraîche, mozzarella, crème de truffe, roquette, éclats de parmesan</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>14,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -664,9 +702,8 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/biggy.webp" alt="La Biggy" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>La Biggy</h3>
-              <p>Sauce biggy, mozzarella, viande hachée, oignons rouges, tomates cerises, cheddar</p>
+              <p>Le burger revu par le pizzaïolo — sauce maison, cheddar fondu, viande hachée sur pâte artisanale. Sauce biggy, mozzarella, viande hachée, oignons rouges, tomates cerises, cheddar</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -678,7 +715,7 @@
             <div class="pizza-img"><img src="images/products/printanniere.webp" alt="Printannière" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>La Printannière</h3>
-              <p>Crème fraiche, mozzarella, fromage de chèvre, courgette, roquette, basilic frais</p>
+              <p>Légèreté et fraîcheur — courgette, chèvre, roquette et basilic sur une base douce. Crème fraîche, mozzarella, fromage de chèvre, courgette, roquette, basilic frais</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -689,9 +726,8 @@
           <div class="pizza-card">
             <div class="pizza-img"><img src="images/products/fermiere.webp" alt="Fermière" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
-              <div class="card-badges"><span class="badge badge-veg">🌿 Végé</span></div>
               <h3>Fermière</h3>
-              <p>Crème fraîche, mozzarella, poulet, pommes de terre, champignons</p>
+              <p>Généreuse et paysanne — poulet rôti, pommes de terre moelleuses, champignons fondants. Crème fraîche, mozzarella, poulet, pommes de terre, champignons</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>12,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -703,7 +739,7 @@
             <div class="pizza-img"><img src="images/products/dianola.webp" alt="Dianola" loading="lazy" width="600" height="471"></div>
             <div class="pizza-info">
               <h3>Dianola</h3>
-              <p>Crème fraîche, mozzarella, oignons rouges, mozzarella Di Buffala</p>
+              <p>Épurée et raffinée — mozzarella Di Buffala fondante, oignons rouges doux, sur crème. Crème fraîche, mozzarella, oignons rouges, mozzarella Di Buffala</p>
               <div class="pizza-footer">
                 <div class="pizza-price"><strong>13,50€</strong></div>
                 <button class="btn-add">Choisir</button>
@@ -982,7 +1018,7 @@
       <div class="tab-content hidden" id="tab-formules">
         <div class="formules-grid">
 
-          <div class="formule-card formule-gourmand">
+          <div class="formule-card formule-gourmand" id="formule-card-gourmand">
             <div class="formule-header">
               <span class="formule-icon-big">🍕🍕🍕</span>
               <div class="formule-badge formule-badge-gold">Menu Gourmand</div>
@@ -1058,25 +1094,11 @@
     </div>
   </section>
 
-  <!-- ===== CROSS-PROMO MY THAI ===== -->
-  <section class="section-mythai">
-    <div class="container mythai-inner">
-      <div class="mythai-left">
-        <div class="mythai-brand">
-          <span class="mythai-b1">My Thai</span>
-          <span class="mythai-b2">Street Food</span>
-        </div>
-        <p class="mythai-desc">Envie de cuisine thaïlandaise ce soir ? Currys, pad thaï, nouilles sautées… commandez aussi sur My Thai.</p>
-      </div>
-      <a href="http://mythai.ai-autoheal.com" target="_blank" rel="noopener" class="mythai-cta">Commander sur My Thai →</a>
-    </div>
-  </section>
-
   <!-- ===== COMMANDER ===== -->
   <section id="commander" class="section-commander">
     <div class="container">
       <h2 class="section-title white">Votre panier</h2>
-      <p class="section-sub white">Ajoutez vos pizzas depuis le menu, puis choisissez livraison ou retrait</p>
+      <p class="section-sub white">C'est prêt en ~15 min à emporter, ~30 min livré chez vous — cuit à la commande.</p>
 
       <div class="cart-infobadges">
         <span>🛵 Livraison · gratuite ou +2€ · minimum 20€</span>
@@ -1175,7 +1197,7 @@
   <!-- ===== AVIS CLIENTS ===== -->
   <section id="avis" class="section-avis">
     <div class="container">
-      <h2 class="section-title">Ce que disent nos clients</h2>
+      <h2 class="section-title">Ils ont goûté. Voilà pourquoi ils reviennent.</h2>
       <div class="avis-score">
         <span class="score-num">4.8</span>
         <div>
@@ -1278,6 +1300,20 @@
     </div>
   </section>
 
+  <!-- ===== CROSS-PROMO MY THAI ===== -->
+ <section class="section-mythai">
+    <div class="container mythai-inner">
+      <div class="mythai-left">
+        <div class="mythai-brand">
+          <span class="mythai-b1">My Thai</span>
+          <span class="mythai-b2">Street Food</span>
+        </div>
+        <p class="mythai-desc">Envie de cuisine thaïlandaise ce soir ? Currys, pad thaï, nouilles sautées… commandez aussi sur My Thai.</p>
+      </div>
+      <a href="http://mythai.fr" target="_blank" rel="noopener" class="mythai-cta">Commander sur My Thai →</a>
+    </div>
+  </section>
+
   <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container footer-inner">
@@ -1286,7 +1322,7 @@
           <img src="images/svg/logo_panuozzo_transparent.webp" alt="Logo PANUOZZO" class="footer-logo-img" width="200" height="149" loading="lazy">
           <span class="logo-text"><span class="brand-red">Pan</span><span class="brand-white">uoz</span><span class="brand-green">zo</span></span>
         </div>
-        <p>Pizzeria artisanale à Bougival<br>Livraison &amp; à emporter</p>
+        <p>Pizza napolitaine, pâte maison, four à bois.<br>Livraison &amp; à emporter — Bougival.</p>
       </div>
       <div class="footer-links">
         <a href="#menu">Menu</a>
@@ -1361,6 +1397,10 @@
             <input type="text" id="d-city" placeholder="Bougival" autocomplete="address-level2" required>
             <span class="form-error" id="d-city-err"></span>
           </div>
+        </div>
+
+        <div id="d-delivery-fee-notice" style="display:none;background:#fff8e1;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;font-size:.88rem;color:#92400e;margin-bottom:4px;">
+          🛵 Frais de livraison : <strong>+2,00€</strong> (hors zone gratuite)
         </div>
 
         <div class="form-row">
@@ -1476,7 +1516,7 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=20"></script>
+  <script src="js/main.js?v=21"></script>
 
   <!-- ===== BANNIÈRE COOKIES ===== -->
   <div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:rgba(255,255,255,.85);padding:14px 20px;z-index:9999;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.8rem;box-shadow:0 -4px 20px rgba(0,0,0,.25);">

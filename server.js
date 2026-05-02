@@ -482,7 +482,11 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), async (req, 
   }
 
   if (event.type === 'checkout.session.completed') {
-    try { await processOrder(event.data.object); } catch (err) { console.error('Webhook order error:', err.message); }
+    const session = event.data.object;
+    if (session.metadata?.source !== 'site_panuozzo') {
+      return res.json({ received: true }); // commande d'un autre restaurant, on ignore
+    }
+    try { await processOrder(session); } catch (err) { console.error('Webhook order error:', err.message); }
   }
 
   res.json({ received: true });
@@ -757,6 +761,9 @@ app.get('/api/confirm', rlCheckout, async (req, res) => {
     if (session.payment_status !== 'paid') {
       return res.status(402).json({ error: 'Paiement non complété' });
     }
+    if (session.metadata?.source !== 'site_panuozzo') {
+      return res.status(400).json({ error: 'Session invalide pour ce restaurant' });
+    }
     await processOrder(session);
     res.json({ ok: true });
   } catch (err) {
@@ -764,6 +771,15 @@ app.get('/api/confirm', rlCheckout, async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
+
+// ── Zones de livraison ───────────────────────────────────
+const FREE_DELIVERY_ZIPS = new Set(['78380', '78430', '78170']); // Bougival, Louveciennes, La Celle-Saint-Cloud
+const DELIVERY_FEE_EUR   = 2;
+
+function getDeliveryFee(deliveryMode, zip) {
+  if (deliveryMode !== 'livraison') return 0;
+  return FREE_DELIVERY_ZIPS.has((zip || '').trim()) ? 0 : DELIVERY_FEE_EUR;
+}
 
 // ── Vérification horaires d'ouverture ────────────────────
 function isRestaurantOpen() {
@@ -830,6 +846,19 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
       },
       quantity: parseInt(item.qty || 1, 10),
     }));
+
+    // Frais de livraison selon la zone (forcé côté serveur)
+    const deliveryFee = getDeliveryFee(delivery?.mode, delivery?.zip);
+    if (deliveryFee > 0) {
+      line_items.push({
+        price_data: {
+          currency: 'eur',
+          product_data: { name: 'Frais de livraison' },
+          unit_amount: deliveryFee * 100,
+        },
+        quantity: 1,
+      });
+    }
 
     // Vérification côté serveur de l'éligibilité promo — atomique via mutex
     let promoApplied = false;
@@ -1505,6 +1534,22 @@ app.patch('/api/tablette-proxy/mythai/orders/:id/status', express.json(), tablet
     { 'x-session-token': token }, res);
 });
 
+app.post('/api/tablette-proxy/mythai/print/test', tabletteAuth, async (req, res) => {
+  const token = await getMythaiToken();
+  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+  const proxyReq = http.request(
+    { hostname: 'localhost', port: MYTHAI_PORT, path: '/api/print/test', method: 'POST',
+      headers: { 'x-session-token': token } },
+    (proxyRes) => {
+      res.status(proxyRes.statusCode);
+      res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'application/octet-stream');
+      proxyRes.pipe(res);
+    }
+  );
+  proxyReq.on('error', () => res.status(503).json({ error: 'My Thai server unavailable' }));
+  proxyReq.end();
+});
+
 app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, async (req, res) => {
   const token = await getMythaiToken();
   if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
@@ -1525,7 +1570,7 @@ app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, async (req
 app.use('/api/proxy/mythai', adminAuth, async (req, res) => {
   const token = await getMythaiToken();
   if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
-  proxyToMythai(`/api/admin${req.url}`, req.method, req.body,
+  proxyToMythai(req.url, req.method, req.body,
     { 'x-admin-password': token }, res);
 });
 
