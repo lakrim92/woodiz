@@ -2,6 +2,15 @@
    PANUOZZO – main.js
    ========================================= */
 
+// ── Coupe du Monde 2026 (11 juin → 19 juillet) ───────────
+(function() {
+  const now   = new Date();
+  const start = new Date('2026-06-11');
+  const end   = new Date('2026-07-20'); // exclusif
+  const el    = document.getElementById('section-coupe');
+  if (el && now >= start && now < end) el.style.display = '';
+})();
+
 // ── Burger menu ──────────────────────────────────────────
 const burger    = document.getElementById('burger');
 const mobileNav = document.getElementById('mobile-nav');
