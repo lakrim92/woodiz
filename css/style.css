@@ -540,9 +540,10 @@ nav a:hover::after { transform: scaleX(1); }
 .coupe-btn:hover { background: var(--red2); transform: translateY(-2px); }
 @media (max-width: 768px) {
   .section-coupe { padding: 36px 0 40px; }
-  .coupe-inner { flex-direction: column; text-align: center; gap: 20px; }
-  .coupe-ball { font-size: 2.4rem; }
-  .coupe-btn { width: 100%; justify-content: center; }
+  .coupe-inner { flex-direction: column; align-items: stretch; text-align: center; gap: 20px; }
+  .coupe-ball { font-size: 2.4rem; align-self: center; }
+  .coupe-text { width: 100%; }
+  .coupe-btn { display: flex; width: 100%; justify-content: center; box-sizing: border-box; margin-top: 4px; }
 }
 
 .section-title {
