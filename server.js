@@ -860,15 +860,12 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
       });
     }
 
-    // Vérification côté serveur de l'éligibilité promo — atomique via mutex
+    // Vérification côté serveur de l'éligibilité promo
+    // markPromoUsed n'est PAS appelé ici — seulement dans le webhook après paiement confirmé,
+    // pour éviter de bloquer les clients qui abandonnent la session Stripe et reviennent.
     let promoApplied = false;
-    if (applyPromo && promoEmail) {
-      await fileMutex.run(() => {
-        if (isPromoEligible(promoEmail)) {
-          markPromoUsed(promoEmail);
-          promoApplied = true;
-        }
-      });
+    if (promoEmail) {
+      promoApplied = isPromoEligible(promoEmail);
     }
     let discounts = undefined;
     if (promoApplied) {
@@ -1424,33 +1421,11 @@ app.post('/api/admin/google', adminAuth, express.json(), (req, res) => {
 // ── Proxy My Thai admin API ────────────────────────────────
 // Permet au dashboard unifié d'interroger mythai sans CORS
 const MYTHAI_PORT = parseInt(process.env.MYTHAI_PORT) || 3006;
-let _mythaiToken = null;
-let _mythaiTokenExpiry = 0;
 
-function getMythaiToken() {
-  return new Promise((resolve) => {
-    if (_mythaiToken && Date.now() < _mythaiTokenExpiry) return resolve(_mythaiToken);
-    const pwd  = process.env.MYTHAI_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
-    const body = JSON.stringify({ password: pwd });
-    const req  = http.request(
-      { hostname: 'localhost', port: MYTHAI_PORT, path: '/api/auth/admin', method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
-      (res) => {
-        let raw = '';
-        res.on('data', c => raw += c);
-        res.on('end', () => {
-          try {
-            const d = JSON.parse(raw);
-            if (d.ok) { _mythaiToken = d.token; _mythaiTokenExpiry = Date.now() + 7 * 3600_000; }
-          } catch { /* ignore */ }
-          resolve(_mythaiToken);
-        });
-      }
-    );
-    req.on('error', () => resolve(null));
-    req.write(body);
-    req.end();
-  });
+function getMythaiInternalHeader() {
+  const key = process.env.MYTHAI_INTERNAL_API_KEY;
+  if (!key) { console.error('⚠️  MYTHAI_INTERNAL_API_KEY manquant dans .env'); return null; }
+  return { 'x-internal-api-key': key };
 }
 
 function proxyToMythai(apiPath, method, body, extraHeaders, res) {
@@ -1482,9 +1457,9 @@ function proxyToMythai(apiPath, method, body, extraHeaders, res) {
 }
 
 // SSE en temps réel pour mythai (proxy stream — admin dashboard)
-app.get('/api/proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
-  const token = await getMythaiToken();
-  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+app.get('/api/proxy/mythai/orders/stream', tabletteAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) return res.status(503).json({ error: 'My Thai server unavailable' });
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
@@ -1493,7 +1468,7 @@ app.get('/api/proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
   const pr = http.request(
     { hostname: 'localhost', port: MYTHAI_PORT,
       path: '/api/orders/stream',
-      method: 'GET', headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', 'x-session-token': token } },
+      method: 'GET', headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', ...headers } },
     (proxyRes) => { proxyRes.pipe(res); proxyRes.on('end', () => res.end()); }
   );
   pr.on('error', () => { try { res.write('event: error\ndata: {}\n\n'); res.end(); } catch { /* closed */ } });
@@ -1502,24 +1477,22 @@ app.get('/api/proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
 });
 
 // ── Proxy My Thai — accès tablette cuisine ─────────────────
-// tabletteAuth woodiz, proxie vers My Thai avec token admin My Thai (x-session-token)
-
-app.get('/api/tablette-proxy/mythai/orders/stream', tabletteAuth, async (req, res) => {
-  const token = await getMythaiToken();
+app.get('/api/tablette-proxy/mythai/orders/stream', tabletteAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) {
+    try { res.write('event: error\ndata: {"error":"My Thai unavailable"}\n\n'); res.end(); } catch { /* closed */ }
+    return;
+  }
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders();
-  if (!token) {
-    res.write('event: error\ndata: {"error":"My Thai unavailable"}\n\n');
-    return res.end();
-  }
   const pr = http.request(
     { hostname: 'localhost', port: MYTHAI_PORT,
       path: '/api/orders/stream',
       method: 'GET',
-      headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', 'x-session-token': token } },
+      headers: { 'Accept': 'text/event-stream', 'Cache-Control': 'no-cache', ...headers } },
     (proxyRes) => { proxyRes.pipe(res); proxyRes.on('end', () => res.end()); }
   );
   pr.on('error', () => { try { res.write('event: error\ndata: {}\n\n'); res.end(); } catch { /* closed */ } });
@@ -1527,19 +1500,17 @@ app.get('/api/tablette-proxy/mythai/orders/stream', tabletteAuth, async (req, re
   pr.end();
 });
 
-app.patch('/api/tablette-proxy/mythai/orders/:id/status', express.json(), tabletteAuth, async (req, res) => {
-  const token = await getMythaiToken();
-  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
-  proxyToMythai(`/api/orders/${req.params.id}/status`, 'PATCH', req.body,
-    { 'x-session-token': token }, res);
+app.patch('/api/tablette-proxy/mythai/orders/:id/status', express.json(), tabletteAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) return res.status(503).json({ error: 'My Thai server unavailable' });
+  proxyToMythai(`/api/orders/${req.params.id}/status`, 'PATCH', req.body, headers, res);
 });
 
-app.post('/api/tablette-proxy/mythai/print/test', tabletteAuth, async (req, res) => {
-  const token = await getMythaiToken();
-  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+app.post('/api/tablette-proxy/mythai/print/test', tabletteAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) return res.status(503).json({ error: 'My Thai server unavailable' });
   const proxyReq = http.request(
-    { hostname: 'localhost', port: MYTHAI_PORT, path: '/api/print/test', method: 'POST',
-      headers: { 'x-session-token': token } },
+    { hostname: 'localhost', port: MYTHAI_PORT, path: '/api/print/test', method: 'POST', headers },
     (proxyRes) => {
       res.status(proxyRes.statusCode);
       res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'application/octet-stream');
@@ -1550,12 +1521,12 @@ app.post('/api/tablette-proxy/mythai/print/test', tabletteAuth, async (req, res)
   proxyReq.end();
 });
 
-app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, async (req, res) => {
-  const token = await getMythaiToken();
-  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
+app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) return res.status(503).json({ error: 'My Thai server unavailable' });
   const proxyReq = http.request(
     { hostname: 'localhost', port: MYTHAI_PORT, path: `/api/orders/${req.params.id}/print`, method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-session-token': token } },
+      headers: { 'Content-Type': 'application/json', ...headers } },
     (proxyRes) => {
       res.status(proxyRes.statusCode);
       res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'application/octet-stream');
@@ -1567,11 +1538,10 @@ app.post('/api/tablette-proxy/mythai/orders/:id/print', tabletteAuth, async (req
 });
 
 // Routes admin mythai (stats, orders, export, delete)
-app.use('/api/proxy/mythai', adminAuth, async (req, res) => {
-  const token = await getMythaiToken();
-  if (!token) return res.status(503).json({ error: 'My Thai server unavailable' });
-  proxyToMythai(req.url, req.method, req.body,
-    { 'x-admin-password': token }, res);
+app.use('/api/proxy/mythai', adminAuth, (req, res) => {
+  const headers = getMythaiInternalHeader();
+  if (!headers) return res.status(503).json({ error: 'My Thai server unavailable' });
+  proxyToMythai(req.url, req.method, req.body, headers, res);
 });
 
 // ── Fichiers statiques ────────────────────────────────────
