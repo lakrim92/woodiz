@@ -139,8 +139,12 @@ async function getPromoCouponId() {
     name:        'Première commande -10%',
   });
   _promoCouponId = coupon.id;
-  console.log(`✅ Coupon promo créé : ${coupon.id} — ajoutez PROMO_COUPON_ID=${coupon.id} dans .env`);
+  console.log(`✅ Coupon promo créé : ${coupon.id} — mettez à jour PROMO_COUPON_ID=${coupon.id} dans .env`);
   return _promoCouponId;
+}
+async function invalidateExpiredCoupon() {
+  _promoCouponId = null;
+  console.log('⚠️  Coupon promo expiré/invalide — un nouveau sera créé à la prochaine commande promo');
 }
 
 // ── Persistance commandes ──────────────────────────────────
@@ -873,20 +877,44 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
       discounts = [{ coupon: couponId }];
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items,
-      mode: 'payment',
-      success_url: `${process.env.SITE_URL}/merci.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${process.env.SITE_URL}/#commander`,
-      locale: 'fr',
-      ...(discounts ? { discounts } : {}),
-      metadata: {
-        source:      'site_panuozzo',
-        delivery:    JSON.stringify(delivery || {}),
-        promoEmail:  promoApplied ? promoEmail.trim().toLowerCase() : '',
-      },
-    });
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items,
+        mode: 'payment',
+        success_url: `${process.env.SITE_URL}/merci.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url:  `${process.env.SITE_URL}/#commander`,
+        locale: 'fr',
+        ...(discounts ? { discounts } : {}),
+        metadata: {
+          source:      'site_panuozzo',
+          delivery:    JSON.stringify(delivery || {}),
+          promoEmail:  promoApplied ? promoEmail.trim().toLowerCase() : '',
+        },
+      });
+    } catch (stripeErr) {
+      // Si le coupon est expiré, réessayer sans la promo plutôt que de bloquer la commande
+      if (discounts && stripeErr.message?.toLowerCase().includes('expired')) {
+        await invalidateExpiredCoupon();
+        session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card'],
+          line_items,
+          mode: 'payment',
+          success_url: `${process.env.SITE_URL}/merci.html?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url:  `${process.env.SITE_URL}/#commander`,
+          locale: 'fr',
+          metadata: {
+            source:      'site_panuozzo',
+            delivery:    JSON.stringify(delivery || {}),
+            promoEmail:  '',
+          },
+        });
+        console.error('⚠️  Coupon expiré — commande créée sans promo. Mettez à jour PROMO_COUPON_ID dans .env');
+      } else {
+        throw stripeErr;
+      }
+    }
 
     // Sauvegarder les items complets (avec desc/added/removed) — persisté sur disque
     savePendingItem(session.id, items);
