@@ -962,12 +962,46 @@ const deliveryModal      = document.getElementById('delivery-modal');
 const deliveryModalClose = document.getElementById('delivery-modal-close');
 const deliveryForm       = document.getElementById('delivery-form');
 
-const FREE_DELIVERY_ZIPS = new Set(['78380', '78430', '78170']);
+const FREE_DELIVERY_ZIPS   = new Set(['78380', '78430', '78170']); // livraison gratuite
+const GARCHES_ZIPS         = new Set(['92380']); // Garches : +3€
+const ALLOWED_DELIVERY_ZIPS = new Set([
+  '78380', // Bougival
+  '78430', // Louveciennes
+  '78170', // La Celle-Saint-Cloud
+  '78230', // Le Pecq
+  '78290', // Croissy-sur-Seine
+  '78400', // Chatou
+  '78160', // Marly-le-Roi
+  '92500', // Rueil-Malmaison
+  '92210', // Saint-Cloud
+  '92380', // Garches
+]);
 
 document.getElementById('d-zip').addEventListener('input', (e) => {
   const zip = e.target.value.trim();
   const notice = document.getElementById('d-delivery-fee-notice');
-  if (notice) notice.style.display = (zip.length === 5 && !FREE_DELIVERY_ZIPS.has(zip)) ? 'block' : 'none';
+  const errEl  = document.getElementById('d-zip-err');
+  const input  = document.getElementById('d-zip');
+
+  if (zip.length === 5) {
+    if (!ALLOWED_DELIVERY_ZIPS.has(zip)) {
+      input.classList.add('input-error');
+      if (errEl) errEl.textContent = 'Nous ne livrons pas dans cette zone. Villes desservies : Bougival, Louveciennes, La Celle-Saint-Cloud, Le Pecq, Croissy-sur-Seine, Chatou, Marly-le-Roi, Rueil-Malmaison, Saint-Cloud, Garches.';
+      if (notice) notice.style.display = 'none';
+    } else {
+      input.classList.remove('input-error');
+      if (errEl) errEl.textContent = '';
+      if (notice) {
+        const fee = GARCHES_ZIPS.has(zip) ? '3,00€' : '2,00€';
+        notice.innerHTML = `🛵 Frais de livraison : <strong>+${fee}</strong> (hors zone gratuite)`;
+        notice.style.display = !FREE_DELIVERY_ZIPS.has(zip) ? 'block' : 'none';
+      }
+    }
+  } else {
+    input.classList.remove('input-error');
+    if (errEl) errEl.textContent = '';
+    if (notice) notice.style.display = 'none';
+  }
 });
 
 // Formules disponibles uniquement à emporter
@@ -1087,6 +1121,16 @@ deliveryForm.addEventListener('submit', (e) => {
     }
   }
   if (!valid) return;
+
+  // Blocage zone hors secteur
+  if (!ALLOWED_DELIVERY_ZIPS.has(fields.zip.val)) {
+    const zipInput = document.getElementById('d-zip');
+    const zipErr   = document.getElementById('d-zip-err');
+    zipInput.classList.add('input-error');
+    zipErr.textContent = 'Nous ne livrons pas dans cette zone. Villes desservies : Bougival, Louveciennes, La Celle-Saint-Cloud, Le Pecq, Croissy-sur-Seine, Chatou, Marly-le-Roi, Rueil-Malmaison, Saint-Cloud, Garches.';
+    zipInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   deliveryInfo = {
     mode:      'livraison',

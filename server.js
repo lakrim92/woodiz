@@ -778,11 +778,28 @@ app.get('/api/confirm', rlCheckout, async (req, res) => {
 
 // ── Zones de livraison ───────────────────────────────────
 const FREE_DELIVERY_ZIPS = new Set(['78380', '78430', '78170']); // Bougival, Louveciennes, La Celle-Saint-Cloud
-const DELIVERY_FEE_EUR   = 2;
+const ALLOWED_DELIVERY_ZIPS = new Set([
+  '78380', // Bougival
+  '78430', // Louveciennes
+  '78170', // La Celle-Saint-Cloud
+  '78230', // Le Pecq
+  '78290', // Croissy-sur-Seine
+  '78400', // Chatou
+  '78160', // Marly-le-Roi
+  '92500', // Rueil-Malmaison
+  '92210', // Saint-Cloud
+  '92380', // Garches
+]);
+const DELIVERY_FEE_EUR        = 2;
+const DELIVERY_FEE_GARCHES_EUR = 3;
+const GARCHES_ZIPS            = new Set(['92380']); // Garches
 
 function getDeliveryFee(deliveryMode, zip) {
   if (deliveryMode !== 'livraison') return 0;
-  return FREE_DELIVERY_ZIPS.has((zip || '').trim()) ? 0 : DELIVERY_FEE_EUR;
+  const z = (zip || '').trim();
+  if (FREE_DELIVERY_ZIPS.has(z))  return 0;
+  if (GARCHES_ZIPS.has(z))        return DELIVERY_FEE_GARCHES_EUR;
+  return DELIVERY_FEE_EUR;
 }
 
 // ── Vérification horaires d'ouverture ────────────────────
@@ -836,6 +853,14 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
 
     if (!isRestaurantOpen()) {
       return res.status(403).json({ error: 'Le restaurant est actuellement fermé. Les commandes ne sont pas acceptées.' });
+    }
+
+    // Blocage des commandes hors zone de livraison
+    if (delivery?.mode === 'livraison') {
+      const zip = (delivery?.zip || '').trim();
+      if (!ALLOWED_DELIVERY_ZIPS.has(zip)) {
+        return res.status(400).json({ error: 'Adresse hors zone de livraison. Nous livrons uniquement à Bougival, Louveciennes, La Celle-Saint-Cloud, Le Pecq, Croissy-sur-Seine, Chatou, Marly-le-Roi, Rueil-Malmaison, Saint-Cloud et Garches.' });
+      }
     }
 
     const line_items = items.map(item => ({
