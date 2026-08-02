@@ -1204,9 +1204,17 @@ async function payWithStripe() {
     }
   }
 
-  // Minimum 20€ pour toute commande
-  if (total < 20) {
-    alert(`Commande minimum 20€.\nVotre panier : ${total.toFixed(2).replace('.', ',')}€`);
+  // Minimum 20€ après réduction éventuelle
+  const promoEmail = deliveryInfo?.mode === 'livraison'
+    ? document.getElementById('d-email').value.trim()
+    : (deliveryInfo?.email || '');
+  const promoWillApply = promoState.eligible && promoState.email === promoEmail;
+  const effectiveTotal = promoWillApply ? total * 0.9 : total;
+  if (effectiveTotal < 20) {
+    const msg = promoWillApply
+      ? `Commande minimum 20€ après réduction.\nAprès -10% : ${effectiveTotal.toFixed(2).replace('.', ',')}€ (panier : ${total.toFixed(2).replace('.', ',')}€).`
+      : `Commande minimum 20€.\nVotre panier : ${total.toFixed(2).replace('.', ',')}€`;
+    alert(msg);
     return;
   }
 
@@ -1217,11 +1225,6 @@ async function payWithStripe() {
   if (activeBtn) { activeBtn.disabled = true; activeBtn.textContent = 'Redirection...'; }
 
   try {
-    // Récupère l'email promo selon le mode (livraison = d-email, emporter = e-email via deliveryInfo)
-    const promoEmail = deliveryInfo?.mode === 'livraison'
-      ? document.getElementById('d-email').value.trim()
-      : (deliveryInfo?.email || '');
-
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

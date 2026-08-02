@@ -845,10 +845,12 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
       }
     }
 
-    // Minimum de commande : 20€
+    // Minimum de commande : 20€ après réduction éventuelle
     const orderTotal = items.reduce((s, i) => s + parseFloat(i.price) * parseInt(i.qty || 1, 10), 0);
-    if (orderTotal < 20) {
-      return res.status(400).json({ error: 'Montant minimum de commande : 20€' });
+    const promoEligible = promoEmail ? isPromoEligible(promoEmail) : false;
+    const effectiveTotal = promoEligible ? orderTotal * 0.9 : orderTotal;
+    if (effectiveTotal < 20) {
+      return res.status(400).json({ error: 'Montant minimum de commande : 20€ (réduction incluse)' });
     }
 
     if (!isRestaurantOpen()) {
@@ -892,10 +894,7 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
     // Vérification côté serveur de l'éligibilité promo
     // markPromoUsed n'est PAS appelé ici — seulement dans le webhook après paiement confirmé,
     // pour éviter de bloquer les clients qui abandonnent la session Stripe et reviennent.
-    let promoApplied = false;
-    if (promoEmail) {
-      promoApplied = isPromoEligible(promoEmail);
-    }
+    let promoApplied = promoEligible;
     let discounts = undefined;
     if (promoApplied) {
       const couponId = await getPromoCouponId();
