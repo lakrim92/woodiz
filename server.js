@@ -802,13 +802,20 @@ function getDeliveryFee(deliveryMode, zip) {
   return DELIVERY_FEE_EUR;
 }
 
+// ── Fermetures exceptionnelles (format YYYY-MM-DD) ───────
+const EXCEPTIONAL_CLOSURES = ['2026-08-25'];
+
 // ── Vérification horaires d'ouverture ────────────────────
 function isRestaurantOpen() {
   const now  = new Date();
+  const dateStr = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0');
+  if (EXCEPTIONAL_CLOSURES.includes(dateStr)) return false;
   const day  = now.getDay(); // 0=dim, 1=lun, ..., 6=sam
   const hm   = now.getHours() * 60 + now.getMinutes();
   if (day === 1) return false; // lundi fermé
-  return (hm >= 11 * 60 && hm < 14 * 60 + 30) ||
+  return (hm >= 11 * 60 && hm < 15 * 60) ||
          (hm >= 18 * 60 && hm < 23 * 60);
 }
 
@@ -845,11 +852,11 @@ app.post('/api/checkout', rlCheckout, async (req, res) => {
       }
     }
 
-    // Minimum de commande : 20€ après réduction éventuelle
+    // Minimum de commande : 20€ après réduction éventuelle, livraison uniquement
     const orderTotal = items.reduce((s, i) => s + parseFloat(i.price) * parseInt(i.qty || 1, 10), 0);
     const promoEligible = promoEmail ? isPromoEligible(promoEmail) : false;
     const effectiveTotal = promoEligible ? orderTotal * 0.9 : orderTotal;
-    if (effectiveTotal < 20) {
+    if (delivery?.mode === 'livraison' && effectiveTotal < 20) {
       return res.status(400).json({ error: 'Montant minimum de commande : 20€ (réduction incluse)' });
     }
 
